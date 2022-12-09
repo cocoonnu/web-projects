@@ -1,0 +1,75 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url("./Poppins.ttf");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    font-family: 'Poppins',sans-serif;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    background-color: #025bee;
+}
+
+.container {
+    width: 90%;
+    max-width: 34.37em;
+    margin: 3.12em auto;
+    padding: 3.12em 1.25em;
+    border-radius: 0.43em;
+    background-color: #fff;
+    box-shadow: 0 1.25em 2.18em rgba(1,28,71,0.3);
+}
+
+#file-input {
+    display: none;
+}
+
+#file-lable {
+    display: block;
+    width: 18.75em;
+    padding: 1.12em 0;
+    /* 居中显示 */
+    margin: 0 auto;
+    color: #fff;
+    font-size: 1.12em;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 0.31em;
+    cursor: pointer;
+    background-color: #025bee;
+}
+
+#num-of-files {
+    font-weight: 400;
+    text-align: center;
+    margin: 1.25em 0 1.87em 0;
+}
+
+#files-list {
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+#files-list::-webkit-scrollbar {
+    width: 0;
+}
+
+#files-list li {
+    display: flex;
+    justify-content: space-between;
+    color: #025bee;
+    font-weight: 500;
+    border-radius: 0.3em;
+    background-color: #eff5ff;
+    margin-bottom: 1em;
+    padding: 1.1em 1em;
+}
