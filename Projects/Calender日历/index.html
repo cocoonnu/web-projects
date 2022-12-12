@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calender</title>
+
+    <link rel="stylesheet" href="./style.css">
+    <script src="./script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="calender">
+            
+            <!-- 头部 -->
+            <div class="calender-header">
+                <span class="month-picker" id="month-picker"> May </span>
+                
+                <div class="year-picker" id="year-picker">
+                    <span class="year-change" id="pre-year"><pre><</pre></span>
+                    <span id="year">2022</span>
+                    <span class="year-change" id="next-year"><pre>></pre></span>
+                </div>
+            </div>
+
+            <!-- 内容 -->
+            <div class="calender-body">
+                <div class="calender-week-days">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+
+                <!-- 日期包含div -->
+                <div class="calender-days"></div>
+            </div>
+
+            <!-- 底部 -->
+            <div class="calender-footer"></div>
+
+            <!-- 当前时间 -->
+            <div class="date-time-formate">    
+                <div class="day-text-formate">Today</div>
+
+                <div class="date-time-value">
+                    <div class="time-formate"></div>
+                    <div class="date-formate"></div>
+                </div>
+            </div>
+        
+            <!-- 所有月份 -->
+            <div class="month-list"></div>
+        </div>
+    </div>
+</body>
+</html>
