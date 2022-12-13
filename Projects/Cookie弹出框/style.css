@@ -1,0 +1,93 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url("./Poppins.ttf");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: 'Poppins',sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #4070f4;
+}
+
+.wrapper {
+    position: fixed;
+    bottom: 50px;
+    right: -420px;
+    /* 最大宽度为345px 其余body的100% */
+    max-width: 345px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    /* 上 左右 下 */
+    padding: 15px 25px 22px;
+    transition: right 0.4s;
+}
+
+.show {
+    right: 20px;
+}
+
+.wrapper header {
+    display: flex;
+    align-items: center;
+    /* 列元素之间的间隙 */
+    column-gap: 15px;
+}
+
+.wrapper header i {
+    color: #4070f4;
+    font-size: 32px;
+}
+
+.wrapper header h2 {
+    color: #4070f4;
+    font-weight: 500;
+}
+
+.wrapper .data {
+    margin-top: 16px;
+}
+
+.wrapper .data p {
+    color: #333;
+    font-size: 16px;
+}
+
+.wrapper .data a {
+    color: #4070f4;
+    font-size: 16px;
+    cursor: default;
+} 
+.wrapper .data a:hover {
+    text-decoration: underline;
+} 
+
+.wrapper .buttons {
+    display: flex;
+    /* 宽度占父类的100% 并且子元素两边对齐 */
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.wrapper .buttons button {
+    /* 宽度基于父类的计算！！ */
+    width: calc(50% - 10px);
+    /* 用padding撑大盒子 */
+    padding: 8px 0;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #4070f4;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.wrapper .buttons button:hover {
+    background-color: #034bf1;
+}
