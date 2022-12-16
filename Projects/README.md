@@ -12,7 +12,7 @@ div {
     display: grid;
     place-items: center;
 }
-``` 
+```
 
 # 让body占满整个页面
 ```css
@@ -243,7 +243,7 @@ charCodeAt(str)：返回str的ASCII码
 
 Math.floor(Math.random() * num)：返回0到num-1的整数
 
-navigator.clipboard.writeText(123);：实现用户复制内容
+navigator.clipboard.writeText(123);：实现用户复制内容为123
 
 splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
 
@@ -264,7 +264,13 @@ setInterval(function() {
     console.log(formateTimer);
 },1000)
 
-``` 
+// 数组与字符串互相转化
+Arr.join('/r/n')  Str.split() 
+
+// exec()：正则表达式匹配字符串
+let arr = regStyle.exec(htmlData);
+let cssData = arr[0].replace('<style>','').replace('<\/style>','');
+```
 
 # js细节大全
 ```js
@@ -294,6 +300,8 @@ const cards = `
     }
     </div>        
 `;
+
+// items.map()：返回一个新数组  item.map().join('')：将新数组转化为字符串
 
 // 将cards转化为dom元素 命名为parser
 const parser = new DOMParser().parseFromString(cards,'text/html');

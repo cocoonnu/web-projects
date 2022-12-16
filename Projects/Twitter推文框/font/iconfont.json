@@ -1,0 +1,58 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1114",
+      "name": "网络",
+      "font_class": "wangluo",
+      "unicode": "f00b9",
+      "unicode_decimal": 983225
+    },
+    {
+      "icon_id": "29929",
+      "name": "emoji",
+      "font_class": "emoji",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "3703982",
+      "name": "emoji",
+      "font_class": "emoji1",
+      "unicode": "e67b",
+      "unicode_decimal": 59003
+    },
+    {
+      "icon_id": "29797991",
+      "name": "扫码",
+      "font_class": "saoma",
+      "unicode": "100cf",
+      "unicode_decimal": 65743
+    },
+    {
+      "icon_id": "29798005",
+      "name": "图片",
+      "font_class": "tupian",
+      "unicode": "100d0",
+      "unicode_decimal": 65744
+    },
+    {
+      "icon_id": "29798012",
+      "name": "定位",
+      "font_class": "dingwei",
+      "unicode": "100d1",
+      "unicode_decimal": 65745
+    },
+    {
+      "icon_id": "29798015",
+      "name": "我的",
+      "font_class": "wode",
+      "unicode": "100d2",
+      "unicode_decimal": 65746
+    }
+  ]
+}

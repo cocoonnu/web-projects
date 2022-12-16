@@ -1,0 +1,180 @@
+@font-face {
+    font-family: 'Open Sans';
+    src: url(./Open-Sans.ttf);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    outline: none;
+    border: 0;
+    font-family: 'Open Sans',sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #1da1f2;
+}
+
+/* 主盒子一般不定义高度 都是由内容和padding撑大 */
+.wrapper {
+    max-width: 475px;
+    width: 100%;
+    padding: 25px 25px 15px 25px;
+    background: #fff;
+    border-radius: 15px;
+}
+
+.wrapper .input-box {
+    padding-top: 10px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+/* 输入框部分 */
+.wrapper .input-box .twee-area {
+    /* placeholder、readonly 均脱标 */
+    position: relative;
+    min-height: 130px;
+    max-height: 170px;
+    overflow-y: auto;
+}
+
+.twee-area::-webkit-scrollbar {
+    width: 0;
+}
+
+/* 输入框提示 */
+.twee-area .placeholder {
+    /* 没有给方位+脱标 所以span的margin可以作用于父盒子 */
+    position: absolute;
+    margin-top: -3px;
+    font-size: 22px;
+    color: #98a5b1;
+    /* 元素不能对鼠标事件做出反应。 */
+    pointer-events: none;
+}
+
+/* 输入框输入 */
+.twee-area .input {
+    font-size: 17px;
+    /* 内容如果足够长得话则换行 */
+    word-wrap: break-word;
+    word-break: break-all;
+    letter-spacing: 1px;
+}
+
+.twee-area .input .highlight {
+    background-color: #fd9bb0;
+}
+
+.twee-area .editable {
+    position: relative;
+    z-index: 5;
+}
+
+.twee-area .readonly {
+    /* 参考点：twee-area属性中没写宽度所以宽度为0 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    /* 将文字透明 只留下高亮背景  */
+    color: transparent;
+    background: transparent;
+}
+
+/* 隐私框部分 */
+.wrapper .input-box .privacy {
+    /* 行内块元素flex布局 宽度为内容大小 当然也可以指定宽度 */
+    display: inline-flex;
+    /* 垂直居中 */
+    align-items: center;
+    color: #1da1f2;
+    margin: 15px 0;
+    padding: 7px 10px;
+    border-radius: 50px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+.wrapper .input-box .privacy:hover {
+    background: #e7f5fe;
+}
+
+.privacy i {
+    font-size: 18px;
+}
+
+.privacy span {
+    font-size: 15px;
+    font-weight: 600;
+    margin-left: 7px;
+}
+
+/* 底部栏部分 */
+.wrapper .bottom {
+    /* ul和button两端对齐 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 13px;
+}
+
+/* 图标 */
+.bottom ul {
+    /* 将ul转为行内块，并且flex布局 li垂直居中 */
+    display: inline-flex;
+    align-items: center;
+}
+
+.bottom ul li {
+    width: 38px;
+    height: 38px;
+    color: #1da1f2;
+    font-size: 20px;
+    margin: 0 2px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+    /* 将里面的图标垂直水平居中 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bottom ul li:hover {
+    background: #e7f5fe;
+}
+
+/* 按钮 */
+.bottom .content {
+    display: inline-flex;
+    align-items: center;
+} 
+
+.bottom .content .counter {
+    display: none;
+    margin-right: 15px;
+    padding-right: 15px;
+    border-right: 1px solid #aab8c2;
+}
+
+.bottom .content button {
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 50px;
+    color: #fff;
+    background-color: #1da1f2;
+    padding: 9px 18px;
+    cursor: pointer;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.bottom .content .active {
+    opacity: 1;
+    pointer-events: auto;
+}
