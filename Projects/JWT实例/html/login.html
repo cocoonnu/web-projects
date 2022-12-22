@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录表单页面</title>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        list-style: none;
+        /* 所有边框为0 */
+        border: 0;
+        outline: none;
+        user-select: none;
+        text-decoration: none;
+        font-family: 'Varela Round',serif;
+    }
+
+
+    html {
+        font-size: 16px;
+    }
+
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-size: cover;
+        background: linear-gradient(45deg,#fbda61,#ff5acd);
+    }
+
+    .login-box {
+        /* 所有子类盒子宽度继承：400-40-40=320 */
+        /* 高度为内容大小 */
+        width: 400px;
+        height: min-content;
+        padding: 40px;
+        background-color: #fff;
+        text-align: center;
+        border-radius: 16px;
+    }
+
+    .login-box h2 {
+        font-size: 2.2rem;
+    }
+
+    .login-box p {
+        font-size: 1.2rem;
+        color: #404040;
+        margin-top: 4px;
+    }
+
+    .form {
+        /* 宽度继承父类 320px */
+        text-align: left;
+        margin-top: 30px;
+    }
+
+    .form .form-group {
+        margin: 18px 0;
+    }
+
+    .form .form-group label {
+        display: block;
+        font-size: 20px;
+        color: #101010;
+    }
+
+    .form .form-group input {
+        width: 100%;
+        height: 40px;
+        margin-top: 6px;
+        font-size: 18px;
+        color: #404040;
+        /* 加边框 */
+        border: 2px solid #c4c4c4;
+        border-radius: 5px;
+        /* 内容用padding挤开 */
+        padding: 0 12px 0 10px;
+    }
+    .form .form-group input:focus {
+        border-color: #124ce7;
+        box-shadow: 0 0 12px #bbd3ff;
+    }
+    .form .form-group input:valid {
+        border-color: #124ce7;
+        background: #e4edff;
+    }
+
+    .form .forgot {
+        color: #3784ff;
+        font-size: 18px;
+        cursor: pointer;
+    }
+    .form .forgot:hover {
+        color: #124ce7;
+    }
+
+    .form input[type='submit'] {
+        width: 100%;
+        height: 46px;
+        font-size: 22px;
+        color: #fff;
+        border-radius: 3px;
+        margin-top: 28px;
+        background: linear-gradient(45deg,#124ce7,#3784ff);
+        cursor: pointer;
+    }
+
+    </style>
+</head>
+<body>
+        <div class="login-box">
+            <h2>Welcome back</h2>
+            <p>Enter your details</p>
+
+            <!-- 标准form表单 -->
+            <div class="form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="username" id="username" placeholder="Your Username" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Your password" required>
+                </div>
+
+                <a class="forgot">Forgot your password?</a>
+                
+                <!-- 提交按钮 -->
+                <input type="submit" id="login" value="Log In">
+            </div>
+
+        </div>
+
+
+        <script>
+            const usernameInput = document.querySelector('#username');
+            const passwordInput = document.querySelector('#password');
+            const loginBtn = document.querySelector('#login');
+
+            loginBtn.addEventListener('click',function() {
+                let url = 'http://127.0.0.1:8000/login';
+                axios.get(url, {
+                    //url参数
+                    params: {
+                        usernameInput: usernameInput.value,
+                        passwordInput: passwordInput.value
+                    },
+                }).then(value => {
+                    if (value.data.statue) {
+                        // 登录成功
+                        alert(value.data.msg);
+                        
+                        // 在浏览器中存储token
+                        localStorage.setItem('token', value.data.token);
+                        location.href = 'http://127.0.0.1:8000/html/index.html';
+
+                    } else {
+                        alert(value.data.msg);
+                    }
+                })
+            })
+        </script>
+</body>
+</html>

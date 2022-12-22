@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动画资料卡片</title>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+            user-select: none;
+        }
+
+        body {
+            /* 定义body高度为浏览器窗口高度 */
+            height: 100vh;
+            /* 让body子元素每时每刻垂直水平居中 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg,#fbda61,#ff5acd);
+        }
+
+        .card {
+            position: relative;
+            width: 350px;
+            height: 190px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 35px 80px rgba(0,0,0,0.15);
+            transition: 0.5s;
+        }
+        .card:hover {
+            height: 450px;
+        }
+
+        .imgBx {
+            position: absolute;
+            left: 50%;
+            top: -50px;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            background-color: #ff5acd;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.30);
+            overflow: hidden;
+            transition: 0.5s;
+            z-index: 99;
+        }
+
+        .imgBx:hover {
+            width: 200px;
+            height: 200px;
+        }
+
+        .imgBx img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 内容区域大盒子 大小和card相同 */
+        .content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            /* 内容子元素底部对齐 */
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .content .details {
+            width: 100%;
+            padding: 40px 20px;
+            text-align: center;
+            transition: 0.5s;
+            /* 首先移至卡片外隐藏 */
+            transform: translateY(180px);
+        }
+
+        .card:hover .content .details {
+            transform: translateY(0);
+        }
+
+        .content .details h2 {
+            font-size: 1.25em;
+            font-weight: 600;
+            color: #555;
+            line-height: 1.2em;
+        }
+
+        .content .details h2 span {
+            font-size: 0.75em;
+            font-weight: 500;
+            opacity: 0.5;
+            text-align: center;
+        }
+
+        .content .details .data {
+            display: flex;
+            /* 先两边贴边再平分剩余空间 */
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .content .details .data h3 {
+            /* 平均分成n份！！ */
+            flex: 1;
+            font-size: 1em;
+            color: #555;
+            line-height: 1.3em;
+            font-weight: 600;
+            text-align: center;
+            /* padding: 0 15px; */
+        }
+
+        .content .details .data h3 span {
+            font-size: 0.85em;
+            font-weight: 400;
+            opacity: 0.5;
+            text-align: center;
+        }
+
+        .content .details .actionBtn {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        /* 没有指定宽高 决定按钮大小：flex:1 font-size padding */
+        .content .details .actionBtn button {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #fff;
+            background-color: #ff5f95;
+            padding: 10px 30px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .content .details .actionBtn button:nth-child(2) {
+            border: 1px solid #999;
+            color: #999;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+    
+        <div class="imgBx">
+            <img src="http://127.0.0.1:8000/html/Power.jpg" alt="">
+        </div>
+    
+        <div class="content">
+            <div class="details">
+                <h2>
+                    cocoonnp<br>
+                    <span>Senior UX/UI Designer</span>
+                </h2>
+                <div class="data">
+                    <h3>342<br><span>Posts</span></h3>
+                    <h3>120k<br><span>Followers</span></h3>
+                    <h3>285<br><span>Following</span></h3>
+                </div>
+                <div class="actionBtn">
+                    <button>Edit</button>
+                    <button class="signout">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+    <script>
+        // 发送请求实现：如果没登录则进入登录页面，登录过则直接进入
+        axios.post('http://127.0.0.1:8000/index', {
+            'token': localStorage.getItem('token')
+        }, {
+        }).then(response => {
+            if (!response.data.statue) {
+                location.href = 'http://127.0.0.1:8000/html/login.html';
+            } else {
+                console.log(response.data.decoded);
+                alert(`欢迎回来 ${response.data.decoded.username}`)
+            }
+        })
+
+
+        // const signoutBtn = document.querySelector('.signout');
+        // signoutBtn.addEventListener('click',function() {
+        //     let url = 'http://127.0.0.1:8000/signout';
+
+        //     axios.get(url, {
+        //     }).then(value => {
+        //         if (value.data.statue) {
+        //             alert(value.data.msg);
+                    
+        //             location.href = 'http://127.0.0.1:8000/html/index.html';
+        //         }
+        //     })
+        // })
+    </script>
+</body>
+</html>
