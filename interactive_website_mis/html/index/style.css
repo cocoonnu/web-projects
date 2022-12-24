@@ -1,0 +1,201 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Varela Round', sans-serif;
+    user-select: none;
+}
+
+img[src=""], img:not([src]) {
+    opacity:0;
+}
+
+body {
+    /* 定义body高度为浏览器窗口高度 */
+    height: 100vh;
+    /* 让body子元素每时每刻垂直水平居中 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: linear-gradient(45deg,#fbda61,#ff5acd);
+}
+
+.card {
+    /* visibility: done; */
+    position: relative;
+    width: 350px;
+    height: 190px;
+    /* height: 450px; */
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 35px 80px rgba(0,0,0,0.15);
+    transition: 0.5s;
+}
+.card:hover {
+    height: 450px;
+}
+
+.imgBx {
+    position: absolute;
+    left: 50%;
+    top: -70px;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 150px;
+    background-color: #ff5acd;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+    overflow: hidden;
+    transition: 0.5s;
+    z-index: 1;
+}
+
+.imgBx:hover {
+    width: 200px;
+    height: 200px;
+}
+
+.imgBx img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 内容区域大盒子 大小和card相同 */
+.content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    /* 内容子元素底部对齐 */
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.content .details {
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    transition: 0.5s;
+    /* 首先移至卡片外隐藏 */
+    transform: translateY(180px);
+}
+
+.card:hover .content .details {
+    transform: translateY(0);
+}
+
+.content .details #usernameInfo {
+    font-size: 1.2em;
+    font-weight: 550;
+    color: #555;
+    line-height: 1.2em;
+}
+
+.content .details #emailInfo {
+    font-size: 0.65em;
+    font-weight: 500;
+    opacity: 0.6;
+    text-align: center;
+}
+
+.content .details .data {
+    display: flex;
+    /* 先两边贴边再平分剩余空间 */
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.content .details .data h3 {
+    /* 平均分成n份！！ */
+    flex: 1;
+    font-size: 1em;
+    color: #555;
+    line-height: 1.3em;
+    font-weight: 600;
+    text-align: center;
+    /* padding: 0 15px; */
+}
+
+.content .details .data h3 span {
+    font-size: 0.85em;
+    font-weight: 400;
+    opacity: 0.5;
+    text-align: center;
+}
+
+.content .details .actionBtn {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+/* 没有指定宽高 决定按钮大小：flex:1 font-size padding */
+.content .details .actionBtn button {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: #fff;
+    background-color: #ff5f95;
+    padding: 10px 30px;
+    margin: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.content .details .actionBtn button:nth-child(2) {
+    border: 1px solid #999;
+    color: #999;
+    background-color: #fff;
+}
+
+.container {
+    /* visibility: hidden; */
+    /* 未定义高度的惯用套路：用padding撑开！！ */
+    width: 25em;
+    padding: 2em 3.75em;
+    background-color: #f8f8f8;
+    border-radius: 0.7em;
+    box-shadow: 0 1em 4em rgba(71,50,4,0.3);
+    /* 实现在body中脱标垂直水平居中 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,120%);
+    /* transform: translate(-50%,-55%); */
+    z-index: 2;
+    transition: all 0.5s ease-in-out;
+}
+
+input, #submit {
+    /* 将行内块转换为块元素 独占一行 */
+    display: block;
+    outline: none;
+    border: 0;
+}
+
+input {
+    width: 100%;
+    margin-bottom: 2em;
+    padding: 1em 0 0.5em 0.5em;
+    background-color: transparent;
+    border-bottom: 2px solid #202020;
+}
+
+#submit {
+    position: relative;
+    margin: 0 auto;
+    width: 16em;
+    padding: 0.8em 0;
+    font-size: 1.1em;
+    margin-top: 2em;
+    border-radius: 0.3em;
+    background: linear-gradient(45deg,#fbda61,#ff5acd);
+    transition: 0.3s;
+    user-select: none;
+    cursor: pointer;
+}

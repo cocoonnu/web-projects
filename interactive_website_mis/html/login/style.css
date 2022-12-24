@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    /* 所有边框为0 */
+    border: 0;
+    outline: none;
+    user-select: none;
+    text-decoration: none;
+    font-family: 'Varela Round',serif;
+}
+
+
+html {
+    font-size: 16px;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./wave-haikei.png);
+    background-size: cover;
+    /* 逆向且循环播放 */
+    animation: move 10s linear alternate infinite;
+}
+
+@keyframes move {
+    50% {
+        background-position: 50%;
+    }
+}
+
+.login-box {
+    /* 所有子类盒子宽度继承：400-40-40=320 */
+    /* 高度为内容大小 */
+    width: 400px;
+    height: min-content;
+    padding: 40px;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.login-box h2 {
+    font-size: 2.2rem;
+}
+
+.login-box p {
+    font-size: 1.2rem;
+    color: #404040;
+    margin-top: 4px;
+}
+
+form {
+    /* 宽度继承父类 320px */
+    text-align: left;
+    margin-top: 30px;
+}
+
+form .form-group {
+    margin: 18px 0;
+}
+
+form .form-group label {
+    display: block;
+    font-size: 20px;
+    color: #101010;
+}
+
+form .form-group input {
+    width: 100%;
+    height: 40px;
+    margin-top: 6px;
+    font-size: 18px;
+    color: #404040;
+    /* 加边框 */
+    border: 2px solid #c4c4c4;
+    border-radius: 5px;
+    /* 内容用padding挤开 */
+    padding: 0 12px 0 35px;
+}
+form .form-group input:focus {
+    border-color: #124ce7;
+    box-shadow: 0 0 12px #bbd3ff;
+}
+.form-group input:valid {
+    border-color: #124ce7;
+    background-color: #e4edff;
+}
+
+form .form-group .iconfont {
+    position: absolute;
+    transform: translateX(12px) translateY(16px);
+    font-size: 18px;
+    color: #404040;
+    opacity: 0.8;
+}
+
+form .register {
+    color: #3784ff;
+    font-size: 18px;
+    cursor: pointer;
+}
+form .register:hover {
+    color: #124ce7;
+}
+
+form input[type='submit'] {
+    width: 100%;
+    height: 46px;
+    font-size: 22px;
+    color: #fff;
+    border-radius: 3px;
+    margin-top: 28px;
+    background: linear-gradient(45deg,#124ce7,#3784ff);
+    cursor: pointer;
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="../font/iconfont.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+
+</head>
+<body>
+        <div class="login-box">
+            <h2>Welcome back</h2>
+            <p>Enter your details</p>
+
+            <!-- 标准form表单 -->
+            <form>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <span class="iconfont icon-wode"></span>
+                    <input type="email" id="email" placeholder="Your email" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <span class="iconfont icon-mima"></span>
+                    <input type="password" id="password" placeholder="Your password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <span class="iconfont icon-mima"></span>
+                    <input type="password" id="passwords" placeholder="password again" required>
+                </div>
+
+                <a class="login">Run to login</a>
+                
+                <!-- 提交按钮 -->
+                <input type="submit" id="submit" value="Register">
+            </form>
+
+        </div>
+
+        <script>
+            // 前端进行了表单验证！
+
+
+            const login = document.querySelector('.login');
+            const email = document.querySelector('#email');
+            const password = document.querySelector('#password'); 
+            const submit = document.querySelector('#submit');
+            const passwords = document.querySelector('#passwords');
+
+            login.addEventListener('click',function() {
+                location.href = 'http://127.0.0.1:8000/html/login/login.html';
+            })
+
+            // 邮箱正则
+            function isEmailValid() {
+                const emailRegex = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(?:\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+                return emailRegex.test(email.value);
+            }
+            function emailChange() {
+                if (!isEmailValid())
+                {
+                    email.style.cssText = "border-color: #fe2e2e; background-color: #ffc2c2;"
+                } else
+                {
+                    email.style.cssText = "border-color: #34bd34; background-color: #c2ffc2;"
+                }    
+            }
+
+            email.addEventListener('input',function() {
+                emailChange();
+            })
+            email.addEventListener('blur',function() {
+                emailChange();
+            })
+
+            
+            // 弱密码正则
+            function isPasswordValid() {
+                const passwordRegex = /^[\w]{6,16}$/;
+                return passwordRegex.test(password.value);
+            }
+            function isPasswordsValid() {
+                const passwordRegex = /^[\w]{6,16}$/;
+                return passwordRegex.test(passwords.value);
+            }
+            function passwordChange() {
+                // 如果密码格式不正确
+                if (!isPasswordValid())
+                {
+                    password.style.cssText = "border-color: #fe2e2e; background-color: #ffc2c2;"
+                } else
+                {
+                    password.style.cssText = "border-color: #34bd34; background-color: #c2ffc2 !important;"
+                }    
+            }
+            function passwordsChange() {
+                // 如果密码格式不正确
+                if (!isPasswordsValid())
+                {
+                    passwords.style.cssText = "border-color: #fe2e2e; background-color: #ffc2c2;"
+                } else
+                {
+                    passwords.style.cssText = "border-color: #34bd34; background-color: #c2ffc2 !important;"
+                }    
+            }
+
+            password.addEventListener('input',function() {
+                passwordChange();
+            })
+            password.addEventListener('blur',function() {
+                passwordChange();
+            })
+            passwords.addEventListener('input',function() {
+                passwordsChange();
+            })
+            passwords.addEventListener('blur',function() {
+                passwordsChange();
+            })
+
+
+
+            submit.addEventListener('click',function(e) {
+                e.preventDefault();
+
+                if (isEmailValid() && isPasswordValid()) {
+                    if (password.value == passwords.value) {
+                        
+                        axios.post('http://127.0.0.1:8000/regUser', {
+                            'email': email.value,
+                            'password': password.value
+                        }, {
+                        }).then(response => {
+
+                            alert(response.data.msg);
+                        })
+
+                    } else {
+                        alert('两次密码输入不一致');
+                    }
+
+                } else {
+                    alert('请正确填写邮箱或密码');
+                }
+
+            })
+
+        </script>
+</body>
+</html>

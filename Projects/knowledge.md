@@ -1,4 +1,19 @@
-# 实现内容垂直水平居中的方法
+## 知识点记录
+
+
+
+#### src为空时，img标签不显示裂图
+
+```css
+img[src=""], img:not([src]) {
+    opacity:0;
+}
+```
+
+
+
+#### 实现内容垂直水平居中的方法
+
 ```css
 /* flex */
 div {
@@ -14,7 +29,10 @@ div {
 }
 ```
 
-# 让body占满整个页面
+
+
+### 让body占满整个页面
+
 ```css
 body {
     /* body宽度默认100% 默认高度为内容高度 */
@@ -28,7 +46,10 @@ body {
 }
 ```
 
-# html、body、自定义属性
+
+
+### html、body、自定义属性
+
 ```css
 html：整个页面
 
@@ -40,7 +61,10 @@ body：整个内容
 /* var(--clr) */
 ```
 
-# css初始化属性
+
+
+### css初始化属性
+
 ```css
 * {
     margin: 0;
@@ -71,12 +95,18 @@ input {
 }
 ```
 
-# flex依然影响绝对定位的子元素
+
+
+### flex依然影响绝对定位的子元素
+
 ```css
 /* 如果子元素有绝对定位 则脱标且依然满足flex布局  */
 ```
 
-# img属性
+
+
+### img属性
+
 ```css
 .imgBx img {
     width: 100%;
@@ -85,7 +115,10 @@ input {
 }
 ```
 
-# 实现字体
+
+
+### 实现字体
+
 ```css
 /* 首先电脑要安装该字体 或者直接引入*/
 /* font-family: 'Varela Round'; */
@@ -98,12 +131,18 @@ input {
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
 ```
 
-# 适配最小内容高度
+
+
+### 适配最小内容高度
+
 ```css
 height: min-content;
 ```
 
-# 背景无限循环移动
+
+
+### 背景无限循环移动
+
 ```css
 body {
     height: 100vh;
@@ -123,7 +162,10 @@ body {
 }
 ```
 
-# calc 宽度基于父类的计算
+
+
+### calc 宽度基于父类的计算
+
 ```css
 .wrapper .buttons {
     display: flex;
@@ -139,17 +181,25 @@ body {
 }
 ```
 
-# input 新型写法
+
+
+### input 新型写法
+
 ```html
 <!-- 直接变成一个文本框 -->
 <div class="input editable" contenteditable="true">dada</div>
 ```
 
-# 行内元素margin-top无效！！！！！！解决：加定位、变块元素
+```
+### 行内元素margin-top无效！！！！！！解决：加定位、变块元素
 
-# 绝对定位的宽度只会继承参考点属性中的宽度！！！
+### 绝对定位的宽度只会继承参考点属性中的宽度！！！
+```
 
-# e.target和this有什么区别？？
+
+
+### `e.target`和`this`有什么区别？？
+
 ```js
 // 1、由于事件捕获、事件冒泡会导致多个对象产生监听 
 // 2、e.target返回真正触发事件的对象 和 this可能不一样！！
@@ -157,7 +207,10 @@ body {
 // 事件委托通常需要结合使用 e.target 属性。
 ```
 
-# 滚动条参数
+
+
+### 滚动条参数
+
 ```css
 #files-list {
     max-height: 300px;
@@ -169,7 +222,10 @@ body {
 }
 ```
 
-# 禁止右键、复制、快捷键
+
+
+### 禁止右键、复制、快捷键
+
 ```js
 // 禁止打开右键
 document.oncontextmenu=new Function("event.returnValue=false");
@@ -196,7 +252,7 @@ document.onkeydown = function(event){
 
 ```
 
-# 背景图片适配
+### 背景图片适配
 ```css
 .scan .fingerprint {
     width: 300px;
@@ -207,7 +263,7 @@ document.onkeydown = function(event){
 }
 ```
 
-# 未定义高度的惯用套路：用padding撑开！！
+### 未定义高度的惯用套路：用padding撑开！！
 ```css 
 .container {
     width: 31.25em;
@@ -220,7 +276,7 @@ document.onkeydown = function(event){
 }
 ```
 
-# flex行内元素贴不到两边
+### flex行内元素贴不到两边
 ```css
 /* 必须转块级元素或者行内块 */
 p {
@@ -229,7 +285,7 @@ p {
 }
 ```
 
-# 常用JS函数
+### 常用JS函数
 ```js
 toFixed：保留小数位
 
@@ -272,7 +328,7 @@ let arr = regStyle.exec(htmlData);
 let cssData = arr[0].replace('<style>','').replace('<\/style>','');
 ```
 
-# js细节大全
+### js细节大全
 ```js
 // <!-- defer：文档加载完毕再加载js -->
 {/* <script src="./script.js" defer></script> */}
@@ -285,7 +341,7 @@ new Date(2020,10)：得到2020年11月份的第一天date对象
 new Date(2020,10,2)：得到2020年11月2号date对象
 ```
 
-# 在JS中写html 并插入html中
+### 在JS中写html 并插入html中
 ```js
 // 在js中写html
 const cards = `
@@ -311,7 +367,7 @@ selectors.board.replaceWith(parser.querySelector('.board'));
 
 ```
 
-# css特殊选择器
+### css特殊选择器
 ```css
 /* 选择当包含flipped的所有元素中不包含matched的元素 */
 .flipped:not(.matched) {};
@@ -321,7 +377,7 @@ selectors.board.replaceWith(parser.querySelector('.board'));
 
 ```
 
-# css隐藏背面
+### css隐藏背面
 ```css
 /* 当元素旋转时 背面不可见 */
 backface-visibility: hidden;    

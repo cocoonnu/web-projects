@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页</title>
+
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+
+</head>
+<body>
+    <div class="card">
+    
+        <div class="imgBx">
+            <img id="imageInfo" src="" alt="">
+        </div>
+    
+        <div class="content">
+            <div class="details">
+                <h2>
+                    <span id="usernameInfo"></span><br>
+                    <span id="emailInfo"></span>
+                </h2>
+                <div class="data">
+                    <h3><a class="post">342</a><br><span>Posts</span></h3>
+                    <h3><a class="followers">120k</a><br><span>Followers</span></h3>
+                    <h3><a class="following">285</a><br><span>Following</span></h3>
+                </div>
+                <div class="actionBtn">
+                    <button class="editing">Editing</button>
+                    <button class="signout">Sign out</button>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+    <div class="container">
+        <input type="text" placeholder="Username without chinese" id="usernameSub">
+        <input type="text" placeholder="Change password (can be null)" id="passwordSub">
+        <input type="text" placeholder="Imageurl" id="imageurlSub">
+        <button id="submit">Submit</button>
+    </div>
+
+
+    <script>
+        var emailRef = '';
+        const usernameInfo = document.querySelector('#usernameInfo');
+        const emailInfo = document.querySelector('#emailInfo');
+        const imageInfo = document.querySelector('#imageInfo');
+        const signout = document.querySelector('.signout');
+        const editing = document.querySelector('.editing');
+        const card = document.querySelector('.card');
+        const container = document.querySelector('.container');
+        const submit = document.querySelector('#submit');
+        const usernameSub = document.querySelector('#usernameSub');
+        const imageurlSub = document.querySelector('#imageurlSub');
+        const passwordSub = document.querySelector('#passwordSub');
+
+
+        function indexPost() {
+            // 发送请求实现：如果没登录则进入登录页面，登录过则直接进入
+            axios.post('http://127.0.0.1:8000/index', {
+                'token': localStorage.getItem('token')
+            }, {
+            }).then(response => {
+                
+                if (response.data.statue) {
+
+                    var user = response.data.decoded.user;  // user有email属性 解析token获得
+
+                    // 获取用户信息请求
+                    axios.post('http://127.0.0.1:8000/getUserInfo', {
+
+                        email: user.email
+
+                    }, {
+                    }).then(response => {
+                        
+                        if (response.data.statue) {
+                            // 成功获取用户信息
+                            
+                            let userinfo = response.data.userinfo;
+                            // console.log(userinfo);
+                            // 存储为全局变量
+                            emailRef = user.email;
+
+                            // 填写html
+                            imageInfo.src = userinfo.image ? userinfo.image : '';
+                            usernameInfo.innerHTML = userinfo.username ? userinfo.username : 'username';
+                            emailInfo.innerHTML = userinfo.email;
+
+                        } else {
+            
+                            console.log(response.data.msg);
+                        }
+            
+                    })
+
+
+                } else {
+                    location.href = 'http://127.0.0.1:8000/html/login/login.html';
+                }
+
+            })
+        }
+        indexPost();
+
+
+        signout.addEventListener('click',function() {
+            // 删除本地token
+            localStorage.removeItem('token');
+
+            location.reload();
+        })
+
+        editing.addEventListener('click',function() {
+            container.style.transform = 'translate(-50%,-55%)';
+        })
+
+        container.addEventListener('dblclick',function() {
+            container.style.transform = 'translate(-50%,120%)';
+        })
+
+        // 提交更新用户信息
+        submit.addEventListener('click',function() {
+
+            let username = usernameSub.value;
+            let image = imageurlSub.value;
+            let password = passwordSub.value;
+
+            // 新密码验证规则
+            function isPasswordValid() {
+                const passwordRegex = /^[\w]{6,16}$/;
+
+                // 不为空则需要判断
+                if (passwordSub.value) {
+                    return passwordRegex.test(passwordSub.value);
+                } else {
+                    return true;
+                }
+            }
+            
+            if (!isPasswordValid()) {
+                alert('密码格式不正确');
+                password = null;
+            };
+
+            // 判断输入的用户名、图片url是否为空
+            username = usernameSub.value ? usernameSub.value : usernameInfo.innerHTML;
+            image = imageurlSub.value ? imageurlSub.value : imageInfo.src;
+            console.log(image);
+
+            // 用户名最大长度为5
+            if (usernameSub.value.length > 15) {
+                username = usernameSub.value.substr(0,15);
+            }            
+
+            // 发送更新数据请求
+            axios.post('http://127.0.0.1:8000/updataUserInfo', {
+                username: username,
+                image: image,
+                newPassword: password,
+                email: emailRef
+            }, {
+            }).then(response => {
+                
+                if (response.data.statue) {
+    
+                    // console.log(response.data.msg);
+
+                    // 刷新页面
+                    setTimeout(function() {
+                        location.reload();
+                    },1000)
+
+                } else {    
+                    console.log(response.data.msg);
+                }
+    
+            })
+
+
+
+            container.style.transform = 'translate(-50%,120%)';
+        })
+
+
+        function updataData() {
+            const posts = document.querySelector('.post');
+            const followers = document.querySelector('.followers');
+            const following = document.querySelector('.following');
+
+            // Math.floor(Math.random() * num)：返回0到num-1的整数
+            posts.innerHTML = 100 + Math.floor(Math.random() * 900);
+            followers.innerHTML = Math.floor(Math.random() * 1000) + 'k';
+            following.innerHTML = 100 + Math.floor(Math.random() * 900);
+        }
+        updataData();
+    </script>
+
+
+</body>
+</html>
