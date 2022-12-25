@@ -1,0 +1,68 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url("./Poppins.ttf");
+}
+
+html {
+    font-size: 16px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #ffc13d;
+}
+
+.container {
+    /* 未定义高度的惯用套路：用padding撑开！！ */
+    width: 31.25em;
+    padding: 4em 3.75em;
+    background-color: #f8f8f8;
+    border-radius: 0.7em;
+    box-shadow: 0 1em 4em rgba(71,50,4,0.3);
+    /* 实现在body中脱标垂直水平居中 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+input, #submit {
+    /* 将行内块转换为块元素 独占一行 */
+    display: block;
+    outline: none;
+    border: 0;
+}
+
+input {
+    width: 100%;
+    margin-bottom: 2em;
+    padding: 1em 0 0.5em 0.5em;
+    background-color: transparent;
+    border-bottom: 2px solid #202020;
+}
+
+#submit {
+    position: relative;
+    width: 7em;
+    padding: 0.8em 0;
+    font-size: 1.1em;
+    margin-top: 2em;
+    border-radius: 0.3em;
+    background-color: #ffc13d;
+    transition: 0.3s;
+    user-select: none;
+}
+
+#message-ref {
+    font-size: 0.9em;
+    color: #34bd34;
+    margin-top: 1.5em;
+    visibility: hidden;
+}
