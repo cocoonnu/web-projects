@@ -326,6 +326,9 @@ Arr.join('/r/n')  Str.split()
 // exec()：正则表达式匹配字符串
 let arr = regStyle.exec(htmlData);
 let cssData = arr[0].replace('<style>','').replace('<\/style>','');
+
+// 新对象拥有全部属性，相同属性，后者覆盖前者
+const obj = {...apple, ...pen};
 ```
 
 ### js细节大全

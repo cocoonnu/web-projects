@@ -1,0 +1,166 @@
+@font-face {
+    font-family: 'Varela Round';
+    src: url("./Varela-Round.ttf");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: 'Varela Round';
+    box-sizing: border-box;
+    user-select: none;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(325deg,  #03001e 0%,#7303c0 30%,#ec38bc 70%, #fdeff9 100%) no-repeat;
+    overflow: hidden;
+}
+
+.game {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.controls {
+    display: flex;
+    /* 设置列之间的间隙 */
+    column-gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.controls button {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #282a3a;
+    cursor: pointer;
+}
+
+.controls .disabled {
+    color: #757575;
+}
+
+.controls .states {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #fff;
+}
+
+
+/* 方块板 */
+.board-container {
+    position: relative;
+}
+
+/* 卡片板和win板正面 */
+.board, .win {
+    border-radius: 5px;
+    box-shadow: 0 25px 50px rgb(33 33 33 / 25%);
+    background: linear-gradient(135deg,  #03001e 0%,#7303c0 0%,#ec38bc 50%, #fdeff9 100%);
+    transition: transform .6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    /* 如果旋转至背面则隐藏 */
+    backface-visibility: hidden;
+}
+
+/* 定义卡片版中卡片的分布 */
+.board-container .board {
+    padding: 20px;
+    display: grid;
+    /* 每列的宽度 */
+    grid-template-columns: repeat(4,auto);
+    /* 每列的间隙 */
+    grid-gap: 20px;
+}
+
+.win {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 30px;
+    text-align: center;
+    /* win默认旋转至背面 */
+    transform: rotateY(180deg) rotateZ(50deg); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.win-text h2 {
+    color: #ffa600;
+    margin-bottom: 20px;
+}
+
+.win-text p {
+    color: #003f5c;
+    margin-bottom: 5px;
+}
+.highlight {
+    color: #ffa600;
+}
+
+
+/* 当board-container添加flipped时 board旋转 */
+.board-container.flipped .board {
+    transform: rotateY(180deg) rotateZ(50deg); 
+}
+
+/* 当board-container添加flipped时 win转回来 */
+.board-container.flipped .win {
+    transform: rotateY(0) rotateZ(0); 
+} 
+
+/* 默认win翻转看不到 看到board */
+/* 游戏结束时board-container添加flipped win转回来 看到win */
+
+
+/* 卡片 */
+.card {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    background-color: #282a3a;
+    transition: transform .6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    backface-visibility: hidden;
+} 
+
+/* card-back带有emoji 默认旋转180度 */
+.card-back {
+    font-size: 28pt;
+    text-align: center;
+    line-height: 100px;
+    user-select: none;
+    background-color: #fdf8e6;
+    transform: rotateY(180deg) rotateZ(50deg); 
+}
+
+/* 当卡片被翻开 */
+.card.flipped .card-front {
+    transform: rotateY(180deg) rotateZ(50deg); 
+}
+.card.flipped .card-back {
+    transform: rotateY(0) rotateZ(0); 
+} 
+
+
+/* rotateY(180deg)：翻转至背面 rotateZ(50deg)：顺时针旋转*/
+/* 默认为card-front在后面 card-back在前面 */
+/* 默认card-back翻转 所以默认看到card-front */
+/* 当card添加flipped时 card-back转回来 card-front翻转 所以看到card-back*/

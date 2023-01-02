@@ -1,0 +1,151 @@
+@font-face {
+    font-family: 'Varela Round';
+    src: url("./Varela\ Round.ttf");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    font-family: 'Varela Round',sans-serif;
+    text-decoration: none;
+    user-select: none;
+}
+
+:root {
+    --clr: #222327;
+}
+
+body {
+    display: flex;
+    /* 子元素nav沿主轴排列方式 */
+    justify-content: center;
+    /* 子元素nav沿测轴排列方式 */
+    align-items: center;
+    /* body高度最小为浏览器窗口高度 */
+    min-height: 100vh;
+    background-color: var(--clr);
+}
+
+.nav {
+    width: 400px;
+    height: 70px;
+    background-color: #fff;
+    /* 使ul垂直水平居中 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.nav ul {
+    position: relative;
+    display: flex;
+    width: 350px;
+}
+
+.nav ul .list {
+    position: relative;
+    display: flex;
+    /* 用百分比的话 父类盒子变化就跟着变化了 */
+    width: 70px;
+    height: 70px;
+    /* 定位叠放优先级 */
+    z-index: 1;
+}
+
+.nav ul .list a {
+    /* a标签存放li的内容 大小和li应相等！ */
+    position: relative;
+    display: flex;
+    /* 主方向为y轴 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* 调整内部结构 */
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-weight: 500;
+}
+
+.nav ul .list a .iconfont {
+    position: relative;
+    /* span要先转块级元素！ */
+    display: block;
+    line-height: 75px;
+    font-size: 1.5em;
+    text-align: center;
+    color: var(--clr);
+    /* 当图标有transform、动画时做出过渡效果 all可以省略 */
+    transition: 0.5s;
+}
+
+.nav ul .list a .text {
+    /* 加绝对定位使得在a中脱标 和incon不争位置 ！ */
+    /* 但是a中的flex布局依然会影响 */
+    position: absolute;
+    color: var(--clr);
+    font-size: 0.75em;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    transition: 0.5s;
+    /* 先下偏移 */
+    transform: translateY(20px);
+    /* 透明度 */
+    opacity: 0;
+}
+
+/* 当li有hover时 后面的做transform */
+/* .nav ul .list:hover a .iconfont {
+    transform: translateY(-35px);
+}
+.nav ul .list:hover a .text {
+    opacity: 1;
+    transform: translateY(10px);
+} */
+/* .list.active（必须黏在一起） 当list添加了active 后面的做transform */
+.nav ul .list.active a .iconfont {
+    transform: translateY(-35px);
+}
+.nav ul .list.active a .text {
+    opacity: 1;
+    transform: translateY(15px);
+}
+
+.indicator {
+    /* 相对于nav的绝对定位 */
+    position: absolute;
+    top: -50%;
+    /* 大小和li一样 */
+    width: 70px;
+    height: 70px;
+    background-color: #29fd53;
+    border-radius: 50%;
+    border: 6px solid var(--clr);
+    transition: 0.5s;   
+}
+.indicator::before {
+    /* 不要忘记加！！ */
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -22px;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border-top-right-radius: 20px;
+    box-shadow: 1px -10px 0 0 var(--clr);
+}
+.indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -22px;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border-top-left-radius: 20px;
+    box-shadow: -1px -10px 0 0 var(--clr);
+}

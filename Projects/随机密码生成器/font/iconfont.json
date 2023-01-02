@@ -1,0 +1,23 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "12323769",
+      "name": "复制",
+      "font_class": "fuzhi",
+      "unicode": "e654",
+      "unicode_decimal": 58964
+    },
+    {
+      "icon_id": "25964413",
+      "name": "成功复制",
+      "font_class": "chenggongfuzhi",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    }
+  ]
+}

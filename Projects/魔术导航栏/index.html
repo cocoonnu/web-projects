@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔术导航栏</title>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="font/iconfont.css">
+
+    <script src="script.js"></script>
+</head>
+<body>
+
+    <div class="nav">
+        <ul>      
+            <li class="list active">
+                <a>
+                    <span class="iconfont icon-shouye"></span>
+                    <span class="text">Home</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="iconfont icon-wode"></span>
+                    <span class="text">Profile</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="iconfont icon-pinglun"></span>
+                    <span class="text">Mesaages</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="iconfont icon-xiangji"></span>
+                    <span class="text">Photos</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="iconfont icon-shezhi"></span>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+
+            <div class="indicator"></div>
+        </ul>
+
+    </div>
+
+    <script>
+        const lis = document.querySelectorAll('.list');
+        const indicator = document.querySelector('.indicator');
+
+        function activeLink() {
+            // 添加active
+            lis.forEach(item => {
+                item.classList.remove('active');
+            })
+            this.classList.add('active');
+            
+            // 移动indicator
+            let move = this.index * this.offsetHeight;
+            indicator.style.transform = `translateX(${move}px)`;
+        }
+
+        lis.forEach((item,index) => {
+            item.index = index;
+            item.addEventListener('click',activeLink);
+        })
+
+    </script>
+
+</body>
+</html>
