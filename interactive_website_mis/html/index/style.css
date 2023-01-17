@@ -80,7 +80,7 @@ body {
     text-align: center;
     transition: 0.5s;
     /* 首先移至卡片外隐藏 */
-    transform: translateY(180px);
+    transform: translateY(160px);
 }
 
 .card:hover .content .details {

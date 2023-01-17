@@ -7,6 +7,10 @@ Promise 是异步操作的一种解决方案。具体八股文自己去搜，这
 
 
 
+Promise 的特点是异步执行，它不会按照 js 代码执行顺序而执行，通常会安排到后面
+
+
+
 什么时候使用 Promise 呢？
 
 Promise 一般用来解决层层嵌套的回调函数（回调地狱 callback hell）的问题。
@@ -335,7 +339,7 @@ p.finally(function() {
 
 
 
-## 1.6 all\race\allSettled
+## 1.6 all/race/allSettled
 
 - Promise.all()
 
@@ -358,6 +362,123 @@ Promise.race() 的状态取决于第一个完成的 Promise 实例对象，如�
 - Promise.allSettled()
 
 Promise.allSettled() 的状态与传入的 Promise 状态无关。它永远都是成功的，只会执行 then 的第一个回调函数。用途：用于记录下各个 Promise 的表现。
+
+
+
+## 1.7 async/await 函数
+
+我们获取promise对象的value有两种方式，一种是用 then，一种是这个东西。下面是例子展示
+
+1、then
+
+```js
+new Promise(function(resolve,reject) {
+        
+    if(1) resolve('1111');
+    else reject('0000');
+
+}).then(function(value) {
+    console.log(value);
+})
+
+// 1111
+```
+
+
+
+2、async/await
+
+```js
+async function main() {
+    let result = await new Promise(function(resolve,reject) {
+        if(1) resolve('1111');
+        else reject('0000');
+    })
+
+    console.log(result);
+}
+main()
+
+// 1111
+```
+
+
+
+
+
+**1、async**
+
+当一个普通函数加上 `async` 则 返回值一定是一个 promise 对象！
+
+- 当函数返回非 promise 对象 ，则为成功态
+- 返回 promise 对象，则状态由该 promise 决定
+
+```js
+// 返回 promise 对象
+async function main() {
+    return new Promise(function(resolve,reject) {
+        if(1) resolve('1111');
+        else reject('0000');
+    })
+}
+
+// 返回非 promise 对象
+async function main() {
+    return 111
+}
+
+let result = main(); // Promise {<fulfilled>: 111}
+```
+
+
+
+**2、await**
+
+await 只能运用在 async 函数中！它的右边为 promise 对象或者其他值
+
+- **如果右边是 promise 对象，则返回的是 promise 对象的值value**
+- 如果是其他值，则直接返回该值
+- 如果函数中有多条 await（后面是promise 对象）则会按顺序异步执行
+
+```js
+async function main() {
+    let b = await new Promise(function(resolve,reject) {
+        if(1) resolve('111');
+        else reject('000');
+    }) 
+    let a = await 222;
+
+    console.log(a);
+    console.log(b);
+}
+
+main(); // 222 111
+```
+
+
+
+await 错误处理：如果有promise对象为失败态，则使用 `try{}catch(err){}` 可以返回失败结果
+
+```js
+async function main() {
+    try {
+        await new Promise(function(resolve,reject) {
+            if(0) resolve('111');
+            else reject('000');
+        }) 
+    }catch(err) {
+        console.log(err);
+    }
+}
+
+main(); // 000
+```
+
+
+
+**3、搭配使用案例**
+
+如果函数中有多条 await（后面是promise 对象）则会按顺序异步执行，利用这一点我们就可**以安排多条异步任务**
 
 
 
@@ -912,7 +1033,7 @@ Programmer
 
 
 
-## 2.9 get、set
+## 2.9 get/set 函数
 
 ```js
 class Goods {

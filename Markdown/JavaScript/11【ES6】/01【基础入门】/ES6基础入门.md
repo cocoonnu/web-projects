@@ -965,7 +965,7 @@ console.log(x, y);
 ### 4.2.1 原理
 
 1. 模式（结构）匹配 `{} = {};`
-2. 属性名相同的完成赋值 `const {name, age} = {name: 'jerry', age: 18};` 或 `const {age, name} = {name: 'jerry', age: 18};`
+2. **属性名相同的完成赋值** `const {name, age} = {name: 'jerry', age: 18};` 或 `const {age, name} = {name: 'jerry', age: 18};`
 
 ### 4.2.2 标准写法
 
@@ -978,6 +978,7 @@ const {'name': name, 'age': age} = obj;
 
 // 这样写法的一个最大的好处就是可以自定义别名
 const {name: myName, age: myAge} = o;
+
 console.log(myName, myAge);	// jerry 18
 ```
 

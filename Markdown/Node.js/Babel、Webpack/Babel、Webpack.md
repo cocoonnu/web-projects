@@ -18,27 +18,15 @@ Babel 本身可以编译 ES6 的大部分语法，比如：let、const、箭头�
 
 注意：我们一般不考虑 [In the browser](https://babel.dev/setup#installation) 方式，因为此种方式代码每次被浏览器执行时都要先转换为 ES6 之前的代码，这样的转换影响了性能，而 CLI 及 Webpack 的方式是提前就将 ES6 代码转化为 ES6 之前的代码，浏览器在运行时已经是 ES6 之前的代码了，不影响性能。
 
-## 2.3 使用Babel前的准备工作
+## 2.3 Babel自主编译步骤
 
-### 2.3.1 什么是Node.js和npm
 
-简单的说 Node.js 就是运行在服务端的 JavaScript。
 
-Node.js 是一个基于 Chrome JavaScript 运行时建立的一个平台。
+**这里讲解Babel自主编译步骤，不是基于webpack的（在后面有）**
 
-Node.js 是一个事件驱动 I/O 服务端 JavaScript 环境，基于 Google 的 V8 引擎，V8 引擎执行 Javascript 的速度非常快，性能非常好。
 
-后端的 JavaScript = ECMAScript + IO + File + ...服务器端的操作。
 
-npm 是随同 Node.js 一起安装的包管理工具，能解决 Node.js 代码部署上的很多问题，常见的使用场景有以下几种：
-
-- 允许用户从 npm 服务器下载别人编写的第三方包到本地使用。
-- 允许用户从 npm 服务器下载并安装别人编写的命令行程序到本地使用。
-- 允许用户将自己编写的包或命令行程序上传到 npm 服务器供别人使用。
-
-由于新版的 Node.js 已经集成了 npm，所以之前 npm 也一并安装好了。同样可以通过输入 **"npm -v"** 来测试是否成功安装。
-
-### 2.3.2 安装Node.js
+### 2.3.1 安装Node.js
 
 Node.js 中文官网：[Node.js (nodejs.org)](https://nodejs.org/zh-cn/)
 
@@ -46,7 +34,7 @@ Node.js 中文官网：[Node.js (nodejs.org)](https://nodejs.org/zh-cn/)
 
 可以通过在终端中依次输入：`node -v` 及 `npm -v` 来查看版本，如果查看成功，即表明安装成功。
 
-### 2.3.3 初始化项目
+### 2.3.2 初始化项目
 
 - 初始化项目：`npm init`
 
@@ -76,7 +64,7 @@ Node.js 中文官网：[Node.js (nodejs.org)](https://nodejs.org/zh-cn/)
 > }
 > ```
 
-### 2.3.4 安装Babel需要的包
+### 2.3.3 安装Babel需要的包
 
 安装命令：`npm install --save-dev @babel/core @babel/cli`
 
@@ -99,7 +87,7 @@ Node.js 中文官网：[Node.js (nodejs.org)](https://nodejs.org/zh-cn/)
 >
 > 注意：在平时的项目开发中，我们在拷贝项目或者迁移项目时，通常不会把 node_modules 文件夹一同拷贝或迁移，因为该文件夹的文件数量级太大了，所以拷贝或迁移的时间会特别长，而且还容易出错，我们一般都是通过 `npm install` 来重新生成。
 
-### 2.3.5 使用Babel编译ES6代码
+### 2.3.4 使用Babel编译ES6代码
 
 首先，我们需要手动在 package.json 文件中添加以下代码：
 
@@ -146,6 +134,8 @@ Node.js 中文官网：[Node.js (nodejs.org)](https://nodejs.org/zh-cn/)
 ```
 
 > 配置之后，我们再次执行 `npm run build` 命令，那么 dist 目录中的文件就是编译完成的 ES6 之前版本的代码了！
+
+
 
 # 二、Webpack
 
@@ -267,7 +257,7 @@ module.exports = {
 };
 ```
 
-以上是单入口的情况，如果不是单入口，就有多个出口，那么就需要这样写：
+
 
 ```javascript
 const path = require('path');
@@ -565,7 +555,7 @@ mini-css-extract-plugin：在实际场景中，我们更倾向于**将 css 以 <
 
 
 
-安装 
+安装一个插件 mini-css-extract-plugin
 
 ```
 npm install mini-css-extract-plugin -D
@@ -722,6 +712,8 @@ module: {
 
 为什么需要 webpack-dev-server？  答案：自动打包！（每次修改都会自动打包）
 
+**如果当修改了 webpack.config.js 则必须关闭服务，`npx webpack` 再重启服务**
+
 
 
 **安装：**
@@ -772,51 +764,49 @@ devServer: {
 
 loader：加载器
 
-webpack 本身是用来打包 js 的（主要就是来解决 JS 模块化问题），如果需要用到其他模块的功能，那么就需要各种各样的 loader。
+webpack 本身是用来打包 js 的（主要就是来解决 JS 模块化问题），如果需要用到其他模块的功能，那么就需要各种各样的 loader。[loaders | webpack 中文网 (webpackjs.com)](https://www.webpackjs.com/loaders/)
 
-[loaders | webpack 中文网 (webpackjs.com)](https://www.webpackjs.com/loaders/)
 
-【babel-loader】
+
+**babel-loader**
 
 在 webpack 中使用 babel 就需要借助 babel-loader。
 
 安装：babel-loader + babel/core + babel/preset-env
 
 ```
-npm install --save-dev babel-loader@8.1.0 @babel/core@7.11.0 @babel/preset-env@7.11.0
+npm install --save-dev babel-loader @babel/core @babel/preset-env
 ```
 
-记得配置 babel，`.babelrc`
+
+
+想要完整功能即必须再安装两个包。。
 
 ```
+npm i @babel/runtime @babel/plugin-transform-runtime -D
+```
+
+
+
+配置 babel，`.babelrc`
+
+```json
 {
-    "presets": ["@babel/preset-env"]
+    "presets": ["@babel/preset-env"],
+    "plugins": [["@babel/plugin-transform-runtime"]]
 }
 ```
 
-在 webpack.config.js 中配置 babel-loader
+
+
+配置 webpack.config.js 
 
 ```javascript
-const path = require('path');
-
 module.exports = {
-    mode: 'development',
-    entry: {
-        index: './src/index.js'
-    },
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: '[name].js'
-    },
     module: {
-        // 可以配置多个 loader，所以是一个数组
         rules: [
-            // 每个 loader 用一个对象来配置内容
-            //（注意：不同的 loader 的配置规则不同，可以在 www.webpackjs.com/loaders/ 中查看）
             {
-                // 正则表达式匹配需要被该 loader 处理的文件（此处是所有的 js 文件）
                 test: /\.js$/,
-                // node_modules 也包含 js 文件，但不需要处理，所以我们将其排除
                 exclude: /node_modules/,
                 loader: 'babel-loader'
             }
@@ -825,25 +815,13 @@ module.exports = {
 };
 ```
 
-之后，当我们 `npm run webpack` 后，会先处理 loader，再 webpack 打包！
 
-最后，我们查看打包后的 dist/index.js 文件，会发现里面的 let 等 ES6 语法都已经转为 var 等之前版本的语法了！说明 babel 确实生效了！
 
-但是！细心观察会发现，babel 只是会将一些 ES6 的基本语法进行转换，但是诸如：Object、Set、Map、Promise 等 ES6 提供的 API，babel 是无法直接转换的，所以我们需要再借助其它的模块，而这些第三方模块可以帮我们实现 ES6 中的 API。
+最后打包后会自动将ES6代码编译！可以在出口 js 文件中查看
 
-安装 core-js：
-
-```
-npm install --save-dev core-js@3.6.5
-```
-
-之后，我们只需要在我们 js 文件的开头都写上 `import 'core-js/stable';` 便可以了！
-
-例如：index.js
+测试代码：
 
 ```javascript
-import 'core-js/stable';
-
 let name = 'Alex';
 const age = 18;
 

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
 
 ## 1.1 初识Vue
 
@@ -54,7 +54,12 @@ Vue模板语法有2大类:
 
   v-bind:可以简写为:
   
-  
+
+
+
+查询是不是 JS 语句 可以在浏览器控制台里面输入看看！！
+
+
 
 > 代码
 
@@ -847,6 +852,18 @@ vm.$watch('number.b',function(newValue,oldValue) {
 
 ## 1.11 绑定样式+动画
 
+高级一点的玩法：动态添加类名或样式
+
+```vue
+<h1 :style="{display: currentIndex == index ? 'block' : 'none'}"/>
+
+<h1 :class="{color: currentIndex == index}"/>
+```
+
+
+
+
+
 ### 1.11.1  class样式
 
 写法：:class="xxx"    xxx可以是字符串、对象、数组。
@@ -1008,9 +1025,23 @@ github：https://github.com/animate-css/animate.css
 
 动画演示网址：https://www.dowebok.com/demo/2014/98/
 
-安装和所有的动画效果都在官网，接下来介绍在vue里面怎么使用
 
-当类名为`animate__animated + animate__动画名字` 时，就会展示动画
+
+1、安装：
+
+```
+npm i animate.css
+```
+
+```js
+// 在 mian.js 全局安装
+import animated  from 'animate.css'
+Vue.use(animated)
+```
+
+
+
+2、当类名为`animate__animated + animate__动画名字` 时，就会展示动画
 
 
 
@@ -1026,15 +1057,13 @@ github：https://github.com/animate-css/animate.css
 <button 
     class="btn btn-danger animate__animated"
     :class="delClass" 
-    @click="handleDelete()">删除</button>
+    @click="handleDelete()"
+>删除</button>
 ```
 
 ```js
-data() {
-    return {
-        // 动画类名初始化
-        delClass: {'animate__rubberBand': false}
-    }
+delClass: {
+    'animate__rubberBand': false
 }
 ```
 
@@ -2749,17 +2778,17 @@ vue在工作的某个阶段会执行的函数 我们称为生命周期函数
 
 
 1. **beforeCreate（创建前）**：数据监测(getter和setter)和初始化事件还未开始，此时 data 的响应式追踪、event/watcher 都还没有被设置，也就是说不能访问到data、computed、watch、methods上的方法和数据。
-2. **created（创建后）**：实例创建完成，实例上配置的 options 包括 data、computed、watch、methods 等都配置完成，但是此时渲染得节点还未挂载到 DOM，所以不能访问到 `$el`属性。
+2. **created（创建后）**：实例创建完成，实例上配置的 options 包括 data、computed、watch、methods 等都配置完成，**但是此时渲染得节点还未挂载到 DOM**，所以不能访问到 `$el`属性。
 
 
 
 3. **beforeMount（挂载前）**：在挂载开始之前被调用，相关的render函数首次被调用。此阶段Vue开始解析模板，生成虚拟DOM存在内存中，还没有把虚拟DOM转换成真实DOM，插入页面中。所以网页不能显示解析好的内容。
-4. **mounted（挂载后）**：在el被新创建的 vm.$el（就是真实DOM的拷贝）替换，并挂载到实例上去之后调用（将内存中的虚拟DOM转为真实DOM，真实DOM插入页面）。此时页面中呈现的是经过Vue编译的DOM，这时在这个钩子函数中对DOM的操作可以有效，但要尽量避免。一般在这个阶段进行：开启定时器，发送网络请求，订阅消息，绑定自定义事件等等
+4. **mounted（挂载后）**：在el被新创建的 vm.$el（就是真实DOM的拷贝）替换，并挂载到实例上去之后调用（将内存中的虚拟DOM转为真实DOM，真实DOM插入页面）。此时页面中呈现的是经过Vue编译的DOM，这时在**这个钩子函数中对DOM的操作可以有效，但要尽量避免**。一般在这个阶段进行：开启定时器，发送网络请求，订阅消息，绑定自定义事件等等
 
 
 
 5. **beforeUpdate（更新前）**：响应式数据更新时调用，此时虽然响应式数据更新了，但是对应的真实 DOM 还没有被渲染（数据是新的，但页面是旧的，页面和数据没保持同步呢）。
-6. **updated（更新后）** ：在由于数据更改导致的虚拟DOM重新渲染和打补丁之后调用。此时 DOM 已经根据响应式数据的变化更新了。调用时，组件 DOM已经更新，所以可以执行依赖于DOM的操作。然而在大多数情况下，应该避免在此期间更改状态，因为这可能会导致更新无限循环。该钩子在服务器端渲染期间不被调用。
+6. **updated（更新后）** ：在由于数据更改导致的虚拟DOM重新渲染和打补丁之后调用。此时 DOM 已经根据响应式数据的变化更新了。调用时，组件 DOM已经更新，所以可以执行依赖于DOM的操作。然而在大多数情况下，**应该避免在此期间更改状态，因为这可能会导致更新无限循环**。该钩子在服务器端渲染期间不被调用。
 
 
 
@@ -4001,7 +4030,7 @@ Vue.use(plugin)
 
 less案例:
 
-下载less-loader：1、`view less-loader versions`  2、`npm i less-loader@7 `
+下载less-loader、less：`npm i less-loader less `
 
 ```vue
 <style lang="less" scoped>
@@ -4131,6 +4160,21 @@ localStorage.setItem('todoList', JSON.stringify(value));
 ```js
 todoList: JSON.parse(localStorage.getItem('todoList')) || []
 ```
+
+
+
+**案例：**
+
+```js
+// 更新 vuex/home 里的 navList （如果本地存储有就不用发请求）
+if(JSON.parse(localStorage.getItem('navList'))) {
+    this.$store.state.home.navList = JSON.parse(localStorage.getItem('navList'));
+} else {                
+    this.$store.dispatch('home/updataNavList');
+}
+```
+
+
 
 
 
@@ -4809,11 +4853,11 @@ mounted() {
 
 
 
-## 2.7 nextTick
+## 2.7 this.$nextTick
 
 1. 语法：```this.$nextTick(回调函数)```
 2. 作用：当DOM解析完成之后在执行其指定的回调。
-3. 什么时候用：当改变数据后，**要基于更新后的新DOM进行某些操作时**，要在nextTick所指定的回调函数中执行。
+3. 什么时候用：**当改变数据后，要基于更新后的新DOM进行某些操作时**，要在nextTick所指定的回调函数中执行。
 
 具体案例：**点击编辑后input才出现且自动获取焦点**
 
@@ -5011,17 +5055,17 @@ this.$nextTick(function() {
 
 ### 2.8.2 搭配animate.css
 
-1、appear：页面刷新就执行动画
+**注意：元素最好有 v-show**
 
-2、name：必须包含animate__animated，然后在取一个名字作为该标签独有动画
+1、appear属性：页面刷新就执行动画
 
-3、enter-active-class：元素显示时执行的动画
+2、enter-active-class：元素显示时执行的动画
 
-4、leave-active-class：元素消失时执行的动画
+3、leave-active-class：元素消失时执行的动画
 
-5、单个元素用`transition`     多个元素用`transition-group`
+4、单个元素用`transition`     多个元素用`transition-group`
 
-6、动画采样：https://www.dowebok.com/demo/2014/98/
+5、动画采样：https://www.dowebok.com/demo/2014/98/
 
 
 
@@ -5032,10 +5076,9 @@ this.$nextTick(function() {
 	<div>
 		<button @click="isShow = !isShow">显示/隐藏</button>
 		<transition-group 
-			appear
-			name="hello animate__animated" 
-			enter-active-class="animate__swing"
-			leave-active-class="animate__backOutUp"
+			appear 
+			enter-active-class="animate__animated animate__swing"
+			leave-active-class="animate__animated animate__backOutUp"
 		>
 			<h1 v-show="!isShow" key="1">你好啊！</h1>
 			<h1 v-show="isShow" key="2">尚硅谷！</h1>
@@ -5138,6 +5181,10 @@ module.exports = {
 
 
 ### 2.9.2 axios请求
+
+axios要提前安装和引入
+
+
 
 当配置了方式二时，我们向5000、5001端口发送请求，**注意看url**
 
@@ -5979,19 +6026,27 @@ increment(n) {
 
 2、前端路由：key是路径，value是组件。
 
+3、具体使用：key：页面 url     value：路由规则下由 key 对应的路由组件
+
+```vue
+// key: http://127.0.0.1:8000/#/home
+
+<router-view></router-view> // value：hone组件
+```
+
 
 
    
 
 ## 4.1 基本使用
 
-1. 安装vue-router，命令：```npm i vue-router@3```（vue2安装vue-router3版本）
+1. 安装vue-router，命令：`npm i vue-router@3`（vue2安装vue-router3版本）
 
 
 2. 应用插件：```Vue.use(VueRouter)```
 
 
-3. 编写router配置项:
+3. 编写router配置项：（router/index.js）
 
    ```js
    //引入VueRouter
@@ -6010,7 +6065,11 @@ increment(n) {
    		{
    			path:'/home',
    			component:Home
-   		}
+   		},
+           {   // 重定向进入首页默认路由为/home
+               path:'/',
+               redirect: '/home'
+           }  
    	]
    })
    
@@ -6052,14 +6111,40 @@ increment(n) {
 
 ## 4.2 几个注意点
 
-1. 路由组件通常存放在```pages```文件夹，一般组件通常存放在```components```文件夹。
+1. 路由组件通常存放在```views```文件夹，一般组件通常存放在```components```文件夹。
 2. 通过切换，“隐藏”了的路由组件，默认是被销毁掉的，需要的时候再去挂载。
 3. 每个组件都有自己的```$route```属性，里面存储着自己的路由信息。
 4. 整个应用只有一个router，可以通过组件的```$router```属性获取到。
 
+**获取当前页面的路由**
+
+```js
+this.$route // 里面有params、query、meta等参数！！！！
+```
+
+
+
+获取**总路由**
+
+```js
+this.$router
+```
+
+
+
 
 
 ## 4.3 多级路由
+
+理解：路由组件里面还包含路由组件 
+
+```vue
+<router-view></router-view> // 路由组件中存在这个
+```
+
+再通过路由规则去实现value
+
+
 
 1. 配置路由规则，使用children配置项：
 
@@ -6107,7 +6192,7 @@ increment(n) {
 
 
 
-1. 传递参数：在路由规则对应的组件中可以接收到
+1. 传递参数：**在路由规则对应的组件中可以接收到**
 
    ```html
    <!-- 跳转并携带query参数，to的普通字符串写法 -->
@@ -6125,7 +6210,7 @@ increment(n) {
    >跳转</router-link>
    ```
 
-2. 接收参数：
+2. 接收参数：（this.$route：跳转之后的路由）
 
    ```html
    this.$route.query.id
@@ -6231,6 +6316,9 @@ increment(n) {
    				{
    					name:'xiangqing',
    					path:'detail/:id/:title', //使用占位符声明接收params参数
+                      
+                       // path:'detail/:id?' 使用问号表示可以传可以不传
+   
    					component:Detail
    				}
    			]
@@ -6257,7 +6345,9 @@ increment(n) {
    >跳转</router-link>
    ```
 
-   > 特别注意：路由携带params参数时，若使用to的对象写法，则不能使用path配置项，必须使用name配置！
+   > 1、路由携带params参数时，若使用to的对象写法，则不能使用path配置项，必须使用name配置！
+   >
+   > 2、如果参数为空字符串最好把空字符串变为undefined
 
 3. 接收参数：
 
@@ -6411,6 +6501,7 @@ router/index.js：
 
 ```js
 // 使用编程式路由实现跳转的时候，多次执行报错问题处理
+// 重写push、replace来解决
 let originPush=VueRouter.prototype.push;
 let originReplace=VueRouter.prototype.replace;
 VueRouter.prototype.push=function(location,resolve,reject){
@@ -6426,6 +6517,28 @@ VueRouter.prototype.replace=function(location,resolve,reject){
     }else{
         originReplace.call(this,location,()=>{},()=>{});
     }
+}
+```
+
+
+
+### 4.9.1 合并参数
+
+当页面中的 `this.$route.query/params` 已经存在参数，并且我们还要跳转路由发送参数时，我们可以使用合并参数。 **就是发送参数的时候把已经存在的参数一起带上即可**
+
+```js
+goSearch() {
+    this.$router.push({
+        path: '/search',
+        
+        query: {
+            value: this.searchWord,
+            
+            dataname: this.$route.query.dataname || '', // 已经存在的参数
+        },
+        
+        params: ..., // 如果存在params参数也可以一起发送
+    })
 }
 ```
 
@@ -6592,6 +6705,12 @@ beforeRouteLeave (to, from, next) {
 
 ## 4.13 路由器的两种工作模式
 
+```js
+mode: 'history/hash'
+```
+
+
+
 1. 对于一个url来说，什么是hash值？—— #及其后面的内容就是hash值。
 
 2. hash值不会包含在 HTTP 请求中，即：**hash值不会带给服务器。**
@@ -6632,7 +6751,45 @@ app.use(history());
 
 
 
-## 5.1 关于打包部署
+这里介绍一下 yarn 的安装和使用 
+
+```
+npm i -g yarn // 全局安装
+```
+
+
+
+通过 yarn 下载依赖包的优点：
+
+1. 安装速度快 (服务器速度快 , 并且是**并行下载**)
+2. 版本锁定，安装版本统一
+3. 缓存机制，如果之前已经安装过一个软件包，用Yarn再次安装时之间从缓存中获取，就不用像npm那样再从网络下载了
+4. 输出简洁并且多注册来源处理。安装包时，直观地打印出必要的信息；不管包被不同的库间接关联引用多少次，只会从一个注册来源去装，防止出现混乱不一致。
+
+
+
+npm 和 yarn 命令对比
+
+![image-20230114104150953](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20230114104150953.png)
+
+还要改一下镜像下载源
+
+```
+# 查看当前的下载包镜像源
+npm config get registry
+
+# 将下载包镜像源切换为淘宝镜像源
+npm config set registry=https://registry.npm.taobao.org
+
+# 查看镜像源是否下载成功
+npm config get registry
+```
+
+
+
+
+
+### 5.1 关于打包部署
 
 1、当前端页面完成后，执行`npm run build` ，会生成dist文件夹，里面只有HTML、CSS、JS和其他资源文件
 
@@ -6661,4 +6818,1190 @@ app.listen(5000,(err)=>{
 ```
 
 
+
+### 5.2 关于文件夹文件命名
+
+我们是这样，**用一个文件夹来封装一个组件，入口vue文件命名为index.vue**。文件夹里面有这个组件用到的图片、字体图标等静态资源，还有其他该组件用到的一些小组件
+
+```js
+// 引入组件
+import Header from '@/components/Header' // 自动引入index.vue
+```
+
+
+
+如果一个组件仅仅用一个 vue 文件就可以封装好，则可以不用建一个文件夹
+
+<img src="C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20230109221854190.png"/>
+
+
+
+### 5.3 注册全局组件
+
+当某个小组件在很多组件中都有用到时，我们可以去 main.js 里面把在这个组件注册成全局组件，然后使用这个小组件都可以不用先引入了！！
+
+
+
+全局组件要放在components文件夹中
+
+ main.js：
+
+```js
+// 注册全局组件
+import TypeNav from '@/components/TypeNav.vue'
+Vue.component(TypeNav.name,TypeNav)
+```
+
+
+
+#### 5.3.1 App根组件发送请求
+
+当一个全局组件在多个组件中用到，则到碰到路由跳转时，**这个全局组件不断会被新建销毁新建销毁**。。。
+
+如果该组件中的数据需要发送请求才能获取，那么我们不能在这个组件里面发，**我们应该去App组件里面发。**
+
+
+
+这样就只需要发送一次请求即可！！（App根组件 mounted 只执行一次）
+
+
+
+App.vue
+
+```js
+// 请求一般在 mounted 这里发送
+// 这里是申请通过 vuex 获取数据
+
+mounted() {
+    this.$store.dispatch('home/updataNavList');
+}
+```
+
+
+
+store/home.js（vuex）
+
+```js
+// home仓库
+
+// 引入请求函数
+import { reqgetCategoryList } from '@/api'
+
+export default {
+	namespaced: true,
+
+    actions: {
+        async updataNavList(context) {
+            let result = await reqgetCategoryList();
+
+            if(result.code == 200) {
+                context.commit('updataNavList',result.data)
+            }
+        }
+    },
+
+    mutations: {
+        updataNavList(state,value) {
+            state.navList = value;
+        }
+    },
+
+    state: {
+        navList: [],
+    },
+}
+```
+
+
+
+
+
+### 5.4 正确发送请求的方式
+
+#### 5.4.1 多接口模式
+
+1、首先我们要明确我们是要在一个大型接口网站下发送多个请求，那个网站会提供多个接口
+
+
+
+2、所以我们要用到：
+
+- 服务器配置代理：实现本地端口到目标端口的映射，解决跨域问题
+- axios二次封装：发送请求前可以做一些事情，响应之后可以写回调函数
+- 接口统一管理：当需要修改请求时，只需要改这里，不用动组件
+
+
+
+**3、配置步骤**
+
+
+
+3.1 服务器配置代理
+
+在 vue.config.js 配置具体代理规则（其他参数上面章节有讲到）
+
+```js
+// 配置服务器代理
+devServer: {
+    proxy: {
+
+        // 匹配所有以 '/api'开头的请求路径
+        '/api': {
+            target: 'http://gmall-h5-api.atguigu.cn', // 硅谷后台管理系统接口  
+        },
+
+    }
+}
+```
+
+当有请求 url 以 `/api` 开头时：
+
+1、`http://localhost:8080/api...` 会**映射**为 `http://gmall-h5-api.atguigu.cn/api...`
+
+2、并且还会解决跨域问题
+
+
+
+3.2 axios二次封装
+
+在 src 文件夹下新建 api 文件夹，新建 `requests.js` 来二次封装 axios
+
+ requests.js：（固定模板）
+
+```js
+// 对axios进行二次封装！让requests代替axios
+
+import axios from "axios";
+
+const requests = axios.create({
+
+    //基础路径 请求url默认开头会加上baseURL
+    baseURL: "/api",
+    
+    //请求不能超过5S
+    timeout: 5000,
+
+});
+
+//请求拦截器----在项目中发请求前执行的函数
+requests.interceptors.request.use(function(config) {
+
+    // 加载进度条
+    nprogress.start();
+
+    return config;
+})
+
+//响应拦截器----当服务器响应请求后的回调函数
+requests.interceptors.response.use(
+    // 成功回调
+    function(res) {
+        // 直接返回响应体的 data 作为 promise对象 的value
+        return res.data
+    },
+
+    // 失败回调
+    function(err) {
+        console.log(err);
+        return err;
+    }
+)
+
+export default requests;
+```
+
+
+
+3.3 接口统一管理      `@/api`
+
+概念：在 src/api 文件夹下新建 `index.js` 来封装所有 发送请求函数。当一个组件想要发送请求时，只需要引入 `src/api/index.js` 中的某个 发送请求函数，之后调用该函数即可。
+
+
+
+注意点：**请求函数返回一个promise对象！！**   存在 状态 和 value
+
+
+
+例如：封装一个 `reqgetCategoryList` 函数来发送 
+
+`url = 'http://localhost:8080/api/product/getBaseCategoryList'` 的请求
+
+
+
+src/api/index.js：
+
+```js
+// 统一接口管理：封装所有请求函数
+
+// 请求函数返回promise对象
+
+import requests from "./requests";
+
+// api 接口
+export const reqgetCategoryList = function() {
+    return requests.get(`/product/getBaseCategoryList`); // 本地端口号可以不写
+}
+
+// params 参数传递
+export const reqgetSearchData = function(params) {
+    return requests({
+        method: 'POST',
+        url: '/list',
+        data: params,
+    })
+} 
+```
+
+
+
+3.4 我们来调用一下刚刚封装的 `reqgetCategoryList` 函数
+
+有两种方式：then、async/await（我笔记里面有怎么用）
+
+```js
+import { reqgetCategoryList } from './api'
+
+// then
+reqgetCategoryList().then(function(value) {
+    coonsole.log(value)
+})
+
+// async/await
+async updataNavList(context) {
+    let value = await reqgetCategoryList();
+    console.log(value);
+}
+```
+
+
+
+#### 5.4.2 单接口模式
+
+如果一个请求的 url 网站只会它的一个或两个接口，并且只会用一次两次。那么直接用 axios 发送请求即可
+
+```
+npm i axios
+```
+
+```js
+import axios from 'axios'
+
+let url = 'http://localhost:8080/api2/cars';
+axios.get(url, {
+}).then(value => {
+    console.log(value.data);
+})
+```
+
+
+
+### 5.5 实现加载进度条
+
+发送请求后我们可以用进度条在展示进展
+
+安装进度条
+
+```
+npm i nprogress
+```
+
+
+
+在 requests.js 下添加如下配置：
+
+```js
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'; // 可以进去修改样式
+
+requests.interceptors.request.use(function(config) {
+
+    // 加载进度条
+    nprogress.start();
+
+    return config;
+})
+
+...nprogress.done();
+```
+
+
+
+### 5.6 关于vuex的运用
+
+一般在项目中在全局组件或大组件的数据，或者需要从服务器获取的数据都储存在vuex中
+
+而且vuex需要模块化。
+
+#### 5.6.1 vuex常用方法
+
+1、读取数据
+
+```js
+import {mapState} from 'vuex'
+
+computed: {
+    ...mapState('home',['navList']),
+},
+```
+
+
+
+2、调用dispatch
+
+```js
+// 调用 home 仓库下的 actions 中的 updataNavList 函数
+
+this.$store.dispatch('home/updataNavList');
+```
+
+
+
+
+
+#### 5.6.1 vuex工作模式
+
+**案例：home组件中的nav组件展示时自动更新数组navList**
+
+
+
+1、新建src/store文件夹 新建index.js
+
+```js
+//引入Vue核心库
+import Vue from 'vue'
+//引入Vuex
+import Vuex from 'vuex'
+//应用Vuex插件
+Vue.use(Vuex)
+
+// 引入仓库
+import home from './home'
+
+//创建并暴露store
+export default new Vuex.Store({
+	modules: {
+        home,
+	}
+})
+```
+
+
+
+2、nav组件  获取vuex中的navList  和 申请更新navList
+
+```js
+import {mapState} from 'vuex'
+
+export default {
+    name: 'TypeNav',
+
+    computed: {
+        ...mapState('home',['navList']),
+    },
+
+    mounted() {
+        // 更新 vuex/home 里的 navList
+        this.$store.dispatch('home/updataNavList');
+
+        console.log(this.navList);
+    },
+}
+```
+
+
+
+3、配置home.js
+
+- 一般在 actons 向服务器发送请求
+- 调用请求函数获取到 promise 对象可通过 async/await 获取具体的值
+- 通过 context.commit 近一步更新NavList
+- 在 mutations 中直接更新！
+
+```js
+// home仓库
+
+// 引入axios请求函数
+import { reqgetCategoryList } from '@/api'
+
+export default {
+	namespaced: true,
+
+    actions: {
+        async updataNavList(context) {
+            let result = await reqgetCategoryList();
+
+            if(result.code == 200) {
+                context.commit('updataNavList',result.data)
+            }
+        }
+    },
+
+    mutations: {
+        updataNavList(state,value) {
+            state.navList = value;
+        }
+    },
+
+    state: {
+        navList: [],
+    },
+
+    getters: {
+    }
+
+}
+```
+
+
+
+### 5.7 防抖与节流（lodash.js）
+
+我们这里用到一个第三方库：lodash.js   
+
+中文文档： https://www.lodashjs.com/docs/lodash.throttle
+
+CDN：
+
+```html
+<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.corejs"></script>
+```
+
+
+
+vue里面安装及使用：
+
+```
+npm i lodash
+```
+
+```js
+import {debounce,throttle} from 'lodash'
+
+methods: {
+    addColor: throttle(function(index) {
+        this.currentIndex = index;
+    },50)
+},
+```
+
+
+
+
+
+#### 5.7.1 防抖
+
+1、概念：前面的所有的触发都被取消，**最后一次执行** 在 **规定的时间** 之后才会触发，也就是说如果连续快速的触发,只会执行最后一次
+
+
+
+2、loadsh 中的 debounce 函数，参数为一个函数和防抖时间
+
+
+
+3、一般用于表单的输入而触发的回调函数，实现当用户输入完成之后再执行回调函数
+
+
+
+4、具体案例：当输入停止 且1s后 才会打印111
+
+```js
+const input = document.querySelector('input');
+
+input.oninput = _.debounce(function() {
+    console.log('111');
+},1000)
+```
+
+
+
+#### 5.7.2 节流
+
+1、概念：在规定的 **间隔时间** 内不会重复触发回调，只有大于这个时间间隔才会触发回调，把频繁触发变为少量触发
+
+
+
+2、一般防止用户快速点击，例如1s内只能执行函数一次
+
+
+
+3、loadsh 中的 throttle 函数，参数为一个函数和节流时间
+
+
+
+4、使用
+
+```js
+import {debounce,throttle} from 'lodash'
+
+methods: {
+    addColor: throttle(function(index) {
+        this.currentIndex = index;
+    },50)
+},
+```
+
+
+
+### 5.8 事件委派+编程式路由
+
+1、事件委派：如果一个父节点有多个子节点，且多个子节点都需要绑定同一个函数。那么我们应该把事件委派给父节点！！只给父节点添加绑定事件
+
+
+
+2、编程式路由：如果通过 v-for 会有多个 router-link 生成，那么我们要取消使用 router-link ，改用编程式路由节约编译时间！！！用绑定事件实现路由跳转
+
+
+
+3、事件委派+编程式路由：**两个结合用于解决多子节点路由跳转问题**   既在父节点中添加绑定事件，在绑定事件中实现路由跳转！！！
+
+
+
+#### 5.8.1 设置自定义属性
+
+1、作用：子节点要想在父节点中独一无二必须要加上自定义属性！
+
+
+
+2、自定义属性命名方式：`data-单词全部小写`
+
+```js
+:data-itemname="item.categoryName"
+```
+
+
+
+3、具体使用：获取节点（e.target）    获取节点自定义属性对象（e.target.dataset）
+
+```js
+goSearch(e) {
+    
+    let itemname = e.target.dataset.itemname; // 普通获取值
+    
+    let { itemname } = e.target.dataset; // 对象结构获取值
+}
+```
+
+
+
+#### 5.8.2 案例
+
+使每个 a 标签实现路由跳转
+
+```vue
+// 父组件未展示
+
+<a href="javascript:void(0);" :data-dataname="item_c_c.categoryName">
+    {{item_c_c.categoryName}}
+</a>
+```
+
+```js
+goSearch(e) {
+    let { dataname } = e.target.dataset;
+
+    if(dataname) {
+        this.$router.push({
+            path: '/search',
+            query: { dataname }
+        })
+    }
+}
+```
+
+
+
+### 5.9 transition标签搭配动画
+
+Vue封装了一个标签 `<transition>` 来实现一个元素的显示与隐藏（v-show） 产生的过渡动画
+
+第三方库这里用到`animate.css` 、 `transition.css`（这个直接复制）
+
+https://www.transition.style/#out:circle:center
+
+https://www.dowebok.com/demo/2014/98/
+
+
+
+下面两个案例自己复制看看效果！！！
+
+#### 5.9.1 animate.css
+
+```js
+npm i animate.css
+
+// 在 mian.js 全局安装
+import animated  from 'animate.css'
+Vue.use(animated)
+```
+
+```vue
+<template>
+	<div>
+		<button @click="show = !show;">点击</button>
+
+		<transition
+			enter-active-class="animate__animated animate__swing"
+			leave-active-class="animate__animated animate__backOutUp"
+		>
+			<!-- 导航下拉面板 -->
+			<div class="nav" v-show="show"></div>
+		</transition>
+
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Test',
+		data() {
+			return {
+				show: false
+			}
+		},
+	}
+</script>
+
+<style scoped>
+	.nav {
+		width: 100px;
+		height: 200px;
+		background: red;
+	}
+</style>
+```
+
+
+
+#### 5.9.2 transition.css
+
+1、需要手动复制动画 并将 `[transition-style="..."]`  改为类名
+
+```vue
+<template>
+	<div>
+		<button @click="show = !show;">点击</button>
+
+		<transition
+			enter-active-class="down"
+			leave-active-class="up"
+		>
+			<!-- 导航下拉面板 -->
+			<div class="nav" v-show="show"></div>
+		</transition>
+
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'Test',
+		data() {
+			return {
+				show: false
+			}
+		},
+	}
+</script>
+
+<style scoped>
+	.nav {
+		width: 100px;
+		height: 200px;
+		background: red;
+	}
+
+    @keyframes wipe-in-down {
+		from {
+			clip-path: inset(0 0 100% 0);
+		}
+		to {
+			clip-path: inset(0 0 0 0);
+		}
+    }
+
+    .down {
+        animation: 1s cubic-bezier(.25, 1, .30, 1) wipe-in-down both;
+    }
+
+    @keyframes wipe-out-up {
+		from {
+			clip-path: inset(0 0 0 0);
+		}
+		to {
+			clip-path: inset(0 0 100% 0);
+		}
+    }
+
+    .up {
+        animation: 1s cubic-bezier(.25, 1, .30, 1) wipe-out-up both;
+    }
+
+
+</style>
+```
+
+
+
+### 5.10 mockjs 的使用
+
+概念：自娱自乐的发送请求，因为 mock 自己存储数据，然后又发送请求从 mock 读取数据。发送请求还是和 ajax 一致。
+
+
+
+1、创建 mock 文件夹，存储 json 数据 和 mockServe.js （json 数据：自己模拟的，不是从服务器里获取）
+
+banner.json：（轮播图数据）
+
+```json
+[
+  {
+    "id": "1",
+    "imgUrl": "/images/banner1.jpg"
+  },
+  {
+    "id": "2",
+    "imgUrl": "/images/banner2.jpg"
+  },
+  {
+    "id": "3",
+    "imgUrl": "/images/banner3.jpg"
+  },
+  {
+    "id": "4",
+    "imgUrl": "/images/banner4.jpg"
+  }
+]
+```
+
+
+
+2、mockServe.js：mock 服务器，设置响应体，就用自己写的数据
+
+```js
+import Mock from 'mockjs'
+
+// 引入 json 数据
+import banner from './banner.json'
+
+// 设置响应
+Mock.mock('/mock/banner',{
+    data: banner,    
+})
+```
+
+
+
+3、去 main.js 里面激活一下 mock 服务
+
+```js
+import '@/mock/mockServe'
+```
+
+
+
+4、进入 api 文件夹，新建 mockRequests.js
+
+mockRequests.js
+
+```js
+// mockRequests：mock 的 ajax 封装
+
+import axios from 'axios';
+
+// 进度条
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css';
+
+const mockRequests = axios.create({
+
+    //基础路径 请求url默认开头会加上baseURL
+    baseURL: "/mock",
+    
+    //请求不能超过5S
+    timeout: 5000,
+
+});
+
+//请求拦截器----在项目中发请求前执行的函数
+mockRequests.interceptors.request.use(function(config) {
+
+    // 加载进度条
+    nprogress.start();
+
+    return config;
+})
+
+//响应拦截器----当服务器响应请求后的回调函数
+mockRequests.interceptors.response.use(
+    // 成功回调
+    function(res) {
+        // 进度条结束
+        nprogress.done();
+
+        // 直接返回响应体的 data 作为 promise对象 的value
+        return res.data
+    },
+
+    // 失败回调
+    function(err) {
+        nprogress.done();
+
+        console.log('mock数据请求失败');
+        return err;
+    }
+)
+
+export default mockRequests;
+```
+
+
+
+5、进入 src/index.js 写 mock 请求函数
+
+```js
+import mockRequests from './mockRequests'
+
+// mock 接口
+export const reqgetBannerList = function() {
+    return mockRequests.get('/banner');
+}
+```
+
+
+
+6、最后！在组件中发送 mock 请求，例如调用 reqgetBannerList 函数
+
+```js
+import { reqgetBannerList } from '@/api'
+
+async updataBannerList(context) {
+    let result = await reqgetBannerList();
+
+    if(result) {
+        console.log(result.data)
+    }
+}
+```
+
+
+
+### 5.11 swiper.js 的使用
+
+官网 API（部署在 swiper 实例中）：https://www.swiper.com.cn/api/index.html
+
+
+
+官网轮播图（查看源代码）：https://www.swiper.com.cn/demo/index.html
+
+
+
+接下来介绍怎么在 vue2 里使用 swiper.js （vue2 使用 swiper5版本）
+
+1、安装、引入css
+
+```
+npm i swiper@5
+```
+
+```js
+// main.js
+
+// 引入 swiper.css
+import "swiper/css/swiper.css";
+```
+
+
+
+2、在组件中使用：引入 js  引入 html 结构 
+
+```js
+import Swiper from 'swiper'
+```
+
+
+
+html 结构：
+
+1、开始先放个图片占个位置确定布局，再把图片换成下面的结构
+
+2、注意最外层的 `class="swiper-container"` 必须！且后面的 swiper 实例也要改！
+
+```html
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide" v-for="(img,index) in bannerList" :key="index">
+            <img :src="img.imgUrl" />
+        </div>
+    </div>
+
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+</div>
+```
+
+
+
+3、最后关键是创建 swiper 实例！ 有两种方式
+
+**方式一：**
+
+如果图片已经固定（或图片url数组已经确定 ）那么**直接在 mounted 函数中创建**
+
+```js
+mounted() {
+    // 下面是普通swiper模板
+    var swiper = new Swiper(".swiper-container", {
+        cssMode: true,
+        loop: true,
+        mousewheel: true,
+        keyboard: true,
+
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+
+        pagination: {
+            el: ".swiper-pagination",
+        },                    
+    });
+}
+```
+
+
+
+**方式二：**
+
+用到 v-for 遍历图片url数组（**并且该数组是在本组件中通过发请求获取的**），那么就要用到 watch + $nextTick
+
+
+
+#### 5.11.1 watch+$nextTick
+
+当一个数据发生改变时，此时 DOM 还没有更新，所以在监视属性中的 handle 函数中 写一个 $nextTick 可以实现 **数据发生改变且 DOM 更新后执行代码**
+
+
+
+回到 swiper ，我们在这个时候 创建 swiper 实例
+
+bannerList：图片url数组
+
+```js
+watch: {
+    bannerList: {
+        handler() {
+            this.$nextTick(function() {
+                var swiper = new Swiper(".swiper-container", {
+                    cssMode: true,
+                    loop: true,
+                    mousewheel: true,
+                    keyboard: true,
+
+                    navigation: {
+                        nextEl: ".swiper-button-next",
+                        prevEl: ".swiper-button-prev",
+                    },
+
+                    pagination: {
+                        el: ".swiper-pagination",
+                    },                    
+                });
+            })
+        }
+    }
+},
+```
+
+
+
+#### 5.11.2 修改分页器样式
+
+1、添加属性
+
+```js
+pagination: {
+    el: ".swiper-pagination",
+    clickable: true,
+    bulletClass : 'my-bullet', // 这个
+    bulletActiveClass: 'my-bullet-active',
+},
+```
+
+
+
+2、在组件里面写 css （不要加 scope）
+
+```less
+// 分页器样式
+.my-bullet{
+    position: relative;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+    background: black;
+    opacity: 0.5;
+    margin: 0 4px;
+}
+
+// 选中的分页器样式（会继承上面那个样式）
+.my-bullet-active {
+    background: #ff6600;
+    opacity: 1;
+}
+```
+
+
+
+#### 5.11.3 封装轮播图组件
+
+当一个图片需要变为轮播图时，我们把 img 标签 换成 Carousel 组件即可！
+
+1、Carousel 组件需要一个参数：图片 url 数组
+
+```js
+imgList = [
+    {imgUrl: '...'}
+    {imgUrl: '...'}
+]
+```
+
+
+
+2、将 Carousel 组件注册为全局组件
+
+```js
+// 在 components 中新建 Carousel 文件夹
+
+// main.js
+import Carousel from '@/components/Carousel'
+Vue.component(Carousel.name,Carousel)
+```
+
+
+
+3、Carousel/index.vue （直接照搬即可 样式可自行修改）
+
+```vue
+<template>
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide" v-for="(img,index) in imgList" :key="index">
+                <img :src="img.imgUrl" />
+            </div>
+        </div>
+
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+</template>
+
+<script>
+    import Swiper from 'swiper'
+
+    export default {
+        name: 'Carousel',
+
+        props: ['imgList'],
+
+        watch: {
+            imgList: {
+                immediate: true,
+                handler() {
+                    this.$nextTick(function() {
+                        var swiper = new Swiper(".swiper-container", {
+                            // loop: true,
+                            // spaceBetween: 30,
+                            hashNavigation: {
+                                watchState: true,
+                            },
+                            pagination: {
+                                el: ".swiper-pagination",
+                                clickable: true,
+                                bulletClass : 'my-bullet',
+                                bulletActiveClass: 'my-bullet-active',
+
+                            },
+                            navigation: {
+                                nextEl: ".swiper-button-next",
+                                prevEl: ".swiper-button-prev",
+                            },
+                        });
+                    })
+                }
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    // 分页器样式
+    .my-bullet{
+        position: relative;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 100%;
+        background: black;
+        opacity: 0.5;
+        margin: 0 4px;
+    }
+
+    // 选中的分页器样式（会继承上面那个样式）
+    .my-bullet-active {
+        background: #ff6600;
+        opacity: 1;
+    }
+</style>
+```
+
+
+
+4、组件中使用（传入图片 url 数组即可）
+
+```vue
+<Carousel :imgList="bannerList" />
+```
+
+
+
+
+
+### 5.12 Element-ui 按需引入
+
+```
+npm i element-ui -S
+```
+
+babel.config.js
+
+```
+module.exports = {
+  "presets": [
+        "@vue/cli-plugin-babel/preset",
+        ["@babel/preset-env", { "modules": false }]
+   ],
+
+  "plugins": [
+    [
+        "component",
+        {
+            "libraryName": "element-ui",
+            "styleLibraryName": "theme-chalk"
+        }
+    ]
+  ]
+}
+```
+
+main.js
+
+```js
+// 引入 element-ui
+import { Button, Select } from 'element-ui'
+Vue.use(Button)
+Vue.use(Select)
+```
 

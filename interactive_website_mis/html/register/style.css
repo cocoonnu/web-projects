@@ -21,7 +21,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url(./wave-haikei.png);
+    /* background-image: url(./wave-haikei.png); */
+    background: linear-gradient(45deg,#fbda61,#ff5acd);
     background-size: cover;
     /* 逆向且循环播放 */
     animation: move 10s linear alternate infinite;
@@ -46,6 +47,7 @@ body {
 }
 
 .login-box h2 {
+    color: rgba(59,69,78,1.00);
     font-size: 2.2rem;
 }
 
@@ -101,13 +103,14 @@ form .form-group .iconfont {
 }
 
 form .login {
-    color: #3784ff;
+    /* color: #3784ff; */
+    color: #fb80d6;
     font-size: 18px;
     cursor: pointer;
 }
-form .login:hover {
+/* form .login:hover {
     color: #124ce7;
-}
+} */
 
 form input[type='submit'] {
     width: 100%;
@@ -116,6 +119,7 @@ form input[type='submit'] {
     color: #fff;
     border-radius: 3px;
     margin-top: 28px;
-    background: linear-gradient(45deg,#124ce7,#3784ff);
+    /* background: linear-gradient(45deg,#124ce7,#3784ff); */
+    background: linear-gradient(45deg,#fbda61,#ff5acd);
     cursor: pointer;
 }
