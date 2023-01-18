@@ -20,6 +20,6 @@
 
 #### 页面预览
 
-![image-20230118214213100](D:\文档\学习文件\GitWebProjects\interactive_website_mis\images\image-20230118214213100.png)
+![image-20230118214213100](images\image-20230118214213100.png)
 
-![image-20230118215911309](D:\文档\学习文件\GitWebProjects\interactive_website_mis\images\image-20230118215911309.png)
+![image-20230118215911309](images\image-20230118215911309.png)

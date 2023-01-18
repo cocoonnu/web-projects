@@ -6,19 +6,19 @@
 
 1、随机密码生成器
 
-![image-20230118221427639](D:\文档\学习文件\GitWebProjects\Projects\images\image-20230118221427639.png)
+![image-20230118221427639](images\image-20230118221427639.png)
 
 
 
 2、Calender日历
 
-![image-20230118221515094](D:\文档\学习文件\GitWebProjects\Projects\images\image-20230118221515094.png)
+![image-20230118221515094](images\image-20230118221515094.png)
 
 
 
 3、Twitter推文框
 
-![image-20230118221651474](D:\文档\学习文件\GitWebProjects\Projects\images\image-20230118221651474.png)
+![image-20230118221651474](images\image-20230118221651474.png)
 
 
 
@@ -27,11 +27,11 @@
 > 这个小游戏很有趣，写的过程当中碰到了很多根本想不到的 bug。这个主要考察对 JavaScript 各种语法和 API 的掌握！ 
 
 
-![image-20230118222220108](D:\文档\学习文件\GitWebProjects\Projects\images\image-20230118222220108.png)
+![image-20230118222220108](images\image-20230118222220108.png)
 
 
 
 5、自定义文件上传
 
-![image-20230118222751162](D:\文档\学习文件\GitWebProjects\Projects\images\image-20230118222751162.png)
+![image-20230118222751162](images\image-20230118222751162.png)
 
