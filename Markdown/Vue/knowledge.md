@@ -2,15 +2,58 @@
 
 
 
-### 媒体查询
+### 第三方在线图标库
+
+1、https://boxicons.com   https://boxicons.com/usage
+
+```html
+// index.html 中引入 css
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+// 作为在线字体使用
+<i class='bx bxl-facebook-square'></i>
+```
+
+
+
+2、https://ionic.io/ionicons   https://ionic.io/ionicons/usage
+
+```html
+// index.html 中引入 js
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+// 作为在线字体使用
+<ion-icon name="heart"></ion-icon>
+```
+
+
+
+
+
+### 媒体查询 + rem
 
 1、html 默认 font-size 为16px ,  `1rem = html-font-size * 1`
 
 2、媒体查询：通过视口宽度实现不同适配方案
 
-2、媒体查询的作用：手动设置 `html-font-size `  、  手动修改样式
+2、媒体查询的作用：手动设置 `html-font-size `  、  手动修改不同视口宽度的样式
 
 3、使用方法：
+
+- 先把常规布局写完（视口宽度为1024px）
+- 然后从大到下 设置媒体查询   **下面的会继承上面的样式**
+- 通过不同视口宽度下 修改某些元素的布局或样式
+
+``` css
+/* 常规 css（750 - ） */
+...
+
+/* 视口宽度：320 - 750 */
+@media screen and (max-width: 750px) {...}
+
+/* 视口宽度：0 - 320 */
+@media screen and (max-width: 30px) {...}
+```
 
 
 
@@ -57,9 +100,15 @@ div {
 首先设置全局样式表 common.css
 
 ```css
-html, body, #app{
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    /* user-select: none; */
+}
+
+html, body, #app{
     height: 100%;
 }
 ```
@@ -90,7 +139,7 @@ img[src=""], img:not([src]) {
 ### flex grid 布局技巧
 
 ```css
-/* flex */
+/* 1、flex */
 
 /* 实现居中 */
 div {
@@ -99,7 +148,11 @@ div {
     align-items: center;
 }
 
-/* grid */
+/* 行列间隙：column-gap  row-gap */
+
+
+
+/* 2、grid */
 
 /* 实现居中 */
 div {
@@ -514,4 +567,15 @@ html {
     filter: progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
 }
 ```
+
+
+
+### 动画收集
+
+1、上下浮动
+
+```css
+```
+
+
 
