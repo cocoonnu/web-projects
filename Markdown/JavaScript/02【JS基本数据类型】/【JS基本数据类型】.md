@@ -119,6 +119,10 @@ typeof 3e-4;	// number
 
 ## 2.5 一个特殊的数字型值 NaN
 
+判断  a 是不是数字：`isNaN(a * 1)`
+
+
+
 `NaN` 是 “not a number” 的意思，即 “不是一个数”，但它是一个数字类型的值。
 
 ```javascript

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
 
 ## 1.1 初识Vue
 
@@ -8,7 +8,7 @@
 * Vue实例和容器是一一对应的
 * 真实开发中只有一个Vue实例，并且会配合着组件一起使用
 * {{xxx}}是Vue的语法：插值表达式，{{xxx}}可以读取到data中的所有属性
-* 一旦data中的数据发生改变，那么页面中用到该数据的地方也会自动更新(Vue实现的响应式)
+* **一旦data中的数据发生改变，那么页面中用到该数据的地方也会自动更新(Vue实现的响应式)**
 
 
 
@@ -416,7 +416,7 @@ const vm = new Vue({
 
 * 使用v-on:xxx 或 @xxx 绑定事件，其中xxx是事件名
 * 事件的回调需要配置在methods对象中，最终会在vm上
-* methods中配置的函数，都是被Vue所管理的函数，this的指向是vm 或 组件实例对象
+* methods中配置的函数，都是被Vue所管理的函数，this的指向是 vm 或 组件实例对象
 * `v-on:` 简写为 `@` ！！！！
 
 
@@ -500,9 +500,11 @@ const vm = new Vue({
 
 ### 1.7.3 事件的传参
 
-事件绑定的函数可以传参：参数$event 则e.target为当前dom对象！！！
+事件绑定的函数可以传参：参数 $event 则 e.target 为当前dom对象！！！
 
-```vue
+如果传参里面不写 $event ，函数里面照样可以用 e 作为参数
+
+```js
 @blur="handleBlur(todo,$event)"
 ```
 
@@ -518,7 +520,7 @@ handleBlur(todo,e) {
 
 
 
-## 1.8 键盘事件@keyup
+## 1.8 键盘事件
 
 键盘事件语法糖：@keydown，@keyup
 
@@ -587,13 +589,16 @@ Vue中常用的按键别名：
 
 
 
-## 1.9 计算属性computed
+## 1.9 计算属性 computed
 
-* 定义：要用的属性不存在，要通过已有属性计算得来
+* 定义：**要用的属性不存在，要通过已有属性计算得来**
 * 原理：底层借助了Objcet.defineProperty方法提供的getter和setter
-* get函数什么时候执行？
-  * (1).初次读取时会执行一次
-  * (2).当依赖的数据发生改变时会被再次调用
+* get 函数什么时候执行？
+  * (1).**初次读取时会执行一次**
+  * (2).**当依赖的数据发生改变时会被再次调用**
+* set 函数什么时候执行？
+  * (1).当手动修改了计算属性时
+  * (2).**我们一般在 set 函数中利用 value 修改 计算属性 所依赖的数据，从而修改该计算属性！！**
 * 优势：与methods实现相比，内部有缓存机制（复用），效率更高，调试方便
 * 备注：
   * 计算属性最终会出现在vm上，直接读取使用即可
@@ -629,6 +634,8 @@ Vue中常用的按键别名：
                     // fullname被外界修改时执行  value为修改的值  应同步修改依赖变量
                     set(value) {
                         let arr = value.split('-');
+                        
+                        // 同步修改依赖变量
                         this.firstname = arr[0];
                         this.lastname = arr[1];   
                     }
@@ -674,9 +681,11 @@ Vue中常用的按键别名：
 
 
 
-## 1.10 监视属性watch
+## 1.10 监视属性 watch
 
 监视属性watch：
+
+- 可以监视组件中所有的属性！！
 
 * 当被监视的属性变化时, 回调函数自动调用, 进行相关操作
 * 监视的属性必须存在，才能进行监视
@@ -722,8 +731,8 @@ vm.$watch('ishot',{
 
 ### 1.10.2 深度监视
 
-* (1).Vue中的watch默认不监测对象内部值的改变（一层）
-* (2).配置deep:true可以监测对象内部值改变（多层）
+* Vue 中的 watch 默认不监测对象内部值的改变（一层）
+* 配置 `deep:true` 可以监测对象内部值改变（多层）
 
 
 
@@ -1178,7 +1187,7 @@ handleDelete() {
 
 ## 1.13 列表渲染
 
-### 1.13.1 v-for指令
+### 1.13.1 v-for
 
 * 用于展示列表数据
 * 语法：`v-for="(item, index) in xxx" :key="yyy"`
@@ -2837,6 +2846,26 @@ vue在工作的某个阶段会执行的函数 我们称为生命周期函数
 
 
 
+### 1.20.3 生命周期函数的使用
+
+1、mounted
+
+- **无法获取 vuex、props 数据**，所以不要在这里设置初始化的数据！！！
+
+- 一般在这里使用 vuex 中的 action 函数
+
+- 如果里面有回调函数，那么一律写成**箭头函数**！！！！
+
+  
+
+
+
+
+
+
+
+
+
 ## 1.21 非单文件组件
 
 非单文件组件定义：一个文件中注册了多个组件，那么组件的html只能写在template里面
@@ -3632,10 +3661,11 @@ let obj = {
 
 ## 2.2 vue 进阶知识点
 
-### 2.2.1 ref属性
+### 2.2.1 ref 属性
 
 * 被用来给元素或子组件注册引用信息（id的替代者）
 * 应用在html标签上获取的是**真实DOM元素**，应用在组件标签上是**组件实例对象**（vc）
+* 一个 ref 属性只能指向一个DOM元素，不能指向多个
 * 使用方式：
   * 打标识：```<h1 ref="xxx">.....</h1>```或 ```<School ref="xxx"></School>```
   * 获取：```this.$refs.xxx```
@@ -3677,11 +3707,14 @@ let obj = {
 
 
 
-### 2.2.2 props配置
+### 2.2.2 props 配置
 
-让组件接收外部传过来的参数   参数优先级最高   不可直接修改   参数不要取内置属性名（如key、ref）
+- 让子组件接收父组件传过来的参数   
+- **props 参数不可修改，不要在 data、mounted 使用**
+- **可以在 html 、computed 中使用**
+- 参数不要取内置属性名（如key、ref）
 
-参数直接变成vc内置属性！！！
+- 参数直接变成组件内置属性
 
 
 
@@ -3755,7 +3788,7 @@ data(){
 
 
 
-### 2.2.3 mixins配置
+### 2.2.3 mixins 配置
 
 混入 (mixin) 提供了一种非常灵活的方式，来分发 Vue 组件中的可复用功能。一个混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
 
@@ -3765,7 +3798,7 @@ data(){
 
 
 
-#### 2.2.3.1 mixins的使用
+#### 2.2.3.1 mixins 的使用
 
 - mixin.js：
 
@@ -3822,7 +3855,7 @@ export const mixin = {
 
 
 
-#### 2.2.3.2 mixin冲突
+#### 2.2.3.2 mixin 冲突
 
 1、data数据冲突
 
@@ -3916,7 +3949,7 @@ vm.conflicting() // => "from self"
 
 
 
-### 2.2.4 plugin插件
+### 2.2.4 plugin 插件
 
 插件通常用来为 Vue 添加全局功能。插件的功能范围没有严格的限制。基于vue2的使用：
 
@@ -4176,10 +4209,6 @@ if(JSON.parse(localStorage.getItem('navList'))) {
 
 
 
-
-
-
-
 **LocalStorage的使用场景:**
 
 - 有些网站有换肤的功能，这时候就可以将换肤的信息存储在本地的LocalStorage中，当需要换肤的时候，直接操作LocalStorage即可
@@ -4199,7 +4228,7 @@ SessionStorage和LocalStorage都是在HTML5才提出来的存储方案，Session
 
 - SessionStorage和LocalStorage都在**本地进行数据存储**；
 - SessionStorage也有同源策略的限制，但是SessionStorage有一条更加严格的限制，SessionStorage**只有在同一浏览器的同一窗口下才能够共享**；
-- LocalStorage和SessionStorage**都不能被爬虫爬取**；
+- LocalStorage和SessionStorage **都不能被爬虫爬取**；
 
 
 
@@ -4228,7 +4257,7 @@ sessionStorage.key(index)
 
 **SessionStorage的使用场景**
 
-由于SessionStorage具有时效性，所以可以用来存储一些网站的游客登录的信息，还有临时的浏览记录的信息。当关闭网站之后，这些信息也就随之消除了。
+由于 SessionStorage 具有时效性，所以可以用来存储一些网站的游客登录的信息，还有**临时的浏览记录的信息**。当关闭网站之后，这些信息也就随之消除了。
 
 
 
@@ -4429,7 +4458,7 @@ Student.vue
 
 
 
-### 2.4.2 ref实现
+### 2.4.2 ref 实现
 
 1、`<Student ref="student"/>`
 
@@ -4590,11 +4619,11 @@ this.$off('atguigu') //解绑一个自定义事件
 
    
 
-2. 使用事件总线：**例如A和B想通信，A需要B的数据。**
+2. 使用事件总线：**例如  A 和 B 想通信，A 需要 B 的数据。**
 
    
 
-   1. 接收数据：在A组件中给$bus**绑定自定义事件**demo，事件的<span style="color:red">回调留在A组件自身。</span>
+   1. 接收数据：在 A 组件中给 $bus **绑定自定义事件 **demo，事件的<span style="color:red">回调留在 A 组件自身。</span>
 
       ```js
       methods(){
@@ -4605,6 +4634,9 @@ this.$off('atguigu') //解绑一个自定义事件
       mounted() {
           // 绑定事件
         this.$bus.$on('demo',this.demo)
+          
+          // 直接写回调函数（必须用箭头函数！）
+        this.$bus.$on('demo',() => {}) 
       }
           
       beforeDestroy() {
@@ -4612,15 +4644,15 @@ this.$off('atguigu') //解绑一个自定义事件
           this.$bus.$off('demo')
       }
       ```
-
+   
       
-
+   
    2. 提供数据：B触发**绑定事件**
-
+   
       ```js
       this.$bus.$emit('demo',data)
       ```
-
+   
       
 
 > 示例代码
@@ -5109,7 +5141,7 @@ this.$nextTick(function() {
 
 
 
-## 2.9 脚手架配置代理
+## 2.9 服务器配置代理
 
 当需要发送跨域服务器的请求，**前端可以配置一个代理8080端口，从而实现跨域请求**（如果服务器不支持跨域）
 
@@ -5119,7 +5151,7 @@ this.$nextTick(function() {
 
 
 
-修改配置有两种方式，然后在用axios发送请求，要注意url地址
+修改配置有两种方式，然后在用 axios 发送请求，要注意 url 地址
 
 
 
@@ -5146,7 +5178,7 @@ devServer:{
 
 **方法二：**
 
-​	编写vue.config.js配置具体代理规则：
+​	编写 vue.config.js 配置具体代理规则：
 
 ```js
 module.exports = {
@@ -5176,7 +5208,7 @@ module.exports = {
 
 1. 优点：可以配置多个代理，且可以灵活的控制请求是否走代理。
 2. 缺点：配置略微繁琐，请求资源时必须加前缀。
-2. **注意changeOrigin**
+2. **注意 changeOrigin**
 
 
 
@@ -5184,11 +5216,11 @@ module.exports = {
 
 axios要提前安装和引入
 
-
-
 当配置了方式二时，我们向5000、5001端口发送请求，**注意看url**
 
 ```js
+import axios from 'axios';
+
 show2() {
     let url = 'http://localhost:8080/api2/cars';
     axios.get(url, {
@@ -5199,7 +5231,7 @@ show2() {
 },
 
 show1() {
-    let url = 'http://localhost:8080/api1/students';
+    let url = '/api1/students'; // 本地端口号还可以省略
     axios.get(url, {
     }).then(value => {
         console.log(value.data);
@@ -5506,11 +5538,11 @@ methods: {
 
 
 
-2、什么时候使用：多个组件需要共享数据时
+2、什么时候使用：多个组件需要共享数据时，都可以读取或修改！
 
 
 
-3、个人理解：将数据放在store里面，每个组件都可以获取和修改，修改的话要经过`dispatch`、`commit`
+3、个人理解：将数据放在store里面，每个组件都可以获取和修改，修改的话要经过 `dispatch`、`commit`
 
 
 
@@ -5726,6 +5758,19 @@ const mutations = {
 		state.sum += value;
 	}
 }
+```
+
+
+
+### 3.3.4 context 的介绍
+
+action、mutations 里的函数中可以接收一个参数 context
+
+context：上下文，可以指代当前 store
+
+可以用它进行 dispath（调用actions中其他的回调函数）、commit 、读取 state 等操作
+
+```js
 ```
 
 
@@ -6358,7 +6403,7 @@ this.$router
 
 
 
-## 4.7 props配置
+## 4.7 props 配置
 
 
 
@@ -6366,9 +6411,9 @@ this.$router
 
 
 
-### 4.7.1 params参数简化
+### 4.7.1 params 参数简化
 
-第一步：路由规则 添加`props: true`
+第一步：路由规则 添加 `props: true`
 
 ```js
 {
@@ -6408,9 +6453,9 @@ props: ['id']
 
 
 
-### 4.7.2 query参数简化
+### 4.7.2 query 参数简化
 
-第一步：路由规则中props为一个函数
+第一步：路由规则中 props 为一个函数
 
 ```js
 {
@@ -6449,7 +6494,7 @@ props: ['id']
 
 
 
-## 4.8 ```<router-link>```的replace属性
+## 4.8 ```<router-link>``` 的 replace 属性
 
 1. 作用：控制路由跳转时操作浏览器历史记录的模式
 
@@ -6745,9 +6790,11 @@ app.use(history());
 
 
 
-# 5、后续问题
+# 5、后续问题 1.0
 
-这一章主要记录Vuex实用编程所遇到的问题、单页面多页面网站的部署、Node.js的一些问题。
+这一章主要记录 Vue 实用编程所遇到的问题、单页面多页面网站的部署、Node.js的一些问题。
+
+**主要利用 vue_project_sph 这个项目练习！！**
 
 
 
@@ -6932,13 +6979,11 @@ export default {
 
 
 
-**3、配置步骤**
-
-
+**3、配置步骤：**
 
 3.1 服务器配置代理
 
-在 vue.config.js 配置具体代理规则（其他参数上面章节有讲到）
+在 vue.config.js 配置具体代理规则（其他参数暂不用配置）
 
 ```js
 // 配置服务器代理
@@ -6985,9 +7030,7 @@ const requests = axios.create({
 
 //请求拦截器----在项目中发请求前执行的函数
 requests.interceptors.request.use(function(config) {
-
-    // 加载进度条
-    nprogress.start();
+    // config 为一个 AJAX 对象，内含请求头等数据
 
     return config;
 })
@@ -6996,13 +7039,16 @@ requests.interceptors.request.use(function(config) {
 requests.interceptors.response.use(
     // 成功回调
     function(res) {
-        // 直接返回响应体的 data 作为 promise对象 的value
+        // 直接返回响应体的 data 作为 promise 对象的value
         return res.data
     },
 
     // 失败回调
     function(err) {
-        console.log(err);
+        // 打印发送请求失败结果
+        console.log('发送请求失败，请检查 api 接口');
+
+        // 返回一个 AxiosError
         return err;
     }
 )
@@ -7012,58 +7058,71 @@ export default requests;
 
 
 
-3.3 接口统一管理      `@/api`
+**3.3 接口统一管理**
 
-概念：在 src/api 文件夹下新建 `index.js` 来封装所有 发送请求函数。当一个组件想要发送请求时，只需要引入 `src/api/index.js` 中的某个 发送请求函数，之后调用该函数即可。
-
-
-
-注意点：**请求函数返回一个promise对象！！**   存在 状态 和 value
+在 src/api 文件夹下新建 `index.js` 来封装所有 发送请求函数。当一个组件想要发送请求时，只需要引入 `src/api/index.js` 中的某个发送请求函数，之后调用该函数即可。
 
 
 
-例如：封装一个 `reqgetCategoryList` 函数来发送 
+1、如果请求发送成功，**那么请求函数返回一个 promise 对象！！** 分为成功态和失败态
+
+2、如果请求发送失败，则返回一个 AxiosError 对象。
+
+
+
+封装一个 `reqgetCategoryList` 函数来发送 
 
 `url = 'http://localhost:8080/api/product/getBaseCategoryList'` 的请求
 
-
-
-src/api/index.js：
+index.js：
 
 ```js
 // 统一接口管理：封装所有请求函数
 
-// 请求函数返回promise对象
+// 1、如果请求发送成功，那么请求函数返回一个 promise 对象！！分为成功态和失败态
+
+// 2、如果请求发送失败，则返回一个 AxiosError 对象。
 
 import requests from "./requests";
 
 // api 接口
+// 普通请求函数
 export const reqgetCategoryList = function() {
     return requests.get(`/product/getBaseCategoryList`); // 本地端口号可以不写
 }
 
-// params 参数传递
-export const reqgetSearchData = function(params) {
+// 带 data 参数的请求函数
+export const reqgetSearchData = function(value) {
     return requests({
         method: 'POST',
         url: '/list',
-        data: params,
+        data: value,
+    })
+} 
+
+// 带内置参数的请求函数
+export const reqCheckCart = function(skuId,isChecked) {
+    return requests({
+        method: 'GET',
+        url: `/cart/checkCart/${skuId}/${isChecked}`,
     })
 } 
 ```
 
 
 
-3.4 我们来调用一下刚刚封装的 `reqgetCategoryList` 函数
+**3.4 调用请求函数**
 
-有两种方式：then、async/await（我笔记里面有怎么用）
+我们来简单调用一下刚刚封装的 `reqgetCategoryList` 函数，并处理 result 
+
+有两种方式：then、async/await（笔记在后面的 `async/await 处理 promis`）
 
 ```js
 import { reqgetCategoryList } from './api'
 
 // then
 reqgetCategoryList().then(function(value) {
-    coonsole.log(value)
+    coonsole.log(value);
 })
 
 // async/await
@@ -7121,26 +7180,48 @@ requests.interceptors.request.use(function(config) {
     return config;
 })
 
-...nprogress.done();
+requests.interceptors.response.use(
+    function(res) {
+        // 进度条结束
+        nprogress.done();
+        return res.data
+    },
+    
+    function(err) {
+        nprogress.done();
+
+        console.log('发送请求失败，请检查 api 接口');
+        return err;
+    }
+)
 ```
 
 
 
 ### 5.6 关于vuex的运用
 
-一般在项目中在全局组件或大组件的数据，或者需要从服务器获取的数据都储存在vuex中
+一般在项目中**全局组件或大组件的数据**，或者**需要从服务器获取的数据都储存在 vuex** 中
+
+vuex 中的 **action 主要用来发送请求**，不在组件中发送了！
 
 而且vuex需要模块化。
 
-#### 5.6.1 vuex常用方法
+
+
+工作模式（三连环）： api 编写发送请求函数  ->  vuex 调用请求函数并存储数据  ->  组件利用 vuex 发送请求获取数据 
+
+
+
+#### 5.6.1 组件中使用 vuex
 
 1、读取数据
 
 ```js
-import {mapState} from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 computed: {
     ...mapState('home',['navList']),
+    ...mapGetters('detail',['spuSaleAttrList','skuInfo','categoryView'])
 },
 ```
 
@@ -7160,11 +7241,11 @@ this.$store.dispatch('home/updataNavList');
 
 #### 5.6.1 vuex工作模式
 
-**案例：home组件中的nav组件展示时自动更新数组navList**
+**案例：home 组件中的 nav 组件展示时自动更新数组 navList**
 
 
 
-1、新建src/store文件夹 新建index.js
+1、新建 src/store 文件夹 新建 index.js
 
 ```js
 //引入Vue核心库
@@ -7187,7 +7268,7 @@ export default new Vuex.Store({
 
 
 
-2、nav组件  获取vuex中的navList  和 申请更新navList
+2、nav组件：获取 vuex 中的 navList  和 申请更新 navList
 
 ```js
 import {mapState} from 'vuex'
@@ -7202,20 +7283,28 @@ export default {
     mounted() {
         // 更新 vuex/home 里的 navList
         this.$store.dispatch('home/updataNavList');
-
-        console.log(this.navList);
     },
 }
 ```
 
 
 
-3、配置home.js
+3、配置 home.js
 
-- 一般在 actons 向服务器发送请求
-- 调用请求函数获取到 promise 对象可通过 async/await 获取具体的值
-- 通过 context.commit 近一步更新NavList
-- 在 mutations 中直接更新！
+（一）**在 actons 向服务器发送请求**
+
+- 调用请求函数（提前在 api 里面写好）获取到 promise 对象，
+- 通过异步函数处理 promise 对象（使用 async/await 获取具体的值）
+
+
+
+（二）通过 context.commit 近一步申请更新 NavList
+
+
+
+（三）在 mutations 中直接更新
+
+
 
 ```js
 // home仓库
@@ -7243,10 +7332,19 @@ export default {
     },
 
     state: {
-        navList: [],
+        navList: {},
+        goodData: {},
     },
 
+    // 一般通过 getter 简化 state 中复杂对象的数据（
     getters: {
+        categoryView(state) {
+            return state.goodData.categoryView || {};
+        },
+
+        skuInfo(state) {
+            return state.goodData.skuInfo || {};
+        },       
     }
 
 }
@@ -7320,7 +7418,7 @@ input.oninput = _.debounce(function() {
 
 
 
-2、一般防止用户快速点击，例如1s内只能执行函数一次
+2、**一般防止用户快速点击，例如1s内只能执行函数一次**
 
 
 
@@ -7328,10 +7426,10 @@ input.oninput = _.debounce(function() {
 
 
 
-4、使用
+4、使用（注意这里的 methods 函数使用方法）
 
 ```js
-import {debounce,throttle} from 'lodash'
+import {throttle} from 'lodash'
 
 methods: {
     addColor: throttle(function(index) {
@@ -7764,8 +7862,7 @@ html 结构：
 ```js
 mounted() {
     // 下面是普通swiper模板
-    var swiper = new Swiper(".swiper-container", {
-        cssMode: true,
+    new Swiper(".swiper-container", {
         loop: true,
         mousewheel: true,
         keyboard: true,
@@ -7805,8 +7902,7 @@ watch: {
     bannerList: {
         handler() {
             this.$nextTick(function() {
-                var swiper = new Swiper(".swiper-container", {
-                    cssMode: true,
+                new Swiper(".swiper-container", {
                     loop: true,
                     mousewheel: true,
                     keyboard: true,
@@ -7924,12 +8020,9 @@ Vue.component(Carousel.name,Carousel)
                 immediate: true,
                 handler() {
                     this.$nextTick(function() {
-                        var swiper = new Swiper(".swiper-container", {
-                            // loop: true,
-                            // spaceBetween: 30,
-                            hashNavigation: {
-                                watchState: true,
-                            },
+                        new Swiper(".swiper-container", {
+                            loop: true,
+
                             pagination: {
                                 el: ".swiper-pagination",
                                 clickable: true,
@@ -7937,6 +8030,7 @@ Vue.component(Carousel.name,Carousel)
                                 bulletActiveClass: 'my-bullet-active',
 
                             },
+                            
                             navigation: {
                                 nextEl: ".swiper-button-next",
                                 prevEl: ".swiper-button-prev",
@@ -7980,17 +8074,43 @@ Vue.component(Carousel.name,Carousel)
 
 
 
+#### 5.11.4 swiper 属性
+
+1、`    <div class="swiper-container">`：为轮播图大盒子
+
+
+
+2、`<div class="swiper-slide">`：为装图片的盒子，可以指定大小，那么图片直接适配。或者不指定大小，则需要指定图片大小。
+
+
+
+3、`slidesPerView`：设置 轮播图大盒子 显示 轮播图 张数，轮播图 会被修改宽度适配 轮播图大盒子 
+
+
+
+4、`slidesPerGroup`：每次切换 轮播图 张数
+
+
+
+5、给 `<div class="swiper-slide">` 添加类名 `swiper-no-swiping` ：禁止滑动
+
 
 
 ### 5.12 Element-ui 按需引入
 
-```
+> 一般还是用全局引入...
+
+
+
+```bash
 npm i element-ui -S
+
+npm install babel-plugin-component -D
 ```
 
 babel.config.js
 
-```
+```js
 module.exports = {
   "presets": [
         "@vue/cli-plugin-babel/preset",
@@ -8018,3 +8138,391 @@ Vue.use(Button)
 Vue.use(Select)
 ```
 
+
+
+### 5.13 路由滚动行为
+
+当路由跳转时，我们可以指定滚动条滚动的位置。
+
+设置为滚动到顶端：
+
+```js
+scrollBehavior() {
+    return {
+        y: 0,
+        behavior: 'smooth',
+    }
+},
+```
+
+
+
+API 文档：https://v3.router.vuejs.org/zh/guide/advanced/scroll-behavior.html
+
+
+
+### 5.14 防止 undefined 报错
+
+- 数组 arr 为 undefined ，那么如果使用了 arr[0] 则会报错；
+- 数组 obj 为 undefined ，那么如果使用了 obj.name 则会报错；
+
+
+
+解决方法：加个问号直接解决！！！`obj?.name`
+
+
+
+### 5.15 计算属性的使用
+
+**computed 里面可以读取 props 参数！！！**
+
+
+
+知识点回顾：就是计算属性的依赖属性变化，计算属性就变！
+
+1、set 函数执行：当手动修改了计算属性时，在 set 函数中利用 value **修改 计算属性 所依赖的数据**，从而修改该计算属性
+
+
+
+2、get函数执行：初次读取时会执行一次，当**依赖的数据发生改变时**会被再次调用
+
+
+
+案例：一个图片数组，有一个默认图片（默认图片会添加 active）；当点击某个图片时，该图片变为默认图片。
+
+数组：imgList，内置属性有 imgUrl、isDefault。
+
+```vue
+// html
+
+<img 
+    v-for="(img,index) in imgList"
+    :src="img.imgUrl" 
+    @click="imgClick(imgIndex = index)"
+    :class="{ active: imgIndex == index}"
+>
+```
+
+```js
+// 直接设置一个计算属性控制即可！
+
+props: ['imgList'],
+
+computed: {
+    imgIndex: {
+        get() {
+            for(let i=0;i<this.imgList.length;i++) {
+                if(this.imgList[i].isDefault == 1) return i;
+            }         
+        },
+
+        set(value) {
+            for(let i=0;i<this.imgList.length;i++) {
+                this.imgList[i].isDefault = 0;
+            }   
+
+            this.imgList[value].isDefault = 1;
+        }
+    }
+},
+```
+
+
+
+### 5.16 在本地存储 vuex 数据
+
+注意这个只能用于存储静态数据！缓存之后方便迅速获取
+
+
+
+1、在组件使用 vuex 时判断
+
+```js
+mounted() {
+    if(JSON.parse(localStorage.getItem('navList'))) {
+        this.$store.state.home.navList = JSON.parse(localStorage.getItem('navList'));
+    } else {                
+        this.$store.dispatch('home/updataNavList');
+    }
+},
+```
+
+
+
+2、在 vuex 对应的仓库中判断
+
+```js
+mutations: {
+    updataNavList(state,value) {
+        if(!JSON.parse(localStorage.getItem('navList'))) 
+        {
+            localStorage.setItem('navList', JSON.stringify(value));
+        }
+        state.navList = value;
+    },
+},
+```
+
+
+
+
+
+# 6、后续问题 2.0
+
+
+
+### 6.1 vuex 中的函数传参
+
+函数参数：第一个必须是 `context` 或者它的解构 `{dispatch,commit,state}` ，第二个是其他参数
+
+当其他参数需要传入多个参数时，必须用**对象参数**
+
+vuex：
+
+```js
+actions: {
+    async addShopCart(context,{skuId,skuNum}) {
+        let result = await reqAddShopCart(skuId,skuNum);
+
+        console.log(result);
+    }
+},
+```
+
+
+
+组件：
+
+```js
+this.$store.dispatch('detail/addShopCart',{
+    skuId: this.$route.params.goodId,
+    skuNum: this.itxtValue
+});
+```
+
+
+
+### 6.2 async/await 处理 promis
+
+请求函数  `reqLogin(user)`  返回一个 promise 对象，如果我们要获取该 promise 对象的值 PromiseResult，我们就需要用到 async/await 。
+
+
+
+因为这个请求函数可能返回三个值 **1、成功态  2、失败态  3、请求失败：AxiosError** 。
+
+（某些请求里面，其中成功态又分为任务失败或者任务成功，用 result.code 区分）
+
+所以要用到下面的固定模板：
+
+```js
+async login(context,user) {
+    try {
+        let result = await reqLogin(user);
+
+        if(result.code == 200) {
+
+            // result为 成功态的值 并且任务完成
+            
+        } else if(result.code == 207) {
+            
+            // result为 成功态的值 并且任务失败
+
+        } else {
+            
+            // 发送请求失败 result 为一个 AxiosError
+            
+        }
+
+    } catch (error) {
+        // error 为失败态的值
+        console.log(error);
+    }
+},
+```
+
+
+
+#### 6.2.1 关于登录业务的案例
+
+首先明确发送完一个登录的请求 `reqLogin(user)`，可以获取到什么数据：
+
+```js
+// result为 成功态的值 并且任务完成
+
+{
+    "code": 200,
+    "message": "成功",
+    "data": {
+        "nickName": "185123",
+        "name": "185123",
+        "userId": 6036,
+        "token": "b484fb811705476da3e85c7a32199524"
+    },
+    "ok": true
+}
+```
+
+```js
+// result为 成功态的值 并且任务失败
+
+{
+    "code": 207,
+    "message": "账号不正确",
+    "data": null,
+    "ok": false
+}
+```
+
+```js
+// result 为一个 AxiosError
+
+{
+    "message": "Request failed with status code 404",
+    "name": "AxiosError",
+	......
+    "status": 404
+}
+```
+
+ ```js
+ // error 为失败态的值
+ ...
+ ```
+
+
+
+那么在 vuex 里面是这样处理的
+
+`store/user.js`
+
+```js
+async login(context,user) {
+    try {
+        let result = await reqLogin(user);
+
+        // result为 成功态的值 并且任务完成
+        if(result.code == 200) {
+
+            context.commit('updataToken',result.data.token); // 存储 token 
+
+            return {message: '登录成功'};
+
+        // result为 成功态的值 并且任务失败
+        } else if(result.code == 207) {
+
+            return result; // 里面带有 message
+
+        // 发送请求失败 result 为一个 AxiosError
+        } else {
+            return {message: '登录失败'}
+        }
+
+        // error 为失败态的值
+    } catch (error) {
+        console.log(error);
+
+        return {message: '登录失败'}
+    }
+},
+```
+
+> 这个函数直接返回的是一个 promise，且一定为成功态，里面有属性 message
+
+
+
+在组件的登录函数是这样调用 vuex 的
+
+简单逻辑，没有加正则
+
+```js
+async login() {
+    if(this.phone && this.password ) {
+        let result = await this.$store.dispatch('user/login',{
+            phone: this.phone,
+            password: this.password,
+        });
+
+        // 打印不同的 result.message
+        alert(result?.message);
+
+        // 登录成功跳转
+        if(result.code == 200) this.$router.push("/");
+
+    } else {
+        alert('请填写正确信息');
+    }
+}
+```
+
+
+
+### 6.3 vue 项目文件夹介绍
+
+public：存放 index.html 以及该文件用到的 css、img 等静态文件
+
+src：vue 项目工作根文件夹
+
+src/api：封装所有请求函数的文件夹
+
+src/assets：提供所有组件共享的静态资源
+
+src/components：存放全局组件
+
+src/pages、views：存放局部组件
+
+src/router：封装路由
+
+src/store：vuex 仓库
+
+src/utils：封装所有公共函数的文件夹（uuid，正则等）
+
+src/plugins：vue 用到的插件
+
+
+
+### 6.4 游客身份实现
+
+1、在 src/utils 文件夹创建 uuid_token.js
+
+```js
+// 导出函数 getUUID() 用于生成 uuid
+
+import { v4 as uuidv4 } from 'uuid';
+
+export const getUUID = function() {
+    // 将 uuid 存储与浏览器中 避免每次产生新id
+    let uuid = localStorage.getItem('uuid');
+
+    if(!uuid) {
+        uuid = uuidv4();
+        localStorage.setItem('uuid', uuid);
+    }
+
+    return uuid;
+}
+```
+
+
+
+2、在 api/requests.js （axios 封装文件）中对请求头添加 uuid
+
+```js
+import { getUUID } from '@/utils/uuid_token'
+
+//请求拦截器----在项目中发请求前执行的函数
+requests.interceptors.request.use(function(config) {
+    // config 为一个 AJAX 对象
+
+    // 给请求头添加游客 uuid （userTempId 为后端提供的请求头属性）
+    config.headers.userTempId = getUUID();
+
+    // 加载进度条
+    nprogress.start();
+
+    return config;
+})
+```
+
+
+
+这样每个请求的请求头的 `userTempId` 都为游客的 uuid，且游客的 uuid 存在浏览器本地存储里

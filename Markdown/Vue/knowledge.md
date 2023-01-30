@@ -2,6 +2,94 @@
 
 
 
+### 简单实现盒子居中方式
+
+```css
+div {
+    text-align: center;
+    line-height: height; 
+}
+```
+
+
+
+
+
+### event 高度宽度属性
+
+e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
+
+1、`e.target`：触发绑定事件的对象，可以为本体，也可以为子盒子
+
+
+
+2、`e.clientX`：鼠标在**页面上可视区域的位置**，从浏览器可视区域左上角开始，即是以浏览器滑动条此刻的滑动到的位置为参考点，随滑动条移而变化
+
+
+
+3、`e.pageX`：鼠标在**页面上的位置**，从页面左上角开始，即是以页面为参考点，不随滑动条移动而变化
+
+
+
+4、`e.offsetX`：鼠标在 `e.target` 盒子里的位置，如果该盒子有边框，则可能出现负值
+
+
+
+
+
+### DOM 高度宽度属性
+
+1、`offsetWidth`：该 DOM 元素宽度
+
+
+
+2、`offsetHeight`：该 DOM 元素高度
+
+
+
+### 滚动条样式
+
+全局 css 设置
+
+```css
+/* 整个滚动条 */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* 垂直滚动条和水平滚动条时交汇的部分 */
+::-webkit-scrollbar-corner {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 滚动条上的滚动滑块 */
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* 滚动条轨道 */
+::-webkit-scrollbar-track {
+    border-right-color: transparent;
+    border-left-color: transparent;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+```
+
+>::-webkit-scrollbar — 整个滚动条.
+>::-webkit-scrollbar-button — 滚动条上的按钮 (上下箭头).
+>::-webkit-scrollbar-thumb — 滚动条上的滚动滑块.
+>::-webkit-scrollbar-track — 滚动条轨道.
+>::-webkit-scrollbar-track-piece — 滚动条没有滑块的轨道部分.
+>::-webkit-scrollbar-corner — 当同时有垂直滚动条和水平滚动条时交汇的部分.
+>::-webkit-resizer — 某些元素的corner部分的部分样式(例:textarea的可拖动按钮).
+
+
+
 ### 第三方在线图标库
 
 1、https://boxicons.com   https://boxicons.com/usage
@@ -209,7 +297,7 @@ body：整个内容
 
 
 
-### css初始化属性
+### css 初始化属性
 
 ```css
 * {
@@ -452,27 +540,35 @@ p {
 }
 ```
 
-### 常用JS函数
+
+
+### 常用 JS 函数
+
 ```js
-toFixed：保留小数位
+parseInt(a) // 转化为整数（向下取整）
 
-substr：截取字符串
+isNaN(a * 1) // 判断 a 是不是数字
 
-for (let i of items)：循环遍历
+toFixed：// 保留小数位
 
-String.fromCharCode(ASCII码)：通过ASCII码返回字符
+substr：// 截取字符串
 
-charCodeAt(str)：返回str的ASCII码
+Arr.join() , Str.split() // 数组与字符串互相转化
 
-Math.floor(Math.random() * num)：返回0到num-1的整数
+for (let i of items)：// 循环遍历
 
-navigator.clipboard.writeText(123);：实现用户复制内容为123
+String.fromCharCode(ASCII码)：// 通过ASCII码返回字符
 
-splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+charCodeAt(str)：// 返回str的ASCII码
 
-forEach()、map()：一个遍历数组，一个返回遍历数组
+Math.floor(Math.random() * num)：// 返回0到num-1的整数
 
-function isLeapYear(year) { 判断闰年
+navigator.clipboard.writeText(123); // 实现用户复制内容为123
+
+arr.splice(下标，个数，替换的值) // 数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+
+// 判断闰年
+function isLeapYear(year) { 
     return (
         (year % 4 == 0 && year % 100 != 0 && year % 400 !=0) ||
         (year % 100 == 0 && year % 400 == 0)
@@ -487,18 +583,14 @@ setInterval(function() {
     console.log(formateTimer);
 },1000)
 
-// 数组与字符串互相转化
-Arr.join('/r/n')  Str.split() 
-
-// exec()：正则表达式匹配字符串
-let arr = regStyle.exec(htmlData);
-let cssData = arr[0].replace('<style>','').replace('<\/style>','');
-
 // 新对象拥有全部属性，相同属性，后者覆盖前者
 const obj = {...apple, ...pen};
 ```
 
-### js细节大全
+
+
+### js 细节大全
+
 ```js
 // <!-- defer：文档加载完毕再加载js -->
 {/* <script src="./script.js" defer></script> */}
@@ -539,10 +631,10 @@ selectors.board.replaceWith(parser.querySelector('.board'));
 
 ### css特殊选择器
 ```css
-/* 选择当包含flipped的所有元素中不包含matched的元素 */
+/* 选择当包含 flipped 的所有元素中不包含 matched 的元素 */
 .flipped:not(.matched) {};
 
-/* 当board-container中包含了flipped 对board作用 */
+/* 当 board-container 中包含了 flipped 对 board 作用 */
 .board-container.flipped .board {};
 
 ```
@@ -570,11 +662,37 @@ html {
 
 
 
+### Typora 图片规范
+
+1、去偏好设置中设置图片指定路径：`./mark-img`
+
+2、粘贴图片后改一下图片 url，确保 github 可以识别
+
+
+
+原图片地址：`D:\文档\学习文件\GitWebProjects\Markdown\Vue\mark-img\image-20230118225827872.png`
+
+
+
+改为：`mark-img/image-20230118225827872.png`     注意是这个： `/` 
+
+
+
 ### 动画收集
 
 1、上下浮动
 
 ```css
+@keyframes floaty {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(15px);
+    }
+}
+
+animation: floaty 1.8s infinite alternate;
 ```
 
 

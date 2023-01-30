@@ -90,12 +90,29 @@ p.then(function(value) {
 
 ### 1.2.2 then 方法
 
+当我们需要处理一个 promise 对象时，如果我们要**获取该 promise 对象的值 PromiseResult**，那么我们就需要用到 then 方法，设置回调函数来获取。
+
 当我们实例化 Promise 后得到的 Promise 对象便具有一个 `then` 方法。
 
 then 方法具有两个回调函数作为参数 
 
 - 当 Promise 对象为成功状态时就默认自动执行 then 方法的第一个回调函数resolved
 - 当 Promise 对象为失败状态时就默认自动执行 then 方法的第二个回调函数rejected
+
+```js
+new Promise(function(resolve,reject) {
+        
+    if(1) resolve('1111');
+    else reject('0000');
+
+}).then(function(value) {
+    console.log(value);
+})
+
+// 1111
+```
+
+
 
 
 
@@ -347,9 +364,9 @@ p.finally(function() {
  const result = Promise.all([p1,p2,p3])
  ```
 
-如果3个promise都是成功态，则result也是成功态，并且存在所有的value值
+如果3个promise都是成功态，则 result 也是成功态，并且保存所有的 value 值
 
-如果3个promise有失败态，则result也是失败态，变成defeat值
+如果3个promise有失败态，则 result 也是失败态，变成 defeat 值
 
 
 
@@ -367,67 +384,53 @@ Promise.allSettled() 的状态与传入的 Promise 状态无关。它永远都�
 
 ## 1.7 async/await 函数
 
-我们获取promise对象的value有两种方式，一种是用 then，一种是这个东西。下面是例子展示
+当我们需要处理一个 promise 对象时，如果我们要获取该 promise 对象的结果 PromiseResult，那么我们就需要用到 async/await 。
 
-1、then
-
-```js
-new Promise(function(resolve,reject) {
-        
-    if(1) resolve('1111');
-    else reject('0000');
-
-}).then(function(value) {
-    console.log(value);
-})
-
-// 1111
-```
-
-
-
-2、async/await
+简单代码介绍：
 
 ```js
 async function main() {
-    let result = await new Promise(function(resolve,reject) {
-        if(1) resolve('1111');
-        else reject('0000');
-    })
-
-    console.log(result);
+    try {
+        let result = await new Promise(function(resolve,reject) {
+            if(0) resolve('111');
+            else reject('000');
+        }) 
+        
+        console.log(result);
+    } catch(err) {
+        console.log(err);
+    }
 }
-main()
 
-// 1111
+main(); // 000
 ```
-
-
 
 
 
 **1、async**
 
-当一个普通函数加上 `async` 则 返回值一定是一个 promise 对象！
+当一个普通函数加上 `async` 则 **返回值一定是一个 promise 对象**！
 
-- 当函数返回非 promise 对象 ，则为成功态
-- 返回 promise 对象，则状态由该 promise 决定
+- 当函数返回非 promise 对象 ，则为成功态，value 值为返回的 value 值
+- 返回 promise 对象，则状态由返回的 promise 对象决定（套娃）
 
 ```js
-// 返回 promise 对象
-async function main() {
-    return new Promise(function(resolve,reject) {
-        if(1) resolve('1111');
-        else reject('0000');
-    })
+async addShopCart(context,{skuId,skuNum}) {
+    let result = await reqAddShopCart(skuId,skuNum); // reqAddShopCart() 返回 promise
+
+    // 成功则返回非 promise 对象
+    if(result.code == 200) {
+        return '加入购物车成功';
+        
+    // 返回失败 promise 对象
+    } else {
+        return Promise.reject(new Error('加入购物车失败'));
+    }
 }
 
-// 返回非 promise 对象
-async function main() {
-    return 111
-}
-
-let result = main(); // Promise {<fulfilled>: 111}
+// 调用 addShopCart
+// 得到一个 promise 对象
+let result = addShopCart();
 ```
 
 
@@ -436,7 +439,7 @@ let result = main(); // Promise {<fulfilled>: 111}
 
 await 只能运用在 async 函数中！它的右边为 promise 对象或者其他值
 
-- **如果右边是 promise 对象，则返回的是 promise 对象的值value**
+- **如果右边是 promise 对象，则返回 promise 对象（成功态+失败态）的值 value**
 - 如果是其他值，则直接返回该值
 - 如果函数中有多条 await（后面是promise 对象）则会按顺序异步执行
 
@@ -457,16 +460,24 @@ main(); // 222 111
 
 
 
-await 错误处理：如果有promise对象为失败态，则使用 `try{}catch(err){}` 可以返回失败结果
+**3、`try {} catch(err) {}`**
+
+如果我们要分开处理  promise 对象成功态、失败态，那么我们就要用到它。
+
+如果 await 右边的 promise 对象为成功态，则继续执行 try 语句代码。
+
+如果 await 右边的 promise 对象为失败态，则跳转执行 catch 语句代码
 
 ```js
 async function main() {
     try {
-        await new Promise(function(resolve,reject) {
+        let result = await new Promise(function(resolve,reject) {
             if(0) resolve('111');
             else reject('000');
         }) 
-    }catch(err) {
+        
+        console.log(result);
+    } catch(err) {
         console.log(err);
     }
 }
@@ -476,15 +487,9 @@ main(); // 000
 
 
 
-**3、搭配使用案例**
-
-如果函数中有多条 await（后面是promise 对象）则会按顺序异步执行，利用这一点我们就可**以安排多条异步任务**
 
 
-
-
-
-## 1.7 Promise的注意事项
+## 1.8 Promise 的注意事项
 
 
 

@@ -1247,7 +1247,7 @@ p {
 
 
 
-# 5 、css特殊属性
+# 5 、css 特殊属性
 
 
 
@@ -1268,7 +1268,7 @@ body {
 
 
 
-## 5.2 inset属性
+## 5.2 inset 属性
 
 ![image-20221119204409301](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221119204409301.png)
 
@@ -1288,3 +1288,14 @@ body {
 <progress>
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/0b3f9beb01964601ac5f7c18c71dfa93.png#pic_center)
+
+
+
+## 5.3 zoom
+
+控制整个放大和缩小
+
+```html
+<div class="card" style="zoom: 0.8">
+```
+
