@@ -364,9 +364,57 @@ p.finally(function() {
  const result = Promise.all([p1,p2,p3])
  ```
 
-如果3个promise都是成功态，则 result 也是成功态，并且保存所有的 value 值
+如果3个promise都是成功态，则 result 也是成功态，并且保存所有 promise 的 value 值为一个数组
 
 如果3个promise有失败态，则 result 也是失败态，变成 defeat 值
+
+
+
+案例：`dispatch('deleteCart',item.skuId)`：函数返回一个 promise
+
+我们将所有 promise 打包到 promiseAll，并返回 `Promise.all(promiseAll)`
+
+如果有失败态，这个函数返回失败态的 promise。
+
+如果全都是成功态，这个函数返回成功态的数组数据。
+
+```js
+// 删除所有选中的商品
+async delCheckedCart({state,dispatch}) {
+    let promiseAll = [];
+
+    state.cartList.forEach(function(item) {
+        if(item.isChecked) {
+            let result = dispatch('deleteCart',item.skuId);
+            promiseAll.push(result);
+        }
+    })
+
+    return Promise.all(promiseAll);
+},
+```
+
+
+
+调用 `delCheckedCart({state,dispatch})`：
+
+```js
+async delCheckedCart() {
+    try {
+        // 申请删除所有选中的商品
+        let result = await this.$store.dispatch('shopcart/delCheckedCart');
+
+        // result 为成功态数组数据
+
+        // 为成功态则刷新购物车列表
+        this.$store.dispatch('shopcart/getCartList');
+
+    } catch (error) {
+        // 为失败态则输出
+        alert('删除所有选中的商品失败');
+    }
+},
+```
 
 
 
@@ -462,7 +510,7 @@ main(); // 222 111
 
 **3、`try {} catch(err) {}`**
 
-如果我们要分开处理  promise 对象成功态、失败态，那么我们就要用到它。
+如果我们要**分开处理  promise 对象成功态、失败态**，那么我们就要用到它。
 
 如果 await 右边的 promise 对象为成功态，则继续执行 try 语句代码。
 
