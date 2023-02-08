@@ -479,11 +479,33 @@ computed: {
 
 
 
-2、调用dispatch
+监视 vuex 数据
 
 ```js
-// 调用 home 仓库下的 actions 中的 updataNavList 函数
+watch: {
+    navList(newValue) {
+        .
+    }
+}
+```
 
+
+
+
+
+2、修改 vuex 数据
+
+必须通过调用 dispatch 或者 commit
+
+```js
+this.$store.commit('user/upDataCountdown');
+```
+
+
+
+调用 dispatch
+
+```js
 this.$store.dispatch('home/updataNavList');
 ```
 
@@ -2081,3 +2103,94 @@ npm config set registry=https://registry.npm.taobao.org
 # 查看镜像源是否下载成功
 npm config get registry
 ```
+
+
+
+
+
+## 7、后续问题 3.0
+
+这个部分专门处理有关配置文件的 bug
+
+
+
+### 7.1 `jsconfig.json` 介绍
+
+当您在工作空间中有一个定义项目上下文的 jsconfig.json 文件时，JavaScript体验会得到改进。
+
+说白了**就是提高在写项目时舒适度的**。
+
+
+
+参考文档：https://blog.csdn.net/weixin_44067347/article/details/125632655
+
+
+
+普通模板：
+
+```js
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "esnext",
+        "baseUrl": "./",
+        "moduleResolution": "node",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "lib": [
+            "esnext",
+            "dom",
+            "dom.iterable",
+            "scripthost"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
+```
+
+
+
+### 7.2 设置并删除定时器
+
+```js
+let timer = setInterval(() => this.$store.commit('user/upDataCountdown'), 1000);
+
+clearInterval(this.timer);
+```
+
+
+
+###  7.3 Element UI 使用技巧
+
+#### 7.3.1 侧边栏实现路由跳转
+
+参考文档：https://blog.csdn.net/qq_22182989/article/details/106262211
+
+
+
+参考模板
+
+```vue
+<el-menu :default-active="this.$route.path" router>
+    <el-submenu index="1">
+        <template slot="title"><i class="el-icon-menu"></i>导航</template>
+        <el-menu-item index="/mytopic">我的题目</el-menu-item>
+        <el-menu-item index="/myexam">我的试卷</el-menu-item>
+        <el-menu-item index="/myrepo">我的试卷库</el-menu-item>
+        <el-menu-item index="/mytest">我的考试记录</el-menu-item>
+    </el-submenu>
+</el-menu>
+```
+
+
+
+侧边栏参数介绍：
+
+1、`default-openeds` ：选择默认展开的数组 `default-openeds="['1']"`
+

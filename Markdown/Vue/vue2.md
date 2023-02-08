@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
 
 ## 1.1 初识Vue
 
@@ -133,7 +133,7 @@ Vue中有2种数据绑定的方式：
 
 
 
-## 1.4 el与data的两种写法
+## 1.4 el 与 data 的两种写法
 
 el有2种写法
 
@@ -209,9 +209,7 @@ data有2种写法
 
 ### 1.6.1 Object.defineProperty()
 
-
-
-**首先要认识一下属性标志**:
+**首先要认识一下属性标志**：
 
 对象属性（properties），除 **`value`** 外，还有三个特殊的特性（attributes），也就是所谓的“标志”
 
@@ -414,59 +412,54 @@ const vm = new Vue({
 
 ### 1.7.1 事件的基本使用
 
-* 使用v-on:xxx 或 @xxx 绑定事件，其中xxx是事件名
-* 事件的回调需要配置在methods对象中，最终会在vm上
-* methods中配置的函数，都是被Vue所管理的函数，this的指向是 vm 或 组件实例对象
-* `v-on:` 简写为 `@` ！！！！
+* 使用 `v-on:xxx` 或 `@xxx` 绑定事件，其中 xxx 一般指原生事件
+
+* `v-on:` 可简写为 `@` 
+
+* 事件的回调需要配置在 methods 对象中
+
+* methods 中配置的函数，都是被 Vue 所管理的函数，this 的指向是 vm 或 组件实例对象
+
+  
 
 
+### 1.7.2 常见的监听事件
+1、常见的鼠标事件监听
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+| 事件名          | 事件描述                           |
+| --------------- | ---------------------------------- |
+| `onclick`       | 当鼠标单击某个对象                 |
+| `ondblclick`    | 当鼠标双击某个对象                 |
+| `onmousedown`   | 当某个鼠标按键在某个对象上被按下   |
+| `onmouseup`     | 当某个鼠标按键在某个对象上被松开   |
+| `onmousemove`   | 当某个鼠标按键在某个对象上被移动   |
+| `onmouseenter`  | 当鼠标进入某个对象  只针对自身盒子 |
+| `onmouseleave`  | 当鼠标离开某个对象  只针对自身盒子 |
+| `onfocus`       | 当鼠标聚焦到input上                |
+| `onblur`        | 当鼠标脱离input                    |
+| `oncontextmenu` | 右键显示菜单                       |
+| `onselectstart` | 鼠标滑动选中                       |
+| `onmouseover`   | 当鼠标进入某个对象  子盒子生效     |
+| `onmouseout`    | 当鼠标离开某个对象  子盒子生效     |
 
-    <script src="../js/vue.js"></script>
+2、常见的键盘事件监听
 
-</head>
-<body>
-    <div class="root">
-        <button v-on:click="show1">点击1</button>
-        <button @click="show2">点击2</button>
-    </div>
+| 事件名       |                           事件描述                           |
+| ------------ | :----------------------------------------------------------: |
+| `onkeypress` | 当某个键盘的键被按下（系统按钮如箭头键和功能键无法得到识别） |
+| `onkeydown`  | 当某个键盘的键被按下（系统按钮可以识别，并且会先于 `onkeypress` 发生） |
+| `onkeyup`    |                     当某个键盘的键被松开                     |
 
-    <script>
-        // v-on + 事件 简写为 @ + 事件
+3、常见的表单事件监听
 
-        // 里面填写vm中的methods中的方法
-
-        // 默认接收参数e 就是dom事件监听里面的event
-
-        new Vue({
-            el: '.root',
-            methods: {
-                show1(e) {
-                    console.log(this); // vm
-                    console.log(e);
-                    console.log(e.target);
-                    console.log(111);
-                },
-                
-                show2() {
-                    console.log(222);
-                }
-
-            }
-            
-        }) 
-    </script>
-</body>
-</html>
-```
+| 事件名     | 事件描述                                  |
+| ---------- | ----------------------------------------- |
+| `onchange` | 当用户改变完成域的内容                    |
+| `onfocus`  | 当某元素获得焦点（比如 tab 键或鼠标点击） |
+| `onblur`   | 当某元素失去焦点                          |
+| `onsubmit` | 当表单被提交                              |
+| `onreset`  | 当表单被重置                              |
+| `oninput`  | 当用户输入时触发（作用于表单时）          |
 
 
 
@@ -475,6 +468,7 @@ const vm = new Vue({
 * prevent：阻止默认事件（常用）
 * stop：阻止事件冒泡（常用）
 * once：事件只触发一次（常用）
+* self：只监听触发该元素的事件
 
 
 
@@ -500,11 +494,11 @@ const vm = new Vue({
 
 ### 1.7.3 事件的传参
 
-事件绑定的函数可以传参：参数 $event 则 e.target 为当前dom对象！！！
+事件绑定的函数可以传参：参数 $event 则 e.target 为当前 DOM 对象！！！
 
-如果传参里面不写 $event ，函数里面照样可以用 e 作为参数
+**如果传参里面不写 $event ，函数里面照样可以用 e 作为参数**
 
-```js
+```
 @blur="handleBlur(todo,$event)"
 ```
 
@@ -3710,11 +3704,11 @@ let obj = {
 ### 2.2.2 props 配置
 
 - 让子组件接收父组件传过来的参数   
-- **props 参数不可修改，不要在 data、mounted 使用**
-- **可以在 html 、computed 中使用**
+- props 参数不可修改，不要在 data、mounted 使用
+- 可以在 html 、computed 中使用
 - 参数不要取内置属性名（如key、ref）
-
 - 参数直接变成组件内置属性
+- **子组件中 `this.$attrs` 可以得到所有`props` 参数**
 
 
 
@@ -3790,7 +3784,7 @@ data(){
 
 ### 2.2.3 mixins 配置
 
-混入 (mixin) 提供了一种非常灵活的方式，来分发 Vue 组件中的可复用功能。一个混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
+混入 (mixin) 提供了一种非常灵活的方式，来分发 Vue 组件中的 **JS 部分**可复用功能。一个混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
 
 1、当data、methods等配置混入时，**以本身已经设置的为主**；
 
@@ -4361,208 +4355,90 @@ sessionStorage.key(index)
 
 ## 2.4 自定义事件
 
-组件自定义事件是一种组件间通信的方式，适用于：<strong style="color:red">子组件 ===> 父组件</strong>
+我们可以给组件或 DOM 元素绑定事件，事件分为原生事件和自定义事件。组件自定义事件是一种组件间通信的方式，适用于：<strong style="color:red">子组件 ===> 父组件</strong>
 
 **使用场景**
 
 A是父组件，B是子组件，B想给A传数据，那么就要在A中给B绑定自定义事件（<span style="color:red">事件的回调在A中</span>）。
 
-**API：**`this.$emit`     **绑定自定义事件有两种实现方式**
+**API：**`this.$emit`   、`this.$on`
 
 
 
-### 2.4.1 v-on实现
-
-1、`		<Student @atguigu="getStudentName"/> `
-
-2、`this.$emit('atguigu',this.name)`
-
-3、三个步骤即可
-
-App.vue
-
-```html
-<template>
-	<div class="app">
-		<!-- 步骤一 -->
-		<Student @atguigu="getStudentName"/> 
-	</div>
-</template>
-
-<script>
-	import Student from './components/Student'
-
-	export default {
-		name:'App',
-		components:{Student},
-		data() {
-			return {
-				msg:'你好啊！',
-				studentName:''
-			}
-		},
-		methods: {
-            // 事件回调 步骤二
-			getStudentName(name,...params){
-				console.log('App收到了学生名：',name,params)
-				this.studentName = name
-			}
-		}
-	}
-</script>
-
-<style scoped>
-	.app{
-		background-color: gray;
-		padding: 5px;
-	}
-</style>
-
-```
-
-Student.vue
-
-```html
-<template>
-	<div class="student">
-		<button @click="sendStudentlName">把学生名给App</button>
-	</div>
-</template>
-
-<script>
-	export default {
-		name:'Student',
-		data() {
-			return {
-				name:'张三',
-			}
-		},
-		methods: {
-			sendStudentlName(){
-				//触发Student组件实例身上的atguigu事件  步骤三
-				this.$emit('atguigu',this.name,666,888,900)
-			}
-		},
-	}
-</script>
-
-<style lang="less" scoped>
-	.student{
-		background-color: pink;
-		padding: 5px;
-		margin-top: 30px;
-	}
-</style>
-
-```
+子组件中 `this.$listeners` 可以得到所有绑定的自定义事件
 
 
 
-### 2.4.2 ref 实现
+### 2.4.1 两种实现方式
 
-1、`<Student ref="student"/>`
+**1、方式一（常用）**
 
-2、`this.$refs.student.$on('atguigu',this.getStudentName)`
-
-3、需要四个步骤
-
-4、使用 `this.$refs.xxx.$on()` 这样写起来更灵活，比如可以加定时器啥的。
-
-
+直接在组件标签里面添加自定义事件
 
 App.vue
 
 ```html
-<template>
-	<div class="app">
-		<!-- 步骤一 -->
-		<Student ref="student"/>
-	</div>
-</template>
-
-<script>
-	import Student from './components/Student'
-
-	export default {
-		name:'App',
-		components:{Student},
-		data() {
-			return {
-				studentName:''
-			}
-		},
-		methods: {
-            // 步骤二
-			getStudentName(name,...params){
-				console.log('App收到了学生名：',name,params)
-				this.studentName = name
-			},
-		},
-        
-        // 步骤三
-		mounted() {
-			this.$refs.student.$on('atguigu',this.getStudentName) //绑定自定义事件
-			// this.$refs.student.$once('atguigu',this.getStudentName) //绑定自定义事件（一次性）
-		},
-	}
-</script>
-
-<style scoped>
-	.app{
-		background-color: gray;
-		padding: 5px;
-	}
-</style>
-
+<Student @atguigu="getStudentName"/> 
 ```
+
+```js
+getStudentName(name,...params){
+    console.log('App收到了学生名：',name,params)
+    this.studentName = name
+}
+```
+
+
 
 Student.vue
 
+```js
+//触发 Student 组件实例身上的 atguigu 事件
+this.$emit('atguigu',this.name,666,888,900)
+```
+
+
+
+**2、方式二**
+
+通过`this.$refs.xxx.$on()` 绑定自定义事件，这样写起来更灵活，比如可以加定时器啥的。
+
+App.vue
+
 ```html
-<template>
-	<div class="student">
-		<button @click="sendStudentlName">把学生名给App</button>
-	</div>
-</template>
+<Student ref="student"/>
+```
 
-<script>
-	export default {
-		name:'Student',
-		data() {
-			return {
-				name:'张三',
-			}
-		},
-		methods: {
-            
-            // 步骤
-			sendStudentlName(){
-				//触发Student组件实例身上的atguigu事件
-				this.$emit('atguigu',this.name,666,888,900)
-			}
-		},
-	}
-</script>
+```js
+// 事件回调
+getStudentName(name,...params){
+    console.log('App收到了学生名：',name,params)
+    this.studentName = name
+},
 
-<style lang="less" scoped>
-	.student{
-		background-color: pink;
-		padding: 5px;
-		margin-top: 30px;
-	}
-</style>
+mounted() {
+    this.$refs.student.$on('atguigu',this.getStudentName) //绑定自定义事件
+    // this.$refs.student.$once('atguigu',this.getStudentName) //绑定自定义事件（一次性）
+},
 
 ```
 
-> 若想让自定义事件只能触发一次，可以使用```once```修饰符，或```$once```方法。
->
-> 触发自定义事件：```this.$emit('atguigu',数据)```		
->
-> 使用 this.$emit() 就可以子组件向父组件传数据
+> 若想让自定义事件只能触发一次，可以使用 ```once``` 修饰符，或 ```$once``` 方法。
 
 
 
-### 2.4.3 解绑自定义事件
+Student.vue
+
+```js
+//触发 Student 组件实例身上的 atguigu 事件
+this.$emit('atguigu',this.name,666,888,900)
+```
+
+
+
+
+
+### 2.4.2 解绑自定义事件
 
 1、vm自己解绑
 
@@ -4576,13 +4452,17 @@ this.$off('atguigu') //解绑一个自定义事件
 
 
 
-### 2.4.4 绑定原生DOM事件
+### 2.4.3 绑定原生事件
 
-组件上也可以绑定原生DOM事件，但需要使用```native```修饰符。
+对组件使用原生事件必须添加修饰符：`native`
+
+**`router-link` 也要加上！！**
+
+
 
 ```vue
-<!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第二种写法，使用ref） -->
-<Student ref="student" @click.native="show"/>
+// 点击 student 组件调用 show 函数
+<Student @click.native="show"/>
 ```
 
 
@@ -5470,11 +5350,11 @@ Category.vue
 
 
 
-### 2.11.3 所有的传参方式
+### 2.11.3 所有的通信方式
 
 **1、父组件给子组件**
 
-用props配置
+用 props 配置
 
 ```vue
 <Student :name="'cocoon'" sex="man" :age="18"/>
@@ -5484,37 +5364,51 @@ props: ['name','age','sex'],
 
 
 
-**2、子组件给父组件**
+**2、父组件与子组件数据同步**
 
-- 使用props+调用
-
-父组件给子组件传入一个函数 ，**子组件接收并调用该函数, 实际上执行父组件的函数** ， 函数的参数为子组件的传参
+用 props + sync 修饰符实现，本质同时是绑定了一个自定义事件 `updata:money`
 
 ```vue
-父组件：App.vue
-<TodoHeader :resive="resive" />
-
-methods: {
-    resive(item) {
-        console.log('接收到了子组件传入的参数：' + item);
-    }
-}
+// 父组件
+<Child :money.sync="money" />
 ```
 
 ```js
-子组件：TodoHeader.vue
-props: ['resive'],
+// 子组件
+props: ['money']
 
-methods: {
-    show() {
-        this.resive('我是子组件发送的参数')
-    }
+// 子组件修改数据
+change(value) {
+    // 将 money 赋值为 value
+    this.$emit('updata:money',value)
 }
 ```
 
 
 
+**3、子组件给父组件**
+
 - 使用自定义事件
+
+App.vue
+
+```html
+<Student @atguigu="getStudentName"/> 
+```
+
+```js
+getStudentName(name,...params){
+    console.log('App收到了学生名：',name,params)
+    this.studentName = name
+}
+```
+
+Student.vue
+
+```js
+//触发 Student 组件实例身上的 atguigu 事件
+this.$emit('atguigu',this.name,666,888,900)
+```
 
 
 
@@ -5522,7 +5416,9 @@ methods: {
 
 
 
-**3、任意组件**：全局事件总线（推荐）、消息订阅与发布
+
+
+**4、任意组件**：全局事件总线（推荐）、消息订阅与发布
 
 
 

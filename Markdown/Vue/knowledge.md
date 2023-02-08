@@ -183,7 +183,7 @@ div {
 
 
 
-### 设置100vw/vh时，vue出现滚动条
+### 充满整个屏幕且不含滚动条
 
 首先设置全局样式表 common.css
 
@@ -206,6 +206,16 @@ html, body, #app{
 ```js
 import "./assets/css/common.css"
 ```
+
+```css
+/*盒子样式*/
+.login-container {
+    width: 100%;
+    height: 100vh;
+}
+```
+
+
 
 
 
@@ -696,4 +706,50 @@ animation: floaty 1.8s infinite alternate;
 ```
 
 
+
+### vscode 快捷键
+
+```
+ctrl + i: 触发建议
+
+ctrl + h: 合并行
+
+ctrl + /: 设置注释
+
+ctrl + `: 打开终端
+
+ctrl + j: 切换面板（终端和编辑器）
+
+ctrl + [: 调整缩进
+
+ctrl + d: 删除整行
+
+ctrl + p: Open Live Server
+
+ctrl + l: 选中该行
+
+ctrl + g: 跳转行号
+
+ctrl + '': 移动到行尾
+
+ctrl + ;: 移动到行头
+
+ctrl + shift + z: 取消撤销
+
+ctrl+ shift + v: 预览Markdown
+
+按住 alt 键: 实现多选
+
+ctrl + b: 空了
+```
+
+
+
+### 其他快捷键
+
+```
+snipaste
+
+F3: 将复制的内容生成图片
+```
 
