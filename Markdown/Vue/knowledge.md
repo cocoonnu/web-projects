@@ -13,8 +13,6 @@ div {
 
 
 
-
-
 ### event 高度宽度属性
 
 e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
