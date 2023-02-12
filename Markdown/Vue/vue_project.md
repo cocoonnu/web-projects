@@ -408,6 +408,12 @@ axios.get(url, {
 
 ### 5.5 实现加载进度条
 
+NProgress.js：https://ricostacruz.com/nprogress/
+
+使用文档：https://blog.csdn.net/weixin_44171004/article/details/106397571
+
+
+
 发送请求后我们可以用进度条在展示进展
 
 安装进度条

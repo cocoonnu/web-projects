@@ -802,3 +802,273 @@ background: rgba(0, 0, 0, 0.3);
 | opacity                | 盒子背景透明度 | opacity: 0-1                                     |
 
 背景图片：实际开发常见于 logo 或者一些装饰性的小图片或者是超大的背景图片，优点是非常便于控制位置（精灵图也是一种运用场景）。
+
+
+
+## 3.9 渐变
+
+### 3.9.1 背景渐变
+
+**（1）背景线性渐变**
+
+语法：
+
+`background: linear-gradient(起始方向, 颜色1, 颜色2, 颜色3, ...)`
+
+```css
+background: -webkit-linear-gradient(left, red, blue);
+background: -webkit-linear-gradient(left top, red, blue, deeppink);
+background: -webkit-linear-gradient(45deg, red, blue);
+```
+
+- 背景渐变**必须**添加浏览器私有前缀
+
+- 起始方向可以是：**方位名词** 或 **度数**，如果省略默认就是 top（从上到下）
+
+- 方位名词：`top`、`bottom`、`left`、`right`、`两两组合`
+
+- 度数：角度是指水平线和渐变线之间的角度，逆时针方向计算。换句话说，0deg 将创建一个从下到上的渐变，90deg 将创建一个从左到右的渐变。
+
+  
+
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>背景线性渐变</title>
+    <style>
+        div {
+            width: 600px;
+            height: 200px;
+            background-color: red; /* 浏览器不支持的时候显示 */
+            /* 背景渐变必须添加浏览器私有前缀 */
+            /* 由于此处是移动端，所以我们写 webkit 就够了 */
+            background: -webkit-linear-gradient(left, red, blue);
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+</body>
+
+</html>
+```
+
+
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>背景线性渐变</title>
+    <style>
+        div {
+            width: 600px;
+            height: 200px;
+            background-color: red; /* 浏览器不支持的时候显示 */
+            /* 背景渐变必须添加浏览器私有前缀 */
+            /* 默认从上到下 top */
+            background: -webkit-linear-gradient(red, blue);
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+</body>
+
+</html>
+```
+
+
+
+【使用透明度】
+
+CSS3 渐变也支持透明度（transparent），可用于创建减弱变淡的效果。
+
+为了添加透明度，我们使用 `rgba()` 函数来定义颜色节点。rgba() 函数中的最后一个参数可以是从 0 到 1 的值，它定义了颜色的透明度：0 表示完全透明，1 表示完全不透明。
+
+下面的实例演示了从左边开始的线性渐变。起点是完全透明，慢慢过渡到完全不透明的红色：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>背景线性渐变</title>
+    <style>
+        div {
+            width: 600px;
+            height: 200px;
+            /* 背景渐变必须添加浏览器私有前缀 */
+            /* 前面的 red 为浏览器不支持时显示 */
+            background: red -webkit-linear-gradient(left, rgba(0,0,255,.2), rgba(255,0,0,1));
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+
+
+**（2）径向渐变**
+
+径向渐变由它的中心定义。
+
+为了创建一个径向渐变，你也必须至少定义两种颜色节点。颜色节点即你想要呈现平稳过渡的颜色。同时，你也可以指定渐变的中心、形状（圆形或椭圆形）、大小。默认情况下，渐变的中心是 center（表示在中心点），渐变的形状是 ellipse（表示椭圆形），渐变的大小是 farthest-corner（表示到最远的角落）。
+
+> 径向渐变不要加浏览器前缀！
+
+**径向渐变 - 颜色节点均匀分布（默认情况下）**
+
+```css
+width: 300px;
+height: 300px;
+background: radial-gradient(red, green, blue);
+```
+
+
+
+**径向渐变 - 颜色节点不均匀分布**
+
+```css
+width: 300px;
+height: 300px;
+background: radial-gradient(red 5%, green 15%, blue 60%);
+```
+
+
+
+**设置形状**
+
+`shape` 参数定义了形状。它可以是值 `circle` 或 `ellipse`。其中，`circle` 表示圆形，`ellipse` 表示椭圆形。默认值是 `ellipse`。
+
+```css
+height: 150px;
+width: 200px;
+background: radial-gradient(red, yellow, green); 
+background: radial-gradient(circle, red, yellow, green); 
+```
+
+
+
+**不同尺寸大小关键字的使用**
+
+`size` 参数定义了渐变的大小。它可以是以下四个值：
+
+- `closest-side`
+- `farthest-side`
+- `closest-corner`
+- `farthest-corner`
+
+```html
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"> 
+<title></title> 
+<style>
+#grad1 {
+  height: 150px;
+  width: 150px;
+  background-color: red; /* 浏览器不支持的时候显示 */
+  background: radial-gradient(closest-side at 60% 55%, red, yellow, black); 
+}
+
+#grad2 {
+  height: 150px;
+  width: 150px;
+  background-color: red; /* 浏览器不支持的时候显示 */
+  background: radial-gradient(farthest-side at 60% 55%, red, yellow, black); 
+}
+
+#grad3 {
+  height: 150px;
+  width: 150px;
+  background-color: red; /* 浏览器不支持的时候显示 */
+  background: radial-gradient(closest-corner at 60% 55%, red, yellow, black);
+}
+
+#grad4 {
+  height: 150px;
+  width: 150px;
+  background-color: red; /* 浏览器不支持的时候显示 */
+  background: radial-gradient(farthest-corner at 60% 55%, red, yellow, black); 
+}
+</style>
+</head>
+<body>
+
+<h3>径向渐变 - 不同尺寸大小关键字的使用</h3>
+
+<p><strong>closest-side：</strong></p>
+<div id="grad1"></div>
+
+<p><strong>farthest-side：</strong></p>
+<div id="grad2"></div>
+
+<p><strong>closest-corner：</strong></p>
+<div id="grad3"></div>
+
+<p><strong>farthest-corner（默认）：</strong></p>
+<div id="grad4"></div>
+
+</body>
+</html>
+```
+
+
+
+### 3.9.2 文字渐变
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        p{
+            font-size: 60px;
+            background: linear-gradient(0deg,red,blue);
+            background-clip:text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+<p>
+    我是渐变文字
+</p>
+</body>
+</html>
+```
+
+
+
+**核心内容说明**
+
+background 属性：设置背景图片为线性渐变色。
+
+background-clip 属性：规定背景的绘制区域（我们注意到该属性上的-webkit-，说明该属性还存在兼容问题，并不是所有浏览器都支持，在 W3C 是没有 text 这个值的，这里的 text 是背景被裁剪到文字）。
+
+color 属性：设置文字颜色为透明，然后面的背景色显示出来。

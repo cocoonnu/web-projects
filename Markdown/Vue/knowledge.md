@@ -521,7 +521,7 @@ document.onkeydown = function(event){
     width: 300px;
     height: 380px;
     background: url(./fingerprint.png) no-repeat;
-    /* 一般指定宽度为盒子宽度 或者cover */
+    /* 一般指定宽度为盒子宽度 或者cover contain*/
     background-size: 300px;
 }
 ```
@@ -742,12 +742,4 @@ ctrl + b: 空了
 ```
 
 
-
-### 其他快捷键
-
-```
-snipaste
-
-F3: 将复制的内容生成图片
-```
 

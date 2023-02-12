@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、vue基础知识和原理
 
 ## 1.1 初识Vue
 
@@ -5195,7 +5195,9 @@ Category.vue
     <div class="category">
         <h1>{{title}}</h1>
         
+        具名插槽
         <slot name="list">列表</slot>
+        
         <slot name="ad">广告</slot>
     
     </div>  
@@ -5208,15 +5210,13 @@ Category.vue
 
 1、**数据在子组件**，但根据数据生成的结构需要父组件来决定
 
-2、实现在插槽中进行数据传输
+2、实现在插槽中进行数据传输：**父组件接收子组件参数**
 
-3、必须用template标签包裹，**slot-scope属性**接收参数
-
-3、`slot-scope="obj"`：对象里面存所有参数   `slot-scope="{ games, }"`：解构赋值
+3、必须用 template 标签包裹，**slot-scope 属性**接收参数，**参数为一个对象**
 
 
 
-案例：games数组在Category组件中，利用插槽操作games数组
+案例：games 数组在 Category 组件中，利用插槽操作 games 数组
 
 App.vue
 
@@ -5224,7 +5224,7 @@ App.vue
 <!-- 无序列表 -->
 <Category title="games">
 
-    <!-- <template slot-scope="obj"> -->
+    <!-- 因为参数为一个对象，所以用结构赋值 -->
     <template slot-scope="{games}" slot="list" >
         <ul>
             <li v-for="(item,index) in games">{{item}}</li>
@@ -5272,10 +5272,6 @@ Category.vue
 ```
 
 
-
-
-
-   
 
 
 
