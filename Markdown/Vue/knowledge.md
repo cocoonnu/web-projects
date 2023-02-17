@@ -670,19 +670,19 @@ html {
 
 
 
-### Typora 图片规范
+### Typora 图片设置
 
 1、去偏好设置中设置图片指定路径：`./mark-img`
 
-2、粘贴图片后改一下图片 url，确保 github 可以识别
-
-
+2、粘贴图片后改一下图片 url，确保 github 可以识别：
 
 原图片地址：`D:\文档\学习文件\GitWebProjects\Markdown\Vue\mark-img\image-20230118225827872.png`
 
-
-
 改为：`mark-img/image-20230118225827872.png`     注意是这个： `/` 
+
+
+
+3、图片位置调整：https://blog.csdn.net/K346K346/article/details/108162853
 
 
 

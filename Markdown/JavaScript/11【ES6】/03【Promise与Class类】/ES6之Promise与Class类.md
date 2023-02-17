@@ -861,6 +861,8 @@ console.log(p.name); // undefined
 console.log(Phone.name);
 ```
 
+
+
 ## 2.6 私有属性和方法
 
 JavaScript 本身没有私有属性和方法，所以我们利用其它方式来实现私有化。
@@ -1018,6 +1020,8 @@ var sonn = new Sonn(1,2,3);
 console.log(sonn.x,sonn.z); // 3 3
 sonn.sum(); // 3
 ```
+
+
 
 ### 2.8.2 作为对象使用（调用父类的函数）
 

@@ -193,8 +193,6 @@ module.exports = {
     output: {
         filename: 'bundle.js', // 生成文件
         path: path.resolve(__dirname, './dist') // dist/bundle.js
-        
-        clean: true, // 整理dist
     },
 
     mode: 'development', // 开发模式
@@ -279,7 +277,6 @@ module.exports = {
 
 
 
-
 ## 2.3 html-webpack-plugin
 
 作用：可以帮我们自动生成index.html！！！   
@@ -289,7 +286,7 @@ module.exports = {
 1、安装html-webpack-plugin：
 
 ```
-npm install --save-dev html-webpack-plugin@4.3.0
+npm install --save-dev html-webpack-plugin@4.3.
 ```
 
 
@@ -710,9 +707,9 @@ module: {
 
 ## 2.8 webpack-dev-server
 
-为什么需要 webpack-dev-server？  答案：自动打包！（每次修改都会自动打包）
+为什么需要 webpack-dev-server？  答案：自动执行打包命令！（每次修改都会自动打包）
 
-**如果当修改了 webpack.config.js 则必须关闭服务，`npx webpack` 再重启服务**
+**如果当修改了 webpack.config.js 则必须重启服务**
 
 
 
@@ -788,7 +785,7 @@ npm i @babel/runtime @babel/plugin-transform-runtime -D
 
 
 
-配置 babel，`.babelrc`
+配置 babel，`.babelrc` 
 
 ```json
 {
@@ -843,3 +840,17 @@ class Person {
 
 new Person('Alex', 18);
 ```
+
+
+
+## 2.10 resolve
+
+该配置指定哪些文件可以被识别为模块引入
+
+```js
+// 用来设置引用模块，可以将这些文件识别为模块
+resolve: {
+    extensions: ['.ts', '.js']
+}
+```
+

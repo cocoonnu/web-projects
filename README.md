@@ -2,9 +2,9 @@
 
 
 
-- 个人学习路线：Markdown/Learning Path
+- 个人学习路线：https://github.com/cocoonnu/WebProjects/blob/main/Markdown/Learning%20Path/Learning%20Path.md
 
-
+  
 
 - Projects：自己根据网上的模板做的一些有意思而且好看的小网页，`UI ` 都是我非常喜欢的风格
 

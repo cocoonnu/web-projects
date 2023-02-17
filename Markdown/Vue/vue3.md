@@ -1,8 +1,10 @@
-# 一、简介
+# 一、Vue3 简介
 
 2020年9月18日，Vue.js发布3.0版本，代号：One Piece（海贼王）
 
-[github.com/vuejs/vue-n…](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fvuejs%2Fvue-next%2Freleases%2Ftag%2Fv3.0.0)
+github 官网地址：https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fvuejs%2Fvue-next%2Freleases%2Ftag%2Fv3.0.0
+
+
 
 ## 1.1 性能的提升
 
@@ -10,14 +12,20 @@
 - 初次渲染快**55%**, 更新渲染快**133%**
 - 内存减少**54%**
 
+
+
 ## 1.2 源码的升级
 
-- 使用`Proxy`代替`defineProperty`实现响应式
-- 重写虚拟`DOM`的实现和`Tree-Shaking`
+- 使用 `Proxy` 代替 `defineProperty` 实现响应式
+- 重写虚拟`DOM`的实现和 `Tree-Shaking`
 
-## 1.3 拥抱TypeScript
+
+
+## 1.3 拥抱 TypeScript
 
 - Vue3可以更好的支持`TypeScript`
+
+
 
 ## 1.4 新的特性
 
@@ -197,7 +205,7 @@ setup() {
 
 1. 不要和Vue2.x配置（data、methos、computed...）**混用**！！
 2. 在setup中<strong style="color:#DD5145">不能访问到</strong> Vue2.x 配置（data、methos、computed...）。
-3. setup不能是一个async函数
+3. 如果组件不是一个异步组件，那么 setup 不能是一个 async 函数，且不能返回 promise 对象，否则会报错！
 
 
 
@@ -205,7 +213,7 @@ setup() {
 
 作用：setup 中定义的变量定义为响应式变量（**数据为简单类型**）
 
-![image-20230211224354819](D:\文档\学习文件\GitWebProjects\Markdown\Vue\mark-img\image-20230211224354819.png)
+![image-20230211224354819](mark-img/image-20230211224354819.png)
 
 
 
@@ -872,6 +880,7 @@ setup(){
     })
 
     return {
+       	// 这是一次性的
         ...toRefs(person)
     }
 }
@@ -882,16 +891,7 @@ setup(){
 <h2>年龄：{{age}}</h2>
 ```
 
-
-
-
-
-- 作用：
-- 语法：```const name = toRef(person,'name')```
-- 应用:   要将响应式对象中的某个属性单独提供给外部使用时。
-
-
-- 扩展：```toRefs``` 与```toRef```功能一致，但可以批量创建多个 ref 对象，语法：```toRefs(person)```
+> `...toRefs(person)`：如果 person 后面添加了其他属性则无法把新添加的属性也 `toRef`
 
 
 
@@ -915,78 +915,197 @@ setup(){
 
 
 
-## 2.readonly 与 shallowReadonly
+##  4,2 readonly/shallowReadonly
 
-- readonly: 让一个响应式数据变为只读的（深只读）。
-- shallowReadonly：让一个响应式数据变为只读的（浅只读）。
-- 应用场景: 不希望数据(尤其是这个数据是来自与其他组件时)被修改时。
+`readonly`：让一个响应式数据变为只读的，当修改数据时会发出警告
+
+```js
+let person = reactive({
+    name:'张三',
+    age:18,
+    job:{
+        j1:{
+            salary:20
+        }
+    }
+})
+
+// 传入一个响应式数据
+person = readonly(person)
+```
 
 
-## 3.toRaw 与 markRaw
 
-- toRaw：
-    - 作用：将一个由```reactive```生成的<strong style="color:orange">响应式对象</strong>转为<strong style="color:orange">普通对象</strong>。
-    - 使用场景：用于读取响应式对象对应的普通对象，对这个普通对象的所有操作，不会引起页面更新。
-- markRaw：
-    - 作用：标记一个对象，使其永远不会再成为响应式对象。
+> 使用场景：不希望数据（尤其是这个数据是来自与其他组件时）被修改时
+
+
+
+`shallowReadonly`：让一个响应式数据变为只读的**（只影响第一层）**
+
+
+
+
+
+## 4.3 toRaw/markRaw
+
+- `toRaw`
+    - 作用：将一个由 ```reactive``` 生成的**响应式对象转为普通对象**（源对象），使用的较少
+
+```js
+let person = reactive({
+    name:'张三',
+    age:18,
+})
+
+function showRawPerson(){
+    const p = toRaw(person)
+    console.log(p)
+}
+```
+
+
+
+- `markRaw`
+    - 作用：标记一个源对象，使其**永远不会再成为响应式对象**。并且最好不要去修改它
     - 应用场景:
-        1. 有些值不应被设置为响应式的，例如复杂的第三方类库等。
-        2. 当渲染具有不可变数据源的大列表时，跳过响应式转换可以提高性能。
+        1. 有些值不应被设置为响应式的，例如**复杂的第三方类库**等。
+        2. 当渲染不需要变化的数据源时，跳过响应式转换可以**提高性能**。
+
+```js
+function addCar() {
+    let  car = {
+        price: 2000,
+        name: 'max'
+    }
+
+    // 这里会自动把 car 变成响应式数据
+    person.car = car
+    
+    // 设置为非响应式
+    person.car = markRaw(car);
+}
+```
 
 
 
-## 4.customRef
 
-- 作用：创建一个自定义的 ref，并对其依赖项跟踪和更新触发进行显式控制。
 
-- 实现防抖效果：
+## 4.4 customRef
 
-  ```vue
-  <template>
-  	<input type="text" v-model="keyword">
-  	<h3>{{keyword}}</h3>
-  </template>
-  
-  <script>
-  	import {ref,customRef} from 'vue'
-  	export default {
-  		name:'Demo',
-  		setup(){
-  			// let keyword = ref('hello') //使用Vue准备好的内置ref
-  			//自定义一个myRef
-  			function myRef(value,delay){
-  				let timer
-  				//通过customRef去实现自定义
-  				return customRef((track,trigger)=>{
-  					return{
-  						get(){
-  							track() //告诉Vue这个value值是需要被“追踪”的
-  							return value
-  						},
-  						set(newValue){
-  							clearTimeout(timer)
-  							timer = setTimeout(()=>{
-  								value = newValue
-  								trigger() //告诉Vue去更新界面
-  							},delay)
-  						}
-  					}
-  				})
-  			}
-  			let keyword = myRef('hello',500) //使用程序员自定义的ref
-  			return {
-  				keyword
-  			}
-  		}
-  	}
-  </script>
-  ```
+作用：创建一个自定义的 `ref`，并对其依赖项跟踪和更新触发进行显式控制。
 
-## 5.provide 与 inject
+`customRef`：创建 `myRef` 函数的地基
 
-<img src="https://v3.cn.vuejs.org/images/components_provide.png" style="width:300px" />
 
-- 作用：实现<strong style="color:#DD5145">祖与后代组件间</strong>通信
+
+`track`：get 函数中必须调用这个，否则只会初始化执行一次
+
+
+
+`trigger`：set 函数中调用，告诉 Vue 去更新界面
+
+
+
+**实现基础的 `ref` 效果**
+
+```vue
+<template>
+	<input type="text" v-model="keyword">
+	<h3>{{keyword}}</h3>
+</template>
+
+<script>
+	import { customRef } from 'vue'
+	export default {
+		name: 'Demo',
+
+		setup(){
+			// 基础 myRef 模板
+			function myRef(value) {
+				return customRef((track,trigger) => {
+					return {
+						get() {
+                            // 告诉 Vue 这个 value 值是需要被追踪的
+							track() 
+
+							return value
+						},
+
+						set(newValue) {
+                            value = newValue
+
+                            // 告诉 Vue 去更新界面
+                            trigger() 
+						}
+					}
+				})
+			}
+            
+            // myRef 实现 ref 效果
+			let keyword = myRef('hello')
+            
+			return {
+				keyword
+			}
+		}
+	}
+</script>
+```
+
+
+
+
+
+**实现防抖效果**（1s 之内只能修改数据一次，并以最后一次修改有效）
+
+```vue
+<template>
+	<input type="text" v-model="keyword">
+	<h3>{{keyword}}</h3>
+</template>
+
+<script>
+	import {ref,customRef} from 'vue'
+	export default {
+		name:'Demo',
+		setup(){
+			// let keyword = ref('hello') //使用Vue准备好的内置ref
+			//自定义一个myRef
+			function myRef(value,delay){
+				let timer
+				//通过customRef去实现自定义
+				return customRef((track,trigger)=>{
+					return{
+						get(){
+							track() //告诉Vue这个value值是需要被“追踪”的
+							return value
+						},
+						set(newValue){
+							clearTimeout(timer)
+							timer = setTimeout(()=>{
+								value = newValue
+								trigger() //告诉Vue去更新界面
+							},delay)
+						}
+					}
+				})
+			}
+			let keyword = myRef('hello',500) //使用程序员自定义的ref
+			return {
+				keyword
+			}
+		}
+	}
+</script>
+```
+
+
+
+## 4.5 provide/inject
+
+
+
+- 作用：实现<strong style="color:#DD5145">祖组件与其后代组件间</strong>通信
 
 - 套路：父组件有一个 `provide` 选项来提供数据，后代组件有一个 `inject` 选项来开始使用这些数据
 
@@ -997,23 +1116,28 @@ setup(){
        ```js
        setup(){
            ......
+           // 传递数据
            let car = reactive({name:'奔驰',price:'40万'})
            provide('car',car)
            ......
        }
        ```
-
+    
     2. 后代组件中：
-
+    
        ```js
        setup(props,context){
            ......
+           // 接收数据
            const car = inject('car')
            return {car}
            ......
        }
        ```
-## 6.响应式数据的判断
+
+
+
+## 4.6 响应式数据的判断
 
 - isRef: 检查一个值是否为一个 ref 对象
 - isReactive: 检查一个对象是否是由 `reactive` 创建的响应式代理
@@ -1021,102 +1145,176 @@ setup(){
 - isProxy: 检查一个对象是否是由 `reactive` 或者 `readonly` 方法创建的代理  
 
 
-# 四、Composition API 的优势
 
-## 1.Options API 存在的问题
 
-使用传统OptionsAPI中，新增或者修改一个需求，就需要分别在data，methods，computed里修改 。
 
-<div style="width:600px;height:370px;overflow:hidden;float:left">
-    <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f84e4e2c02424d9a99862ade0a2e4114~tplv-k3u1fbpfcp-watermark.image" style="width:600px;float:left" />
+# 五、Composition API 的优势
+
+
+
+## 4.1 Options API 存在的问题
+
+使用传统 OptionsAPI 中，新增或者修改一个需求，就需要分别在data，methods，computed里修改 。
+
+<div>
+<img src="mark-img/f84e4e2c02424d9a99862ade0a2e4114tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=left/>
+<img src="mark-img/e5ac7e20d1784887a826f6360768a368tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=right/>
 </div>
-<div style="width:300px;height:370px;overflow:hidden;float:left">
-    <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e5ac7e20d1784887a826f6360768a368~tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;width:560px;left" /> 
-</div>
 
 
 
-
-
-
-
-
-
-
-
-## 2.Composition API 的优势
+## 4.2 Composition API 的优势
 
 我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
 
-<div style="width:500px;height:340px;overflow:hidden;float:left">
-    <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bc0be8211fc54b6c941c036791ba4efe~tplv-k3u1fbpfcp-watermark.image"style="height:360px"/>
-</div>
-<div style="width:430px;height:340px;overflow:hidden;float:left">
-    <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6cc55165c0e34069a75fe36f8712eb80~tplv-k3u1fbpfcp-watermark.image"style="height:360px"/>
+<div>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bc0be8211fc54b6c941c036791ba4efe~tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=left/>
+<img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6cc55165c0e34069a75fe36f8712eb80~tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=right/>
 </div>
 
 
 
+# 六、新的组件
 
-# 五、新的组件
-
-## 1.Fragment
+## 6.1 Fragment
 
 - 在Vue2中: 组件必须有一个根标签
-- 在Vue3中: 组件可以没有根标签, 内部会将多个标签包含在一个Fragment虚拟元素中
+- 在Vue3中: 组件可以没有根标签, 内部会将多个标签包含在一个 `Fragment` 虚拟元素中
 - 好处: 减少标签层级, 减小内存占用
 
-## 2.Teleport
 
-- 什么是Teleport？—— `Teleport` 是一种能够将我们的<strong style="color:#DD5145">组件html结构</strong>移动到指定位置的技术。
 
-  ```vue
-  <teleport to="移动位置">
-  	<div v-if="isShow" class="mask">
-  		<div class="dialog">
-  			<h3>我是一个弹窗</h3>
-  			<button @click="isShow = false">关闭弹窗</button>
-  		</div>
-  	</div>
-  </teleport>
-  ```
+## 6.2 Teleport
 
-## 3.Suspense
-- 等待异步组件时渲染一些额外内容，让应用有更好的用户体验
+什么是Teleport？—— `Teleport` 是一种能够将我们的<strong style="color:#DD5145">组件html结构</strong>移动到**指定位置**的技术。
 
-- 使用步骤：
-
-    - 异步引入组件
-
-      ```js
-      import {defineAsyncComponent} from 'vue'
-      const Child = defineAsyncComponent(()=>import('./components/Child.vue'))
-      ```
-
-    - 使用```Suspense```包裹组件，并配置好```default``` 与 ```fallback```
-
-      ```vue
-      <template>
-          <div class="app">
-              <h3>我是App组件</h3>
-              <Suspense>
-                  <template v-slot:default>
-                      <Child/>
-                  </template>
-                  <template v-slot:fallback>
-                      <h3>加载中.....</h3>
-                  </template>
-              </Suspense>
-          </div>
-      </template>
-      ```
+指定位置填的是 css 选择器
 
 
 
+案例：将 `Teleport` 内部的 HTML 结构放到 body 里面
 
-# 六、其他
+```vue
+<teleport to="body">
+	<div v-if="isShow" class="mask">
+		<div class="dialog">
+			<h3>我是一个弹窗</h3>
+			<button @click="isShow = false">关闭弹窗</button>
+		</div>
+	</div>
+</teleport>
+```
 
-## 1.全局API的转移
+
+
+## 6.3 异步组件和Suspense
+
+首先了解一下异步引入组件，等待异步组件时渲染一些额外内容，让应用有更好的用户体验
+
+```js
+import { defineAsyncComponent } from 'vue'
+const Child = defineAsyncComponent(() => import('./components/Child.vue'))
+```
+
+这样引入组件后，这个组件会异步加载，不会全局加载
+
+<img src="mark-img/gif1.gif" alt="gif1" style="zoom: 33%;" />
+
+
+
+再使用 ```Suspense ``` 包裹异步组件实现加载效果
+
+```vue
+<Suspense>
+    <template v-slot:default>
+        <Demo/>
+    </template>
+    <template v-slot:fallback>
+        <h3>加载中.....</h3>
+    </template>
+</Suspense>
+```
+
+<img src="mark-img/gif2.gif" alt="gif2" style="zoom: 50%;" />
+
+
+
+### 6.3.1 async setup
+
+异步的条件：1、网速不好，加载变慢  2、**组件的 setup 返回一个 promise 对象的结果**
+
+将 setup 添加前缀 async，返回 Promise 对象处理的结果
+
+
+
+App.vue
+
+```vue
+<template>
+    <Suspense>
+        <template v-slot:default>
+            <Demo/>
+        </template>
+        <template v-slot:fallback>
+            <h3>加载中.....</h3>
+        </template>
+    </Suspense>
+</template>
+
+<script>
+    import { defineAsyncComponent } from 'vue'
+    const Demo = defineAsyncComponent(() => import('./components/Demo.vue'))
+
+    export default {
+        name: 'App',
+
+        components: { Demo },
+    }
+</script>
+```
+
+
+
+Demo.vue
+
+```vue
+<template>
+    <h1>{{name}}</h1>
+</template>
+
+<script>
+    import { ref } from 'vue'
+
+	export default {
+		name: 'Demo',
+
+		async setup() {
+            let name = ref('Demo');
+
+            let result = await new Promise(function(resolve) {
+				setTimeout(()=>{
+					resolve({
+                        name,
+                    });
+				},2000)
+            })
+
+            return result;
+		}
+	}
+</script>
+```
+
+<img src="mark-img/gif2.gif" alt="gif2" style="zoom: 50%;" />
+
+
+
+
+
+
+# 七、其他
+
+## 7.1 全局API的转移
 
 - Vue 2.x 有许多全局 API 和配置。
 
@@ -1151,7 +1349,9 @@ setup(){
       | Vue.use                   | app.use                                     |
       | Vue.prototype             | app.config.globalProperties                 |
 
-## 2.其他改变
+
+
+## 7.2 其他改变
 
 - data选项应始终被声明为一个函数。
 
@@ -1184,9 +1384,9 @@ setup(){
       }
       ```
 
-- <strong style="color:#DD5145">移除</strong>keyCode作为 v-on 的修饰符，同时也不再支持```config.keyCodes```
+- <strong style="color:#DD5145">移除</strong> keyCode 作为 v-on 的修饰符，同时也不再支持 ```config.keyCodes```
 
-- <strong style="color:#DD5145">移除</strong>```v-on.native```修饰符
+- <strong style="color:#DD5145">移除</strong> ```v-on.native``` 修饰符
 
     - 父组件中绑定事件
 
@@ -1202,6 +1402,7 @@ setup(){
       ```vue
       <script>
         export default {
+          // 不添加 click ，则默认为原生事件
           emits: ['close']
         }
       </script>
