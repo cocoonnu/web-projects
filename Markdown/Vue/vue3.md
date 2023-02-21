@@ -1,8 +1,46 @@
-# 一、Vue3 简介
+# 一、Vue3
 
 2020年9月18日，Vue.js发布3.0版本，代号：One Piece（海贼王）
 
-github 官网地址：https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fvuejs%2Fvue-next%2Freleases%2Ftag%2Fv3.0.0
+
+
+经典模式：**option api + vetur + webpack + js + vuex**
+
+
+
+所谓的 `option api` 就是和 `Vue2` 的配置差不多，然后插件还是使用 `vetur`，构建工具依然用 `webpack`，
+
+依然使用 `JS`，下面是一个 demo
+
+```html
+<script>
+    import { ref } from 'vue'
+
+	export default {
+		name: 'Demo',
+
+		async setup() {
+            let name = ref('Demo');
+
+            let result = await new Promise(function(resolve) {
+				setTimeout(()=>{
+					resolve({
+                        name,
+                    });
+				},2000)
+            })
+
+            return result;
+		}
+	}
+</script>
+```
+
+
+
+Vue3模式：
+
+
 
 
 
@@ -65,45 +103,6 @@ npm run serve
 
 
 
-## 2.2 使用 vite 创建
-
-官方文档：[https://cn.vuejs.org/guide/quick-start.html](https://cn.vuejs.org/guide/quick-start.html)
-
-vite官网：[vitejs.cn](https://link.juejin.cn?target=https%3A%2F%2Fvitejs.cn)
-
-- 什么是vite？—— 是Vue团队打造的新一代前端构建工具。
-- 优势如下：
-  - 开发环境中，无需打包操作，可快速的冷启动。
-  - 轻量快速的热重载（HMR）。
-  - 真正的按需编译，不再等待整个应用编译完成。
-- 传统构建 与 vite构建对比图
-
-![在这里插入图片描述](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/af5f8d4493f3423087d6b9e6c5e60fa1~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp)
-
-> 传统构建模式，是将所有资源都打包好，再上线
-
-
-
-![在这里插入图片描述](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c57d4d695fe64014b78610ff2a5cd2b6~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp) 
-> 而Vite是按需加载
-
-
-
-接下来我们就用Vite来创建一个Vue3的项目
-
-```powershell
-## 创建工程
-npm init vite-app vue3_test-vite
-## 进入工程目录
-cd vue3_test-vite
-## 安装依赖
-npm install
-## 运行
-npm run dev
-```
-
-
-
 ## 2.3 分析文件目录
 
 **1、main.js**
@@ -161,6 +160,9 @@ app.mount('#app')
 	<HelloWorld msg="Welcome to Your Vue.js App"/>
 </template>
 ```
+
+
+
 
 
 
@@ -1307,14 +1309,7 @@ Demo.vue
 
 <img src="mark-img/gif2.gif" alt="gif2" style="zoom: 50%;" />
 
-
-
-
-
-
-# 七、其他
-
-## 7.1 全局API的转移
+## 6.4 全局API的转移
 
 - Vue 2.x 有许多全局 API 和配置。
 
@@ -1351,7 +1346,7 @@ Demo.vue
 
 
 
-## 7.2 其他改变
+## 6.5 其他改变
 
 - data选项应始终被声明为一个函数。
 
@@ -1413,3 +1408,224 @@ Demo.vue
   > 过滤器虽然这看起来很方便，但它需要一个自定义语法，打破大括号内表达式是 “只是 JavaScript” 的假设，这不仅有学习成本，而且有实现成本！建议用方法调用或计算属性去替换过滤器。
 
 - ......
+
+
+
+# 七、Setup 模式
+
+新增 setup 语法糖、vite 构建工具、vetur 语法检查、TS、pinia
+
+
+
+## 7.1 使用 vite 创建
+
+官方文档：[https://cn.vuejs.org/guide/quick-start.html](https://cn.vuejs.org/guide/quick-start.html)
+
+vite官网：https://vitejs.cn/
+
+- 什么是vite？—— 是Vue团队打造的新一代前端构建工具。
+- 优势如下：
+  - 开发环境中，无需打包操作，可快速的冷启动。
+  - 轻量快速的热重载（HMR）。
+  - 真正的按需编译，不再等待整个应用编译完成。
+- 传统构建 与 vite构建对比图
+
+
+
+> 传统构建模式，是将所有资源都打包好，再上线，而 Vite 是按需加载
+
+
+
+接下来我们就用Vite来创建一个Vue3的项目
+
+```powershell
+## 创建工程
+npm create vite@latest vue3_test-vite --template vue-ts
+## 进入工程目录
+cd vue3_test-vite
+## 安装依赖
+npm install
+## 运行
+npm run dev
+```
+
+>直接支持 TS
+
+
+
+### 7.1.1 解决报错问题
+
+1、vite-env.d.ts
+
+在 src 下新建文件 `vite-env.d.ts`   用来声明解析 ts 中的 vue 文件
+
+```ts
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+    import { DefineComponent } from 'vue'
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
+    const component: DefineComponent<{}, {}, any>
+    export default component
+}
+```
+
+在 `tsconfig.json` 中有使用， 之后重启 vscode
+
+
+
+2、vite 不支持 `commondjs`  的引入方式
+
+
+
+3、import 引入必须写在顶端
+
+
+
+4、我把 `tsconfig.node.json`  给删了，因为会报错而且还不知道怎么解决，现在暂时没影响
+
+```json
+// tsconfig.node.json
+
+{
+    "compilerOptions": {
+        "composite": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "allowSyntheticDefaultImports": true
+    },
+    "include": [
+        "vite.config.ts"
+    ]
+}
+```
+
+
+
+
+
+
+
+## 7.2 Setup 语法糖
+
+它是在单文件组件 (SFC) 中使用组合式 API的编译时语法糖。相比于普通的 <script> 语法，它具有更多优势：
+
+- 更少的样板内容，更简洁的代码
+- 能够使用纯 Typescript 声明 props 和抛出事件。
+- 更好的运行时性能 (其模板会被编译成与其同一作用域的渲染函数，没有任何的中间代理)。
+- 更好的 IDE 类型推断性能 (减少语言服务器从代码中抽离类型的工作)。
+
+
+
+参考文档：https://blog.csdn.net/qq_41880073/article/details/124199104
+
+
+
+## 7.3 配置 `@` 根路径
+
+vite.config.ts
+
+```ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+    plugins: [vue()],
+
+    resolve: {
+        // 配置路径别名
+        alias: {
+            '@': pathresolve(__dirname, './src'),
+        },
+    },
+
+    define: {
+        'process.env': {},
+    },
+})
+```
+
+
+
+tsconfig.json 增加两个配置项
+
+```json
+"baseUrl": ".",
+"paths": {
+    "@/*": [
+        "src/*"
+    ]
+}
+```
+
+
+
+
+
+## 7.4 配置 `vue-router4`
+
+下载： `npm i vue-router@next `
+
+
+
+router/index.ts
+
+```ts
+import { createRouter } from 'vue-router'
+import { createWebHashHistory } from 'vue-router' // mode: 'hash'
+import { createWebHistory } from 'vue-router' // mode: 'history'
+
+
+const routes = [
+    {
+        path: '/',
+        component: () => import('@/views/home/index.vue')
+    },
+    {
+        path: '/hello',
+        name: 'hello',
+        component: () => import('@/views/HelloWorld.vue')
+    }
+]
+
+const router = createRouter({
+    // history: createWebHashHistory(),
+    history: createWebHistory(),
+    routes,
+})
+
+export default router
+```
+
+
+
+main.ts
+
+```js
+import router from './router'
+app.use(router)
+```
+
+
+
+组件中使用
+
+```ts
+import { useRouter, useRoute } from 'vue-router';
+const router = useRouter() // 全局 router
+const route = useRoute() // 当前路由 route
+```
+
+
+
+跳转和参数使用和 vue2 一致
+
+
+
+## 7.5 tsconfig.json 常用配置
+
+参考文档：
+
+https://blog.csdn.net/qq_16051405/article/details/126671093

@@ -13,7 +13,7 @@ div {
 
 
 
-### event 高度宽度属性
+### Event 高度宽度属性
 
 e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 
@@ -29,7 +29,7 @@ e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 
 
 
-4、`e.offsetX`：鼠标在 `e.target` 盒子里的位置，如果该盒子有边框，则可能出现负值
+4、`e.offsetX`：鼠标在 `e.target` **盒子里的位置**，如果该盒子有边框，则可能出现负值
 
 
 
@@ -85,32 +85,6 @@ e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 >::-webkit-scrollbar-track-piece — 滚动条没有滑块的轨道部分.
 >::-webkit-scrollbar-corner — 当同时有垂直滚动条和水平滚动条时交汇的部分.
 >::-webkit-resizer — 某些元素的corner部分的部分样式(例:textarea的可拖动按钮).
-
-
-
-### 第三方在线图标库
-
-1、https://boxicons.com   https://boxicons.com/usage
-
-```html
-// index.html 中引入 css
-<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
-// 作为在线字体使用
-<i class='bx bxl-facebook-square'></i>
-```
-
-
-
-2、https://ionic.io/ionicons   https://ionic.io/ionicons/usage
-
-```html
-// index.html 中引入 js
-<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
-// 作为在线字体使用
-<ion-icon name="heart"></ion-icon>
-```
 
 
 
@@ -215,24 +189,7 @@ import "./assets/css/common.css"
 
 
 
-
-
-
-### img a 标签问题
-
-```css
-// src为空时，img标签不显示裂图
-img[src=""], img:not([src]) {
-    opacity:0;
-}
-
-// a 标签不跳转
-<a href="javascript:void(0);" >
-```
-
-
-
-### flex grid 布局技巧
+### Flex/Grid 布局技巧
 
 ```css
 /* 1、flex */
@@ -290,22 +247,7 @@ body {
 
 
 
-### html、body、自定义属性
-
-```css
-html：整个页面
-
-body：整个内容
-
-:root {
-    --clr: #222327;
-}
-/* var(--clr) */
-```
-
-
-
-### css 初始化属性
+### CSS 初始化属性
 
 ```css
 * {
@@ -353,7 +295,7 @@ min-height: 100vh /* 表示高度时刻随视口高度变化而变化 */
 
 
 
-### img属性
+### `img` 标签属性
 
 ```css
 // 保持图片匹配
@@ -369,9 +311,19 @@ cover		保持原有尺寸比例。但部分内容可能被剪切
 none		保留原有元素内容的长度和宽度，也就是说内容不会被重置
 ```
 
+```js
+// src为空时，img标签不显示裂图
+img[src=""], img:not([src]) {
+    opacity:0;
+}
+
+// a 标签不跳转
+<a href="javascript:void(0);" >
+```
 
 
-### 实现字体
+
+### CSS 字体配置
 
 ```css
 /* 首先电脑要安装该字体 或者直接引入*/
@@ -418,7 +370,7 @@ body {
 
 
 
-### calc 宽度基于父类的计算
+### Calc 宽度计算
 
 ```css
 .wrapper .buttons {
@@ -437,7 +389,7 @@ body {
 
 
 
-### input 样式
+### `input` CSS 样式
 
 ```css
 .input-field input {
@@ -453,22 +405,15 @@ body {
 }
 ```
 
-```
-### 行内元素margin-top无效！！！！！！解决：加定位、变块元素
-
-### 绝对定位的宽度只会继承参考点属性中的宽度！！！
-```
 
 
+### `e.target `和 `this` 的区别
 
-### `e.target`和`this`有什么区别？？
+- 由于事件捕获、事件冒泡会导致多个对象产生监听 
+- e.target 返回真正触发事件的对象 和 this 可能不一样！！
+- 事件委托通常需要结合使用 e.target 属性
 
-```js
-// 1、由于事件捕获、事件冒泡会导致多个对象产生监听 
-// 2、e.target返回真正触发事件的对象 和 this可能不一样！！
 
-// 事件委托通常需要结合使用 e.target 属性。
-```
 
 
 
@@ -487,7 +432,7 @@ body {
 
 
 
-### 禁止右键、复制、快捷键
+### JS 禁止右键、复制、快捷键
 
 ```js
 // 禁止打开右键
@@ -515,7 +460,10 @@ document.onkeydown = function(event){
 
 ```
 
+
+
 ### 背景图片适配
+
 ```css
 .scan .fingerprint {
     width: 300px;
@@ -523,28 +471,6 @@ document.onkeydown = function(event){
     background: url(./fingerprint.png) no-repeat;
     /* 一般指定宽度为盒子宽度 或者cover contain*/
     background-size: 300px;
-}
-```
-
-### 未定义高度的惯用套路：用padding撑开！！
-```css 
-.container {
-    width: 31.25em;
-    padding: 5em 3.75em;
-    /* 实现在body中脱标垂直水平居中 */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-}
-```
-
-### flex行内元素贴不到两边
-```css
-/* 必须转块级元素或者行内块 */
-p {
-    display: block;
-    justify-content: space-between;
 }
 ```
 
@@ -597,23 +523,9 @@ const obj = {...apple, ...pen};
 
 
 
-### js 细节大全
+### JS 中定义 `DOM  ` 元素
 
 ```js
-// <!-- defer：文档加载完毕再加载js -->
-{/* <script src="./script.js" defer></script> */}
-
-// 提供报错
-throw console.error('The dimension of the board must be an even number.');
-
-// date对象 月份从0开始 天从1开始
-new Date(2020,10)：得到2020年11月份的第一天date对象
-new Date(2020,10,2)：得到2020年11月2号date对象
-```
-
-### 在JS中写html 并插入html中
-```js
-// 在js中写html
 const cards = `
     <div class="board" style="grid-template-columns: repeat(${dimension},auto);">
     ${
@@ -629,15 +541,16 @@ const cards = `
 
 // items.map()：返回一个新数组  item.map().join('')：将新数组转化为字符串
 
-// 将cards转化为dom元素 命名为parser
+// 将 cards 转化为 dom 元素 命名为 parser
 const parser = new DOMParser().parseFromString(cards,'text/html');
 
-// 将selectors.board替换成parser.querySelector('.board')
-selectors.board.replaceWith(parser.querySelector('.board'));
-
+// 有了 DOM 元素就方便了
 ```
 
-### css特殊选择器
+
+
+### `flipped` 选择器
+
 ```css
 /* 选择当包含 flipped 的所有元素中不包含 matched 的元素 */
 .flipped:not(.matched) {};
@@ -647,7 +560,7 @@ selectors.board.replaceWith(parser.querySelector('.board'));
 
 ```
 
-### css隐藏背面
+### CSS 背面不可见属性
 ```css
 /* 当元素旋转时 背面不可见 */
 backface-visibility: hidden;    
@@ -705,7 +618,7 @@ animation: floaty 1.8s infinite alternate;
 
 
 
-### vscode 快捷键
+### Vscode 快捷键
 
 ```
 ctrl + i: 触发建议
@@ -743,3 +656,24 @@ ctrl + b: 空了
 
 
 
+### Vscode 插件介绍
+
+1、pritter-Code formatter - 代码格式化
+
+https://blog.csdn.net/qq_45981075/article/details/114551233
+
+
+
+2、Vue Language Features (Volar) - Vue3 代码支持
+
+
+
+3、Vetur - Vue2 代码支持
+
+
+
+### Python 安装
+
+- 下载 python 解释器，复制安装目录，勾选添加到 `path`
+- 下载 pycharm，新建项目，在项目配置中添加下好的解释器 python.exe（目录要对应）
+- 在项目根目录打开终端，修改 `pip` 镜像源，使 `pip` 下载第三方库更快捷

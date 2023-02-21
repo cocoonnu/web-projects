@@ -152,6 +152,10 @@ flex 是 flexible Box 的缩写，意为 “弹性布局”，用来为盒状模
 
 
 
+> 注：行内元素不生效，必须转换为块元素
+
+
+
 ```html
 <!doctype html>
 <html lang="en">

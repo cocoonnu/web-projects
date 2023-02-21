@@ -206,6 +206,10 @@ npx webpack
 
 
 
+**（4）使用快捷命令**
+
+参考：2.8 webpack-dev-server
+
 ## 2.2 entry、output
 
 **1、entry**
@@ -622,6 +626,54 @@ optimization: {
 
 
 
+
+
+### 2.6.4 兼容 CSS
+
+作用是在解析 css 时，兼容所有的浏览器，使用到 `postcss`
+
+```
+npm i -D postcss postcss-loader postcss-preset-env
+```
+
+
+
+配置 webpack.config.js
+
+```js
+// 配置 css
+{
+    test: /\.(css|less)$/,
+    use: [
+        'style-loader',
+        'css-loader',
+
+        // 引入 postcss 兼容 css 样式
+        {
+            loader: "postcss-loader",
+            options: {
+                postcssOptions: {
+                    plugins: [
+                        [
+                            "postcss-preset-env",
+                            {
+                                browsers: 'last 2 versions',// 兼容每个浏览器最新的两个版本
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+
+        'less-loader'
+    ]
+}
+```
+
+
+
+
+
 ## 2.7 处理HTML图片
 
 我们需要在index.html中引入图片就必须借助插件！
@@ -742,10 +794,16 @@ devServer: {
 修改 package.json
 
 ```js
-"scripts": {"dev": "webpack-dev-server"}
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bulid": "webpack",
+    "dev": "webpack-dev-server"
+  },
 ```
 
-执行：`npm run dev`
+启动服务：`npm run dev`
+
+打包：`npm run bulid`
 
 
 
@@ -753,7 +811,7 @@ devServer: {
 
 `npm run dev` 会在内存中生成打包后的文件，**但在项目中是不可见的！**
 
-如果在开发完后需要生成 dist 目录，那么最后 `npx webpack` 即可。
+如果在开发完后需要打包生成 dist 目录，那么最后 `npx webpack` 即可。
 
 
 
