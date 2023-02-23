@@ -2,6 +2,18 @@
 
 
 
+### TS 细节记录
+
+```ts
+// 1、如果函数里面要用到 this 那么一定要箭头函数！！
+
+// 2、遍历数组：array.map(function(i: string) )
+```
+
+
+
+
+
 ### 简单实现盒子居中方式
 
 ```css
@@ -317,9 +329,22 @@ img[src=""], img:not([src]) {
     opacity:0;
 }
 
+
+```
+
+
+
+### a 标签属性
+
+```css
 // a 标签不跳转
 <a href="javascript:void(0);" >
+
+// 新窗口打开
+target="_blank"
 ```
+
+
 
 
 
@@ -370,7 +395,7 @@ body {
 
 
 
-### Calc 宽度计算
+### calc 宽度计算
 
 ```css
 .wrapper .buttons {
@@ -473,6 +498,8 @@ document.onkeydown = function(event){
     background-size: 300px;
 }
 ```
+
+> background-size 必须写在 background 后面！！！
 
 
 
