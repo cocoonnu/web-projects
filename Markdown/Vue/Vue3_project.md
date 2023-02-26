@@ -468,6 +468,10 @@ function changeLan(lan: string) {
 
 #### 11.2 数据库与对象仓库的创建
 
+`onupgradeneeded`：只有首次调用 `openStore` 时，才会调用。内部用来创建所有的对象仓库
+
+
+
 在 `utils` 文件夹下新建 `indexedDB.ts`
 
 ```ts
@@ -479,72 +483,64 @@ export default class IndexedDB {
         this.dbName = dbName
     }
 
-    // 打开数据库 参数：对象仓库名称、主键、索引数组（可选） 
-    openStore(storeName: string, keyPath: string, indexs?: Array<string>) {
-        let request = window.indexedDB.open(this.dbName, 2) // 名称 版本号（不可回退）
+    // 打开数据库 + 对象仓库（参数：对象仓库数组、主键名、索引数组） 
+    openStore(stores: Array<string>, keyPath: string, indexs?: Array<string>) {
 
-        // 数据库打开成功的回调
-        request.onsuccess = (e) => {
-            console.log('数据库打开成功')
-            console.log(e);
-            
-            // 赋值数据库实例
-            this.db = e.target.result   
-        }
+        // 参数：名称、版本号（不可回退）
+        let request = window.indexedDB.open(this.dbName, 2) 
 
-        // 数据库打开失败的回调
-        request.onerror = function (e) {
-            console.log('数据库打开失败')
-            console.log(e);
-        }
+        return new Promise((resolve, reject) => {
+            // 数据库打开成功的回调
+            request.onsuccess = (e) => {
+                // 将 this.db 赋值数据库实例
+                this.db = e.target.result
 
-        // 数据库更新成功的回调
-        request.onupgradeneeded = function (e) {
-            console.log('数据库更新成功')
-            const { result } = e.target   
+                // 返回成功态
+                resolve(true)
+            }
 
-            // 创建对象仓库（传入仓库名和主键名，主键设置为递增）
-            const store = result.createObjectStore(storeName, {
-                autoIncrement: true, keyPath
-            })
+            // 数据库打开失败的回调
+            request.onerror = (e) => {
+                console.log('数据库打开失败')
 
-            // 创建该对象仓库属性的索引
-            if(indexs && indexs.length > 0) {
-                indexs.map(function(i: string) {
-                    store.createIndex(i, i, { unique: true })
+                // 返回失败态
+                reject(false)
+            }
+
+            // 数据库更新成功的回调（第一次打开数据库才会执行！）
+            request.onupgradeneeded = function (e) {
+                const { result } = e.target
+
+                // 创建所有的对象仓库
+                stores.map((storeName) => {
+                    const store = result.createObjectStore(storeName, {
+                        autoIncrement: true, keyPath
+                    })
+
+                    // 创建该对象仓库属性的索引
+                    if (indexs && indexs.length > 0) {
+                        indexs.map(function (i: string) {
+                            store.createIndex(i, i, { unique: true })
+                        })
+                    }
+
+                    // 对象仓库创建成功的回调
+                    store.transaction.oncomplete = function (e) {
+                        // console.log(`${storeName}仓库创建成功`);
+                    }
                 })
+
+                resolve(true)
             }
 
-            // 对象仓库创建成功的回调
-            store.transaction.oncomplete = function(e) {
-                console.log('对象仓库创建成功');
-                console.log(e);
-            }
-        }
-        
+        })        
     }
 }
 ```
 
 
 
-**实例化数据库：1、创建数据库  2、打开对象仓库**
-
-```ts
-import IndexedDB from '@/utils/indexedDB'
-
-// 创建数据库
-const airbnDB = new IndexedDB('airbnDB')
-airbnDB.openStore('room','id', ['hose', 'shu'])
-```
-
-> 仓库名为 'room'，主键命名为 'id'
-
-
-
-<img src="mark-img/image-20230222092026.png" alt="image-20230222092026" style="zoom:67%;" />
-
-
+**实例化数据库在实际使用中讲到**
 
 
 
@@ -578,7 +574,7 @@ if(indexs && indexs.length > 0) {
 **1、增加、修改数据 put**
 
 ```ts
-// 新增、修改对象仓库数据  参数：仓库名、数据
+// 增加、修改单条数据
 updateItem(storeName: string, data: any) {
     // 打开对象仓库
     const store = this.db.transaction([storeName], 'readwrite').objectStore(storeName)
@@ -588,21 +584,26 @@ updateItem(storeName: string, data: any) {
         ...data, updateTime: new Date().getTime()
     })
 
-    // 写入成功的回调
-    request.onsuccess = function(e) {
-        console.log('数据写入成功');
-    }
+    return new Promise((resolve, reject) => {
 
-    // 写入失败的回调
-    request.onerror = function (e) {
-        console.log('数据写入失败');
-    }
+        // 写入成功的回调
+        request.onsuccess = function (e) {
+            resolve(true)
+        }
+
+        // 写入失败的回调
+        request.onerror = function (e) {
+            reject(false)
+        }
+
+    })
+
 }
 ```
 
 
 
-在实例中增加、修改属性 **单个数据也必须用对象形式**
+在实例中增加、修改属性  **参数必须为一个对象！！**
 
 ```ts
 // 增加属性
@@ -612,7 +613,7 @@ airbnDB.updateItem(storeName, {name: 'cocoon', age: 18})
 airbnDB.updateItem(storeName, {id: 1, name: 'czy', age: 21})
 ```
 
-> 主键（id）也会按递增顺序加入数据中
+> 主键（id）也会按递增顺序默认加入数据中！
 
 <img src="mark-img/image-20230222101843539.png" alt="image-20230222101843539" style="zoom:67%;" />
 
@@ -623,20 +624,28 @@ airbnDB.updateItem(storeName, {id: 1, name: 'czy', age: 21})
 **2、删除数据 delete**
 
 ```ts
+// 删除单条数据
 deleteItem(storeName: string, keyPath: string | number) {
     // 打开对象仓库
     const store = this.db.transaction([storeName], 'readwrite').objectStore(storeName)
 
     let request = store.delete(keyPath)
 
-    request.onsuccess = function (e) {
-        console.log('数据删除成功');
-    }
+    return new Promise((resolve, reject) => {
 
-    request.onerror = function (e) {
-        console.log('数据删除失败');
-    }
+        // 删除成功的回调
+        request.onsuccess = function (e) {
+            resolve(true)
+        }
+
+        // 删除失败的回调
+        request.onerror = function (e) {
+            reject(false)
+        }
+
+    })
 }
+
 ```
 
 ```ts
@@ -707,8 +716,50 @@ getItem(storeName: string, key: number | string) {
 async function check(storeName: string) {
     let result = await airbnDB.getList(storeName)
 
-    console.log(result); // 成功态获得数据  失败态获得 event 对象   
+    console.log(result); // 成功态获得数据  失败态为 false   
 }
+```
+
+
+
+
+
+#### 11.4 indexedDB 的实际使用
+
+- `db/index.ts`
+
+当我们在 `src/utils/indexedDB` 中定义好了 `indexedDB` 类，我们就需要在 `src` 文件夹下新建 `db` 文件夹，用来导出数据库和对象仓库
+
+```ts
+import IndexedDB from '@/utils/indexedDB' 
+
+// 数据库
+export const airbnbDB = new IndexedDB('airbnbDB')
+
+// 数据库对象仓库
+export default ['language', 'user']
+```
+
+
+
+- 每次进入页面则初始化所有对象仓库
+
+进入 `@/router/index.ts`
+
+```ts
+router.beforeEach(async function () {
+    let result = await airbnbDB.openStore(stores, 'id')
+    
+    if(result) console.log('所有对象仓库初始化成功');
+}) 
+```
+
+
+
+- 之后在外部函数中直接引入数据库即可
+
+```ts
+import { airbnbDB } from '@/db/index';
 ```
 
 
@@ -742,7 +793,7 @@ async function check(storeName: string) {
 
 解决方法：
 
-将 indexedDB 类中的函数返回值都改成 promis 类型，暂时列举两个函数
+将 indexedDB 类中的函数返回值都改成 promis 类型，暂时列举一个函数
 
 - `openStore()`
 
@@ -780,45 +831,21 @@ openStore(storeName: string, keyPath: string, indexs?: Array<string>) {
 
 
 
-- `getList()`
-
-```ts
-getList(storeName: string) {
-    const store = this.db.transaction(storeName).objectStore(storeName)
-
-    const request = store.getAll()
-
-    // 返回一个异步
-    return new Promise((resolve, reject) => {
-        request.onsuccess = (event: any) => {
-            console.log('查询所有数据成功')
-
-            // 成功得到数据并返回
-            resolve(event.target.result) // 成功态
-        }
-
-        request.onerror = (event: any) => {
-            console.log('查询所有数据失败')
-
-            // 返回失败结果
-            reject(false) // 失败态
-        }
-    })
-}
-```
 
 
+#### 12.2 实现 mock 接口
 
- #### 12.2 实现 mock 接口
-
-以下是查询数据库所有数据 mock 接口函数的模板
+以下是查询数据库所有数据 mock 接口函数的模板，首先确保有 `room` 这个对象仓库
 
 而且实现了加载效果，利用 `ElLoading`
 
 ```ts
-import IndexedDB from '@/utils/indexedDB'
-const airbnDB = new IndexedDB('airbnDB')
+// 引入加载效果
 import { ElLoading } from 'element-plus'
+
+// 引入数据库
+import { airbnbDB } from '@/db/index';
+
 
 // mock 接口
 export async function fetchMockData() {
@@ -828,9 +855,6 @@ export async function fetchMockData() {
         text: 'Loading',
         background: 'rgba(255, 255, 255, 0.7)',
     })
-
-    // 首先打开数据库及对象仓库
-    await airbnDB.openStore('room', 'id')
 
     // 再查询所有数据库数据
     const result = await airbnDB.getList('room')
@@ -1026,6 +1050,26 @@ const handelClick = () => {
 
 
 
+#### 3.1 编写 mock 接口
+
+由此导出两个接口：
+
+`saveLanguageApi(language: any)`：在数据库中保存当前语言
+
+
+
+<img src="mark-img/image-20230224145926070.png" alt="image-20230224145926070" style="zoom:67%;" />
+
+
+
+`fetchLanguageApi()`：返回数据库中当前语言接口
+
+
+
+<img src="mark-img/image-20230224145852977.png" alt="image-20230224145852977" style="zoom:67%;" />
+
+
+
 - 实现 mock 接口
 
 ```ts
@@ -1058,26 +1102,31 @@ export async function saveLanguageApi(language: any) {
         return { code: '204', message: '失败', data: '切换语言失败', ok: false }
     }
 }
-```
 
-- 组件中申请修改案例
-
-```ts
-// 申请修改为中文
-let result: any = await saveLanguageApi('zh')
-
-if(result.code = 200) {
-    // 在 App.vue 中更新语言包
-    emit('changeLang', zhCn)
-
-    // 发送消息
-    ElMessage({
-        message: result.data,
-        type: 'success',
-        duration: 1000
+// 查询当前语言包
+export async function fetchLanguageApi() {
+    // 创建 mock 加载效果
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(255, 255, 255, 0.7)',
     })
-} else {
-    ElMessage.error(result.data)
+
+    // 首先打开数据库及对象仓库
+    await airbnbDB.openStore('language', 'id')
+
+
+    // 再查询仓库中的语言属性（id = 1）
+    let result = await airbnbDB.getItem('language', 1)
+
+    // 加载结束
+    setTimeout(() => { loading.close() }, 200)
+
+    if (result) {
+        return { code: '200', message: '成功', data: result, ok: true }
+    } else {
+        return { code: '204', message: '失败', data: false, ok: false }
+    }
 }
 ```
 
@@ -1085,5 +1134,504 @@ if(result.code = 200) {
 
 
 
+#### 3.2 组件中内实例调用
+
+`locale`：el 组件语言   `localeI18n`：i18n 全局语言
+
+**需要导入**
+
+```ts
+import { useI18n } from 'vue-i18n'
+import { reactive, ref } from 'vue'
+import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+import en from 'element-plus/lib/locale/lang/en'
+import { fetchLanguageApi, saveLanguageApi } from '@/api/index'
+import { ElMessage } from 'element-plus'
+```
+
+
+
+**页面首次加载要查询当前语言**
+
+```ts
+// 全局语言
+const { t, locale: localeI18n } = useI18n()
+
+// 首次加载语言包 locale: el 语言包  localeI18n: 全局语言包
+const locale = ref(zhCn)
+async function getLocale() {
+    let result: any = await fetchLanguageApi()
+
+    if (result.code == 200 && result.data.language == 'en') {
+        locale.value = en
+        localeI18n.value = 'en'
+    }
+}
+getLocale()
+```
+
+
+
+
+
+**切换语言函数**
+
+```ts
+// 触发函数：点击一个按钮，进行来回切换
+
+const changeLang = async function () {
+    let lang: any = await fetchLanguageApi()
+    
+    // 当页面为英文时
+    if (lang.data.language == 'en') {
+        let result: any = await saveLanguageApi('zh')
+        
+
+        if (result.code = 200) {
+            locale.value = zhCn
+            localeI18n.value = 'zh'
+
+            // 发送消息
+            ElMessage({
+                message: result.data,
+                type: 'success',
+                duration: 1000
+            })
+        } else {
+            ElMessage.error(result.data)
+        }
+    }
+
+    // 当页面为中文或者首次切换时
+    if (lang.data.language == 'zh' || !lang.data) {
+        let result: any = await saveLanguageApi('en')
+
+        if (result.code = 200) {
+            locale.value = en
+            localeI18n.value = 'en'
+
+            // 发送消息
+            ElMessage({
+                message: result.data,
+                type: 'success',
+                duration: 1000
+            })
+        } else {
+            ElMessage.error(result.data)
+        }
+    }
+}
+```
+
+
+
+**HTML 里面的配置**
+
+```html
+// el
+<el-config-provider :locale="locale">
+    // 切换按钮
+    <div class="changeLang" @click="changeLang"></div>
+    
+    // 文本类型模板
+    <a class="forgot">{{ t('login.question') }}</a>
+    
+</el-config-provider>
+```
+
+
+
+
+
 ### 4、登录注册业务实现
+
+- indexedDB 存储的用户数据样式
+
+![image-20230225204231827](mark-img/image-20230225204231827.png)
+
+
+
+- 前端输入框要实现校验功能，并且反馈信息
+- 使用 vuex 存储用户登录状态值
+
+
+
+#### 4.1 实现三个 mock 接口
+
+这个也是和数据库对接，来自己模拟用户的登录登出注册功能
+
+```ts
+// code 说明
+// '000000': 操作成功
+// '000001': 手机号已被注册  
+// '000002': 密码不正确
+// '000003': 手机号不正确  
+// '000004': 其他异常  
+// '000005': 登录过期
+
+import { ElLoading } from 'element-plus'
+import { airbnbDB } from '@/db/index';
+
+// 对象仓库名
+const storeName = 'user'
+```
+
+
+
+- 用户注册接口
+
+```ts
+export async function userSignApi(params: any) {
+    // 创建 mock 加载效果
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(255, 255, 255, 0.7)',
+    })
+
+
+    // 获取仓库中所有的用户数组
+    let usersData = await airbnbDB.getList(storeName)
+
+    let hasMobile = false
+    usersData.map((user) => {
+        if(user.mobile == params.mobile) hasMobile = true
+    })
+
+
+    if (hasMobile) {
+        // 加载结束
+        setTimeout(() => { loading.close() }, 500)
+
+        return { code: '000001', message: '失败', data: false, ok: false }
+    }
+
+    // 将用户加入数据库
+    Object.assign(params, { status: 0, token: '' })
+    let result = await airbnbDB.updateItem(storeName, params)
+
+    // 加载结束
+    setTimeout(() => { loading.close() }, 500)
+
+    if (result) {
+        return { code: '000000', message: '成功', data: result, ok: true }
+    } else {
+        return { code: '000004', message: '失败', data: false, ok: false }
+    }
+
+}
+```
+
+```ts
+// 简单测试
+
+let result = await userSignApi({ mobile: '18579152301', password: '123' })
+```
+
+![image-20230225113711645](mark-img/image-20230225113711645.png)
+
+
+
+
+
+- 用户登录
+
+```ts
+export async function usersLoginApi(params: any) {
+    // 创建 mock 加载效果
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(255, 255, 255, 0.7)',
+    })
+
+
+    // 获取仓库中所有的用户数组
+    let usersData = await airbnbDB.getList(storeName)
+    
+    // 如果没有用户
+    if (!usersData) {
+        // 加载结束
+        setTimeout(() => { loading.close() }, 500)
+        return { code: '000003', message: '失败', data: false, ok: false }
+    }
+
+
+    let correct = false
+    let codeData = '000003' // 默认手机号不正确
+
+    // 校验手机号和密码
+    usersData?.map(async function(user) {
+        if (user.mobile == params.mobile && user.password == params.password) {
+            correct = true
+            codeData = '000000' // 成功
+
+            // 成功后设置该用户 token 并更新状态
+            const token = (new Date()).getTime() + ''
+            const obj = { status: 1, token, id: user.id }
+            localStorage.setItem('usertoken', token)
+            Object.assign(params, obj)
+
+            // 更新数据库中用户数据
+            await airbnbDB.updateItem(storeName, params)
+        }
+
+        if (user.mobile == params.mobile && user.password != params.password) {
+            codeData = '000002' // 密码不正确
+        }
+    })
+
+    // 加载结束
+    setTimeout(() => { loading.close() }, 500)
+
+    if(correct) {
+        return { code: codeData, message: '成功', data: true, ok: true }
+    } else {
+        return { code: codeData, message: '失败', data: false, ok: false }
+    }
+
+}
+```
+
+```ts
+// 简单测试
+
+let result = await usersLoginApi({ mobile: '18579152301', password: '123' })
+```
+
+![image-20230225113941071](mark-img/image-20230225113941071.png)
+
+
+
+
+
+- 用户登出
+
+```ts
+export async function userLogoutApi() {
+    // 创建 mock 加载效果
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(255, 255, 255, 0.7)',
+    })
+
+    // 获取仓库中所有的用户数组
+    let usersData = await airbnbDB.getList(storeName)
+
+    // 获取当前登录用户的 usertoken
+    const token = localStorage.getItem('usertoken')
+    let hasToken = false
+
+    // 更新当前用户状态
+    usersData.map(async function (user) {
+        if (user.token == token) {
+            hasToken = true
+            
+            localStorage.removeItem('usertoken');
+            Object.assign(user, { status: 0, token: '' })
+
+            // 更新数据库中用户数据
+            await airbnbDB.updateItem(storeName, user)
+        }
+    })
+
+    // 加载结束
+    setTimeout(() => { loading.close() }, 500)
+
+    if(hasToken) {
+        return { code: '000000', message: '成功', data: true, ok: true }
+    } else {
+        return { code: '000004', message: '失败', data: false, ok: false }
+    }
+
+} 
+```
+
+```ts
+// 简单测试
+
+let result = await userLogoutApi()
+```
+
+![image-20230225114221705](mark-img/image-20230225114221705.png)
+
+
+
+
+
+#### 4.2 el-form 的使用方法
+
+- **HTML 部分**
+
+```html
+<el-form
+    status-icon
+    ref="ruleFormRef"
+    :rules="rules"
+    :model="formData"
+    :label-position="labelPosition"
+>
+```
+
+`ref` 属性：让 ruleFormRef 变量指代整个表单
+
+
+
+`rules` 属性：表单校验规则 rules
+
+
+
+`model` 属性：表单数据对象 formData
+
+
+
+`label-position` 属性：label 标签位置
+
+
+
+```html
+<!-- 手机号 -->
+<el-form-item :label="t('login.mobile')" prop="mobile">
+    <el-input 
+        :placeholder="t('login.placeMobile')"
+        v-model="formData.mobile" 
+    />
+</el-form-item>
+
+<!-- 按钮 -->
+<el-form-item>
+    <el-button 
+        class="submit" type="primary" @click="submitForm(ruleFormRef)" 
+        v-if="loginSignCheck == 'login'" 
+    >
+        {{ t('login.loginBtn') }}
+    </el-button>
+</el-form-item>
+```
+
+
+
+`label` 属性：label 标签文字
+
+
+
+`prop` 属性：表单校验规则 rules.mobile
+
+
+
+`v-model` 属性：表单数据对象 formData.mobile
+
+
+
+`submitForm(ruleFormRef)`：点击按钮函数，传入 el-from 表单变量
+
+
+
+- **数据部分**
+
+```ts
+// 表单数据
+const labelPosition = ref('top')
+const ruleFormRef = ref<FormInstance>() // 整个表单
+const formData = reactive({
+    mobile: '',
+    password: '',
+})
+
+
+// 表单效验规则
+const rules = reactive({
+    mobile: [
+        {
+            min: 11,
+            max: 11,
+            required: true,
+            pattern: /^1[34578]\d{9}$/,
+            message: '',
+            trigger: 'blur'
+        }
+    ],
+    password: [
+        {
+            pattern: /^[\w]{6,16}$/, // 弱密码
+            required: true,
+            message: '',
+            trigger: 'blur'
+        }
+    ]
+})
+```
+
+
+
+- 函数校验部分
+
+模板：`formEl`：el-from 表单变量   `valid`：校验成功返回 true
+
+```ts
+async function submitForm(formEl: FormInstance | undefined) {
+    if (!formEl) return
+
+    formEl.validate(async function(valid) {
+        if(!valid) {
+            ElMessage.error('请填入正确信息')
+            return false
+        }
+
+    	...(校验成功之后的代码)
+```
+
+
+
+实例：
+
+```ts
+async function submitForm(formEl: FormInstance | undefined) {
+    if (!formEl) return
+
+    formEl.validate(async function(valid) {
+        if(!valid) {
+            ElMessage.error('请填入正确信息')
+            return false
+        }
+
+        if (loginSignCheck.value == 'sign') {
+            let result = await userSignApi(formData)
+
+            if (result.code == '000001') ElMessage.error('手机号已被注册')
+            if (result.code == '000004') ElMessage.error('注册失败')
+            if (result.code == '000000') {
+                ElMessage({
+                    message: '注册成功',
+                    type: 'success',
+                    duration: 1000
+                })
+            }
+        }
+        
+        if (loginSignCheck.value == 'login') {
+            let result = await userLoginApi(formData)
+
+            if (result.code == '000002') ElMessage.error('密码不正确')
+            if (result.code == '000003') ElMessage.error('手机号不正确')
+            if (result.code == '000004') ElMessage.error('登录失败')
+            if (result.code == '000000') {
+                // 将全局的 userStatus 设置为1
+                store.commit('changeUserState', 1)
+
+                ElMessage({
+                    message: '登录成功',
+                    type: 'success',
+                    duration: 1000
+                })
+
+                // 跳转路由
+                setTimeout(() => { router.replace({ name: 'home' }) }, 500)
+            }
+        }
+
+    })
+}
+```
 

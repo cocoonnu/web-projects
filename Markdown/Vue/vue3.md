@@ -1521,9 +1521,51 @@ declare module '*.vue' {
 
 
 
+一些 api 的用法：https://blog.csdn.net/weixin_45547638/article/details/127240591
+
+### 7.2.1 onMounte/ref/nextTick
+
+**onMounte：页面 dom 挂载完毕后执行（全局使用）**
+
+**nextTick：页面 dom 挂载完毕后执行（局部使用）**
+
+```ts
+import { onMounted, nextTick } from 'vue';
+
+onMounted(function() {
+    ...  
+})
+
+nextTick(function() {
+    ...  
+})
+```
+
+
+
+**ref 属性：获取 dom 元素**
+
+```ts
+// 首先定义一个空值
+const box = ref(null);
+
+// 然后在 onMounte 函数中输出一下
+onMounte(() => {
+    console.log(box.value)
+})
+
+// 在标签直接添加 ref 属性：<div ref="box">box</div>
+```
+
+
+
+
+
+
+
 ## 7.3 配置 `@` 根路径
 
-vite.config.ts
+**vite.config.ts**
 
 ```ts
 import { defineConfig } from 'vite'
@@ -1549,7 +1591,7 @@ export default defineConfig({
 
 
 
-tsconfig.json 增加两个配置项
+**tsconfig.json 增加两个配置项**
 
 ```json
 "baseUrl": ".",
@@ -1629,3 +1671,103 @@ const route = useRoute() // 当前路由 route
 参考文档：
 
 https://blog.csdn.net/qq_16051405/article/details/126671093
+
+
+
+
+
+## 7.6 在Vue3中使用事件总线
+
+参考文档：
+
+https://blog.csdn.net/qq_52013792/article/details/125803290
+
+
+
+
+
+## 7.7 在Vue3中使用 Vuex
+
+为了符合 vue3 中 ts 的特性，我们把 vuex 仓库的数据也要进行类型管理，作用是在使用 vuex 仓库数据的时候可以看到它是什么类型
+
+> 下面的代码已经实现了 ts 支持
+
+
+
+- **store/index.ts**
+
+```ts
+import { createStore, Store, useStore as baseUseStore } from 'vuex'
+import { InjectionKey } from 'vue'
+
+// 声明仓库数据类型
+export interface AllStateTypes {
+    userState: number
+}
+
+
+// injection key
+export const key: InjectionKey<Store<AllStateTypes>> = Symbol()
+
+
+// 导出自定义 useStore
+export function useStore() {
+    return baseUseStore(key)
+}
+
+
+// 导出 store
+export const store = createStore({
+    state: {
+        userState: 0
+    },
+
+    // 在这里直接修改仓库的值
+    mutations: {
+        changeUserState(state, value) {
+            state.userState = value
+        }
+    },
+  
+    // 一般异步函数放在这里
+    actions: {  
+        incrementWait({ commit, state }, parms) {
+        }
+    },
+
+    // 模块化
+    modules: {
+    }
+})
+```
+
+
+
+- **main.ts**
+
+```ts
+// vuex
+import { store, key } from './store'
+app.use(store, key)
+```
+
+
+
+- 组件中使用
+
+```ts
+import { useStore } from '@/store'
+const store = useStore()
+
+// 获取仓库的值
+store.state.xxx
+
+// 调用 actions
+store.dispatch('incrementWait', parms)
+
+// 调用 mutations
+store.commit('increment', parms)
+```
+
+
+

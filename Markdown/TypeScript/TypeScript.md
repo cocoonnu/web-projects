@@ -984,6 +984,12 @@ const o: Human = {
 
 
 
+还有个 `type` 类型，功能和接口一致。理解的话就照着接口理解就行
+
+参考文档：https://dengxi.blog.csdn.net/article/details/112625953
+
+
+
 ## 2.4 属性的封装
 
 - 我们定义一个私有属性时，一般变量名以下划线开头
@@ -1079,5 +1085,4 @@ test<MyInter>({length: 12});
 ```
 
 > `<T extends MyInter>`：或者让泛型继承于接口
-
 
