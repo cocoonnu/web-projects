@@ -348,7 +348,7 @@ target="_blank"
 
 
 
-### CSS 字体配置
+### CSS 文字属性
 
 ```css
 /* 首先电脑要安装该字体 或者直接引入*/
@@ -360,6 +360,12 @@ target="_blank"
 
 /* 引入在线谷歌字体 */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
+
+文字间距
+letter-spacing: 1px;
+
+文字段落间距
+word-spacing
 ```
 
 
@@ -414,7 +420,7 @@ body {
 
 
 
-### `input` CSS 样式
+### CSS 输入框样式
 
 ```css
 .input-field input {
@@ -506,7 +512,15 @@ document.onkeydown = function(event){
 ### 常用 JS 函数
 
 ```js
-parseInt(a) // 转化为整数（向下取整）
+Math.ceil() // 数字向上取整
+
+Math.round() // 四舍五入
+
+Math.abs() // 绝对值
+
+Math.floor() // 向下
+
+parseInt(a) // 字符串转化为整数（向下取整）
 
 isNaN(a * 1) // 判断 a 是不是数字
 
@@ -527,6 +541,8 @@ Math.floor(Math.random() * num)：// 返回0到num-1的整数
 navigator.clipboard.writeText(123); // 实现用户复制内容为123
 
 arr.splice(下标，个数，替换的值) // 数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+
+arr.splice(i,1) /删除数组中下标为i的值
 
 // 判断闰年
 function isLeapYear(year) { 

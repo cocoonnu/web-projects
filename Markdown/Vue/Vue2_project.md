@@ -935,7 +935,11 @@ div {
 
 ### 5.10 mockjs 的使用
 
-概念：自娱自乐的发送请求，因为 mock 自己存储数据，然后又发送请求从 mock 读取数据。发送请求还是和 ajax 一致。
+概念：自娱自乐的发送请求，因为 mock 自己存储数据，然后又发送请求从 mock 读取数据。发送请求还是和 ajax 一致。就安装下面的教程来，完全不用跨域和处理 http 域名前缀什么的！
+
+
+
+安装：`npm i mockjs -D`
 
 
 
@@ -990,7 +994,7 @@ import '@/mock/mockServe'
 
 
 
-4、进入 api 文件夹，新建 mockRequests.js
+4、在 mock 文件夹，新建 mockRequests.js
 
 mockRequests.js
 
@@ -1047,7 +1051,7 @@ export default mockRequests;
 
 
 
-5、进入 src/index.js 写 mock 请求函数
+5、进入 api/index.js 写 mock 请求函数
 
 ```js
 import mockRequests from './mockRequests'
@@ -1429,7 +1433,7 @@ Vue.use(Select)
 ```js
 scrollBehavior() {
     return {
-        y: 0,
+        y: 0, // vue3 用top
         behavior: 'smooth',
     }
 },
@@ -2009,7 +2013,7 @@ async openMsgBox() {
 
 利用一个 vue 插件：vue-lazyload
 
-https://www.npmjs.com/package/vue-lazyload
+https://www.npmjs.com/package/vue-lazyload	
 
 ```
 安装低版本
@@ -2033,6 +2037,8 @@ Vue.use(VueLazyload, {
 
 
 
+用自定义指令 `v-lazy` 来接管 src
+
 ```vue
 单个图片
 <img v-lazy="imgUrl">
@@ -2049,6 +2055,8 @@ Vue.use(VueLazyload, {
 ### 6.8 使用路由懒加载
 
 作用：当打包构建应用时，JavaScript 包会变得非常大，影响页面加载。如果我们能把不同路由对应的组件分割成不同的代码块，然后当路由被访问的时候才加载对应组件，这样就更加高效了。
+
+一个 index.js 变成了多个 js 文件
 
 以前的路由加载：
 

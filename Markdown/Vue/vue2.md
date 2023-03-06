@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
 
 ## 1.1 初识 Vue
 
@@ -6538,6 +6538,23 @@ router.afterEach(function(to,from) {
 
 
 
+一般要写的 mate 配置如下
+
+```ts
+meta: {
+  title: '',
+  keywords: '',
+  description: '',
+  keepAlive: false // 该路由组件是否缓存
+}
+```
+
+
+
+keepAlive 的使用方法：https://blog.csdn.net/weixin_44251396/article/details/97391206
+
+
+
 ### 4.12.2 全局守卫
 
 分为两个函数，当成功访问该路由时，两个函数都被调用
@@ -6679,3 +6696,6 @@ express框架解决方案：
 const history = require('connect-history-api-fallback');
 app.use(history());
 ```
+
+
+

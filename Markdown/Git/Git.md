@@ -433,3 +433,77 @@ GitFlow 有独立的分支，让发布迭代过程更流畅。
 安全可靠地管理大团队的开发者
 ```
 
+
+
+
+
+## Git 报错问题处理
+
+### 删除工作区内容
+
+即回到该版本初始状态
+
+```bash
+```
+
+
+
+
+
+
+
+### 低于远程的版本
+
+ 报错：`Updates were rejected because the tip of your current branch is behind`：
+
+原因是本地仓库中有部分代码版本低于远程的版本，肯定是版本回退导致的！！
+
+```bash
+git pull origin master //将远程代码拉取到本地，但存在冲突无法merge
+
+git add -u  //将冲突的文件resolve掉之后才能成功pull，-u的意思是将文件的修改、文件的删除，添加到暂存区
+
+git commit -m "注释"
+
+git pull
+```
+
+之后手动解决冲突
+
+```
+<<<<<<< HEAD
+
+本地代码
+
+=======
+
+拉下来的代码
+
+>>>>>>>
+
+```
+
+
+
+解决完所有冲突后
+
+```
+git add. 
+git commit -m "描述"//不加描述的话可能会弹出一个窗口要求填写描述信息，填上保存关掉即可
+git push master origin
+```
+
+
+
+如果 `git push master origin` 还报错
+
+```
+// 重新尝试连接
+git remote remove origin
+
+git remote add origin git@github.com:cocoonnu/airbnb-ssr.git
+
+// 推送
+ git push --set-upstream origin main^
+```
+

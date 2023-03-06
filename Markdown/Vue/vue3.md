@@ -638,7 +638,7 @@ watch(person,(newValue,oldValue)=>{
 
 
 
-- 监视 reactive 定义的对象中的某个属性
+- 监视响应式对象中的某个属性（重点）
 
 ```js
 watch(() => person.job, (newValue,oldValue)=>{
@@ -658,7 +658,7 @@ watch(() => person.job, (newValue,oldValue)=>{
 
 
 
-watchEffect 有点像 computed，都有所谓的依赖项，**初始化执行一次，依赖项发生变化也执行**
+watchEffect 有点像 computed，都有所谓的依赖项，**其回调函数初始化执行一次，依赖项发生变化也执行**
 
 ```js
 // watchEffect 所指定的回调中用到的数据只要发生变化，则直接重新执行回调。
@@ -1220,11 +1220,15 @@ const Child = defineAsyncComponent(() => import('./components/Child.vue'))
 
 这样引入组件后，这个组件会异步加载，不会全局加载
 
+**前提条件是异步组件中渲染的变量为异步变量**
+
+
+
 <img src="mark-img/gif1.gif" alt="gif1" style="zoom: 33%;" />
 
 
 
-再使用 ```Suspense ``` 包裹异步组件实现加载效果
+再使用 ```Suspense ``` 包裹异步组件实现加载效果（template 里面允许有一个 div）
 
 ```vue
 <Suspense>
@@ -1246,6 +1250,10 @@ const Child = defineAsyncComponent(() => import('./components/Child.vue'))
 异步的条件：1、网速不好，加载变慢  2、**组件的 setup 返回一个 promise 对象的结果**
 
 将 setup 添加前缀 async，返回 Promise 对象处理的结果
+
+
+
+**下面的 name 就是一个异步变量**
 
 
 
@@ -1543,7 +1551,7 @@ nextTick(function() {
 
 
 
-**ref 属性：获取 dom 元素**
+**ref 属性：获取单个或多个 dom 元素**
 
 ```ts
 // 首先定义一个空值
@@ -1551,13 +1559,15 @@ const box = ref(null);
 
 // 然后在 onMounte 函数中输出一下
 onMounte(() => {
-    console.log(box.value)
+    console.log(box.value) // 如果是多个则为一个数组
 })
 
 // 在标签直接添加 ref 属性：<div ref="box">box</div>
 ```
 
 
+
+### 7.2.2 可以直接使用 await ！
 
 
 
@@ -1720,6 +1730,12 @@ export function useStore() {
 export const store = createStore({
     state: {
         userState: 0
+        categoryList: []
+    },
+    
+    getters: {
+        // 记得加问号不然会报错！
+        book: state => state.categoryList[0]?.categoryName
     },
 
     // 在这里直接修改仓库的值
@@ -1761,6 +1777,7 @@ const store = useStore()
 
 // 获取仓库的值
 store.state.xxx
+let name = computed(() => store.getters.book)
 
 // 调用 actions
 store.dispatch('incrementWait', parms)

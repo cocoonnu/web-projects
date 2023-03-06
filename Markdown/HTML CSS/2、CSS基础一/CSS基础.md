@@ -1082,6 +1082,18 @@ p {
 
 
 
+文本一行显示
+
+```css
+white-space: nowrap;
+text-overflow: ellipsis;
+overflow: hidden;
+```
+
+
+
+
+
 # 五、CSS引入方式
 
 ## 5.1 CSS的三种引入方式

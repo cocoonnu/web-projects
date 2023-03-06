@@ -2,15 +2,57 @@
 
 以下是项目开发课程步骤及简单笔记
 
+`vue-ssr test`：这个版本是 ssr 改造前的最后一个版本，需要把 `main.ts/index.html` 修改成原样式
+
+
+
+`entry-client`：这个版本完成了客户端渲染，对应 8-12 章节
+
+
+
+`ssr & vuex`：这个版本完成了 ssr 的第一次改造，实现了 vuex 获取动态数据
+
+
+
+`ssr & vuex 2.0`：这个版本修复了 ssr 的报错（将浏览器 api 的首次调动都搬移到 `entry-client.ts` 中），并且将 `entry-client.ts` 与 `vuex` 搭配使用，实现了 vuex 数据的首次加载功能 
+
+ 
+
+`fixed 3.0`、`el-menu&ssr&vuex`： 该版本完成了 el-menu 报错，git 报错等问题
+
+ 
+
+`finish order`：修复了 ssr 服务端渲染的一些报错，一般都是直接取消服务端渲染... ，解决了 indexed DB 请求的一些报错，实现了完整的订单模块的功能**（未区分用户）**：查询、删除、添加订单
+
+
+
+`finish orderByUsers`：通过修改订单模块的三个 mock 接口，实现了登录权限拦截，不同用户拥有不同订单
+
+
+
+`airbnb-vue-ssr 1.0`：在开发环境下，网站基础功能已经全部实现！后续可能还会有一定的优化
+
+
+
+`airbnb-vue-ssr 1.1`：最后一个处于开发环境的版本，这个版本进行了 SEO 优化，处理了路由 mate 元信息
+
+
+
+实现功能：登录、注册，页面重定向，登录权限拦截，订单、历史记录模块的一些功能，切换全局语言功能，首页 ssr 动态数据加载，服务端和客户端 vuex 数据同步，图片懒加载，异步组件的实现，indexed DB 模拟数据库，mock 模拟后端接口，ElementPlus 组件的基本使用
+
 
 
 ### 1、nvm 管理 node.js 版本
 
-`nvm list`  `nvm use`  `nvm install` `nvm unistall`
+`nvm list`  `nvm use`  `nvm install` `nvm uninstall`
+
+安装低版本的第三方库，可能需要降低版本才能安装成功
 
 
 
-### 2、`vue-router4` 使用方法在文档
+
+
+### 2、`vue-router4` 使用方法
 
 
 
@@ -80,28 +122,41 @@ app.use(ElementPlus)
 
 
 
-### 5、ElementPlus - Message 全局生效
+### 5、ElementPlus 组件模板
 
-在 main.ts 中配置
+- 加载模块
 
 ```ts
-// 全局生效 ElementPlus - Message
+import { ElLoading } from 'element-plus'
+
+const loading = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(255, 255, 255, 0.7)',
+})
+
+setTimeout(() => { loading.close() }, 500)
+```
+
+> 在 mock 接口中直接模拟，在真实接口中得去 store 里面模拟
+
+
+
+
+
+- 发送消息
+
+```ts
 import { ElMessage } from 'element-plus'
-app.config.globalProperties.$message = ElMessage
+
+ElMessage({
+    message: `切换页面成功`,
+    type: 'success',
+    duration: 1000
+})
+
+ElMessage.error(result.data)
 ```
-
-
-
-组件中使用
-
-```ts
-import { h,getCurrentInstance } from 'vue'
-const { proxy }: any = getCurrentInstance()
-
-// proxy.$message() 等效于 ElMessage()
-```
-
-> 感觉更麻烦了...
 
 
 
@@ -245,7 +300,7 @@ class Http {
 
     // 封装 get/post 请求函数
     public httpRequestGet<T>(url: string, params: AxiosRequestConfig): Promise<T> {
-        return Http.axiosInstance.get(url, params).then(res => res.data).catch()
+        return Http.axiosInstance.get(url, { params }).then(res => res.data).catch()
     }
 
     public httpRequestPost<T>(url: string, params: AxiosRequestConfig): Promise<T> {
@@ -353,7 +408,7 @@ const value = ref(new Date())
 
 **在 src 下新建 `language `文件夹**
 
-新建 `i18n.ts` 、`zn.ts`、`en.ts`
+新建 `i18n.ts`  `zn.ts`、`en.ts`
 
 ```ts
 import { createI18n } from 'vue-i18n'
@@ -605,13 +660,29 @@ updateItem(storeName: string, data: any) {
 
 在实例中增加、修改属性  **参数必须为一个对象！！**
 
-```ts
-// 增加属性
-airbnDB.updateItem(storeName, {name: 'cocoon', age: 18})
+- 增加属性
 
-// 修改属性（通过主键修改）
-airbnDB.updateItem(storeName, {id: 1, name: 'czy', age: 21})
+```ts
+// 创建
+result = await airbnbDB.updateItem(storeName, { 
+    usertoken,
+    orderList,
+    // keypath id自动会传入
+})
 ```
+
+
+
+- 修改属性：
+  - 需要根据主键（keypath） id 修改  
+  - 后面为属性参数，**进行替换操作**，如果其中属性一个不写，则会消失
+
+```ts
+// 更新用户订单
+result = await airbnbDB.updateItem(storeName, { id, usertoken, orderList })
+```
+
+
 
 > 主键（id）也会按递增顺序默认加入数据中！
 
@@ -649,7 +720,7 @@ deleteItem(storeName: string, keyPath: string | number) {
 ```
 
 ```ts
-airbnDB.deleteItem(storeName, 2)
+airbnbDB.deleteItem(storeName, 2)
 ```
 
 
@@ -714,7 +785,7 @@ getItem(storeName: string, key: number | string) {
 
 ```ts
 async function check(storeName: string) {
-    let result = await airbnDB.getList(storeName)
+    let result = await airbnbDB.getList(storeName)
 
     console.log(result); // 成功态获得数据  失败态为 false   
 }
@@ -739,6 +810,10 @@ export const airbnbDB = new IndexedDB('airbnbDB')
 // 数据库对象仓库
 export default ['language', 'user']
 ```
+
+
+
+> 当需要添加新的对象仓库时，只需要在 export default 数组后面添加新的仓库名即可！！
 
 
 
@@ -978,7 +1053,17 @@ Nuxt3 是基于 Vue3 发布的 SSR 框架，致力于将 SPA 应用转化为 SSR
 
 
 
-### 2、defineEmits 实现父子组件通信
+### 2、defineEmits/defineProps
+
+这两个 api 都是在 setup 语法糖里面使用的，并且不需要引入
+
+`defineProps`：父组件给子组件传递参数
+
+`defineEmits`：在子组件中调用父组件的回调函数，并且可传参
+
+
+
+#### 2.1 defineEmits
 
 - 父组件绑定事件：`@increase="handleIncrease"`
 
@@ -987,7 +1072,7 @@ Nuxt3 是基于 Vue3 发布的 SSR 框架，致力于将 SPA 应用转化为 SSR
 
 ```ts
 // ts 专有
-const emit= defineEmits<{
+const emits= defineEmits<{
     (e: 'increase', num: number): void
 }>()
 ```
@@ -1032,7 +1117,7 @@ emits('increase', 1);
 
 <script setup>
 // ts 专有
-const emit= defineEmits<{
+const emits= defineEmits<{
     (e: 'increase', num: number): void
 }>()
             
@@ -1041,6 +1126,54 @@ const handelClick = () => {
 };
 </script>
 ```
+
+
+
+#### 2.2 defineProps
+
+父组件
+
+```vue
+<template>
+    <div class="Father">
+        <p>我是父组件</p>
+        <!--  -->
+        <son :ftext="ftext"></son>
+    </div>
+</template>
+    
+<script setup>
+import {ref} from 'vue'
+import Son from './son.vue'
+const ftext = ref('我是父组件-text')
+</script>
+```
+
+
+
+子组件
+
+```vue
+<template>
+    <div class="Son">
+        <p>我是子组件</p>
+       <!-- 展示来自父组件的值 -->
+       <p>接收到的值：{{ftext}}</p>
+    </div>
+</template>
+    
+<script setup>
+import {ref} from 'vue'
+// se
+
+//defineProps 来接收组件的传值
+const props = defineProps<{
+    ftext: string,
+}>()
+</script>
+```
+
+
 
 
 
@@ -1054,7 +1187,7 @@ const handelClick = () => {
 
 由此导出两个接口：
 
-`saveLanguageApi(language: any)`：在数据库中保存当前语言
+`saveLanguageApi(language: any)`：在数据库中保存当前语言，并且存储在 `  localStorage` 中以便 vuex 获取
 
 
 
@@ -1087,6 +1220,7 @@ export async function saveLanguageApi(language: any) {
 
     // 再更新仓库中的语言属性（id = 1）
     let result = await airbnbDB.updateItem('language', { id: 1, language })
+    localStorage.setItem('language', language)
 
     if (result) {
 
@@ -1132,49 +1266,51 @@ export async function fetchLanguageApi() {
 
 
 
+#### 3.2 初始化 vuex 全局语言数据
+
+- entry-client.ts
+
+```ts
+router.beforeEach(async function () {
+    
+    // 获取全局语言
+    let lang = localStorage.getItem('language') ? localStorage.getItem('language') : 'zh'
+    store.commit('fetchLanguage', lang)    
+    
+}
+```
 
 
-#### 3.2 组件中内实例调用
+
+
+
+#### 3.3 组件内实例调用
+
+- 初始化查询
 
 `locale`：el 组件语言   `localeI18n`：i18n 全局语言
 
-**需要导入**
-
 ```ts
 import { useI18n } from 'vue-i18n'
-import { reactive, ref } from 'vue'
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 import en from 'element-plus/lib/locale/lang/en'
-import { fetchLanguageApi, saveLanguageApi } from '@/api/index'
-import { ElMessage } from 'element-plus'
-```
+const store = useStore()
 
 
-
-**页面首次加载要查询当前语言**
-
-```ts
 // 全局语言
-const { t, locale: localeI18n } = useI18n()
-
-// 首次加载语言包 locale: el 语言包  localeI18n: 全局语言包
+const { locale: localeI18n } = useI18n()
 const locale = ref(zhCn)
-async function getLocale() {
-    let result: any = await fetchLanguageApi()
 
-    if (result.code == 200 && result.data.language == 'en') {
-        locale.value = en
-        localeI18n.value = 'en'
-    }
+// 刷新之后判断
+if (store.state.language == 'en') {
+    locale.value = en
+    localeI18n.value = 'en'
 }
-getLocale()
 ```
 
 
 
-
-
-**切换语言函数**
+- **切换语言函数**
 
 ```ts
 // 触发函数：点击一个按钮，进行来回切换
@@ -1253,6 +1389,7 @@ const changeLang = async function () {
 
 - 前端输入框要实现校验功能，并且反馈信息
 - 使用 vuex 存储用户登录状态值
+- 用户登录状态值通过 `localStorage.getItem('usertoken') ` 获取
 
 
 
@@ -1635,3 +1772,1728 @@ async function submitForm(formEl: FormInstance | undefined) {
 }
 ```
 
+
+
+
+
+### 5、VUE-SSR 第一次改造方案
+
+实现的效果是页面最开始有服务端渲染的 html 文档呈现到页面，后面再实现客户端渲染进行页面优化
+
+这次改造服务端渲染的 html 数据都是静态的
+
+
+
+#### 5.1 SSR 服务的基本框架
+
+Vite + Vue 3+ TS + SSR 的基本原理、构建步骤、目录结构，实现步骤就是先将页面的静态文件在 HTML 中进行展示，随后再渲染 vue 构建好的页面。即**先服务端渲染再客户端渲染**
+
+![img](mark-img/b2a78f4a65741e16ae6f0e1725c40abe.png)
+
+- 目录结构
+
+![image-20230227094249939](mark-img/image-20230227094249939.png)
+
+
+
+
+
+
+- 基本原理
+  - 通过 Vue 的 server - renderer 模块将 Vue 应用实例转换成一段纯文本的 HTML 字符串
+  - 通过 Nodejs 创建一个静态 Web 服务器
+  - 通过 Nodejs 将服务端所转换好的 HTML 结构发送到浏览器端进行展示
+
+
+
+#### 5.2 SSR 服务开发环境实现
+
+##### 5.2.1 报错代码处理总结
+
+- ElementPlus 不能设置按需引入了！
+
+
+
+- 某些 ElementPlus 组件比如（el-menu）对SSR支持不全面、不兼容，会报错 `Hydration completed but contains mismatches`
+
+
+
+- router 里面的 `history` 必须换成 `import.meta.env.SSR ? createMemoryHistory() : createWebHistory()`
+
+
+
+- **不允许在初始化（页面首次加载）**的时候使用到 `indexedDB`、`localStore` 的 api！！！可通过在 `entry-client.ts` 里面实现功能！
+
+
+
+- **进度条、el-message** 等消息组件无法在服务端加载，所以尽量避免首次加载使用到！
+
+
+
+- **`vue-i18n` 切换语言后服务端渲染无法切换成功**，并且会报出以下警告 `Hydration text content mismatch in` 
+
+
+
+#####5.2.2 先实现客户端渲染
+
+- **main.ts** 
+
+实现导出一个 `createApp` 函数，再去 router、vuex 中实现类似的函数 `createSSR...()`
+
+下面是全新的 `mian.ts`
+
+```ts
+import { createSSRApp } from 'vue'
+import App from './App.vue'
+import './style.css'
+
+import { createSSRRouter } from './router'
+import { createSSRStore, key } from './store'
+
+import ElementPlus from 'element-plus'
+import { ID_INJECTION_KEY } from 'element-plus'
+import 'element-plus/dist/index.css'
+
+import { createSSRI18n } from '@/language/i18n'
+
+import '@/mock/mockServe'
+
+export function createApp() {
+    const app = createSSRApp(App)
+    
+    // 路由
+    const router = createSSRRouter()
+    app.use(router)
+    
+    // vuex
+    const store = createSSRStore()
+    app.use(store, key)
+    
+    // ElementPlus
+    app.use(ElementPlus)
+    app.provide(ID_INJECTION_KEY, {
+        prefix: Math.floor(Math.random() * 10000),
+        current: 0,
+    })
+    
+    // 语言配置
+    const i18n = createSSRI18n()
+    app.use(i18n)
+
+    return { app, router, store }
+}
+```
+
+`router` 导出长这样
+
+```ts
+export function createSSRRouter() {
+
+    return createRouter({
+        history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
+        routes,
+    })
+
+}
+```
+
+
+
+
+
+- **entry-client.ts**
+
+客户端入口文件，（之前一直是 `main.ts`为入口文件，现在入口文件需要区分）
+
+这里主要用于客户端初始化
+
+```ts
+import { createApp } from "./main"
+import { airbnbDB } from '@/db/index';
+import stores from '@/db/index'
+
+
+const { app, router, store } = createApp()
+
+router.beforeEach(async function () {
+    
+    // 页面刷新时执行该回调函数
+    
+    // 一般用于初始化客户端的 vuex 数据
+    ...
+    
+}) 
+
+
+router.isReady().then(function() {
+    app.mount('#app')
+})
+```
+
+
+
+- **index.html**
+
+将首页的渲染方式改成 `entry-client.ts` 客户端渲染
+
+并使用 `<!--ssr-outlet-->` 用作服务端渲染的 HTML 的占位符
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Airbnb</title>
+</head>
+
+<body>
+    <div id="app"><!--ssr-outlet--></div>
+    <script type="module" src="/src/entry-client.ts"></script>
+</body>
+
+</html>
+```
+
+
+
+##### 5.2.3 再实现服务端渲染
+
+这里用的 vite 服务端渲染模板！！
+
+
+
+- **server.js**
+
+需要先下载 `express` 服务器框架，下面是模板
+
+```ts
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import express from 'express'
+import { createServer as createViteServer } from 'vite'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+async function createServer() {
+    const app = express()
+
+    // 以中间件模式创建 Vite 应用，这将禁用 Vite 自身的 HTML 服务逻辑
+    // 并让上级服务器接管控制
+    const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'custom'
+    })
+
+    // 使用 vite 的 Connect 实例作为中间件
+    // 如果你使用了自己的 express 路由（express.Router()），你应该使用 router.use
+    app.use(vite.middlewares)
+
+    app.use('*', async (req, res, next) => {
+        const url = req.originalUrl
+
+        try {
+            // 1. 读取 index.html
+            let template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8')
+
+            // 2. 应用 Vite HTML 转换。这将会注入 Vite HMR 客户端，
+            //    同时也会从 Vite 插件应用 HTML 转换。
+            //    例如：@vitejs/plugin-react 中的 global preambles
+            template = await vite.transformIndexHtml(url, template)
+
+            // 3. 加载服务器入口。vite.ssrLoadModule 将自动转换
+            //    你的 ESM 源码使之可以在 Node.js 中运行！无需打包
+            //    并提供类似 HMR 的根据情况随时失效。
+            const { render } = await vite.ssrLoadModule('/src/entry-server.ts')
+
+            // 4. 渲染应用的 HTML。这假设 entry-server.js 导出的 `render`
+            //    函数调用了适当的 SSR 框架 API。
+            //    例如 ReactDOMServer.renderToString()
+            const appHtml = await render(url)
+
+            // 5. 注入渲染后的应用程序 HTML 到模板中。
+            const html = template.replace(`<!--ssr-outlet-->`, appHtml)
+
+            // 6. 返回渲染后的 HTML。
+            res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
+        } catch (e) {
+            // 如果捕获到了一个错误，让 Vite 来修复该堆栈，这样它就可以映射回
+            // 你的实际源码中。
+            vite.ssrFixStacktrace(e)
+            next(e)
+        }
+    })
+
+    app.listen(5173, function() {
+        console.log('服务端渲染进行中...');
+    })
+}
+
+createServer()
+```
+
+
+
+- **entry-server.ts**
+
+服务端渲染入口！！！
+
+```ts
+import { createApp } from "./main"
+import { renderToString } from 'vue/server-renderer'
+
+export async function render(url: string) {
+    const { app, router } = createApp()
+
+    await router.push(url)
+    await router.isReady()
+
+    const appHtml = renderToString(app)
+    return appHtml
+}
+```
+
+
+
+##### 5.2.4 最后选择启动服务
+
+服务端渲染：`node server.js` 
+
+客户端渲染：`npm run dev`
+
+
+
+只需要启动一次即可！vite 都会帮我们自动更新
+
+
+
+### 6、Vuex 获取动态数据流程
+
+我们进入页面时，**发送一个请求，将请求得到的数据存储在 vuex 中**，并在组件中使用 vuex 中的数据
+
+这个请求可以用真实接口获取，也可以用 mock 接口获取（`mockjs` 使用方法在 `vue2_project`）
+
+
+
+> 注：这里还是客户端获取 vuex 数据的方法！！ 服务端获取在下一节
+
+
+
+- 请求接口  `api/home/index.ts`
+
+```ts
+import { http } from '@/utils/http'
+import mockRequests from '@/mock/mockRequests'
+
+
+// 真实接口
+export const reqgetRoomList = function () {
+    return http.httpRequestGet(`http://110.42.184.111/api/room/room/getRoomList?pageNo=1&pageSize=30`, {});
+}
+
+
+// mock 接口（需要提起封装好 mock 请求）
+// export const reqgetRoomList = function () {
+//     return mockRequests.get('/roomList');
+// }
+```
+
+
+
+- vuex 获取数据  `store/index.ts`
+
+```ts
+state: {
+    roomList: []
+},
+
+actions: {
+    async getRoomList({ state }) {
+        let result = await reqgetRoomList()
+        console.log(result);
+
+
+        if (result.code == '000000') {
+            state.categoryList = result.data
+        } else {
+            ElMessage.error('获取房屋列表失败')
+        }
+    }
+},
+```
+
+
+
+- **组件中调用 `dispath`**
+
+> 使用计算属性的话，这种模式下只能只读！！
+
+```ts
+// 组件中简化使用
+let roomList = computed(() => store.state.roomList)
+
+// 可读可写
+const orderDrawer: any = computed({
+    get() {
+        return store.state.orderDrawer
+    },
+    set(newValue) {
+        store.commit('fetchorderDrawer', newValue)
+    }
+})
+
+// 通常在 onMounted 中发送请求
+onMounted(async function () {
+    await store.dispatch('getRoomList')
+})
+```
+
+
+
+- **entry-client.ts 中调用：**主要用于初始化 vuex 中的数据，集中在这里定义，特别是用到了 浏览器的 api
+
+```ts
+router.beforeEach(async function (to, from, next) {
+
+    // 打开所有仓库
+    let result = await airbnbDB.openStore(stores, 'id')
+    if (result) console.log('所有对象仓库打开成功');
+
+
+    // 查询并保存全局语言
+    let resultLang = await fetchLanguageApi()
+    store.commit('fetchLanguage', resultLang)
+
+
+    // 获取登录状态
+    let status = localStorage.getItem('usertoken') ? 1 : 0
+    store.commit('getUserStatus', status)
+
+    next()
+
+}) 
+```
+
+
+
+#### 6.1 解决数据获取报错问题
+
+![image-20230303110329593](mark-img/image-20230303110329593.png)
+
+一般这种报错都是因为我们在中页面渲染数据的时候使用了二次获取、
+
+```ts
+// 这是我们从仓库获取的数据
+const roomDetail = computed(() => store.state.roomDetail)
+```
+
+
+
+然后我们使用了**二次获取**
+
+```vue
+<span class="room">{{ roomDetail.info.room }} {{ t('detail.rooms') }}</span>
+```
+
+因为使用一次获取 `roomDetail.info` 值为 `undefined` ，因此在 `undefined` 上面取值的话就会报错！
+
+
+
+解决方法：
+
+```ts
+// 再简化一下数据
+const roomDetailInfo = computed(() => store.state.roomDetail.info)
+```
+
+然后加上问号即可
+
+```vue
+<span class="room">{{ roomDetailInfo?.room }} {{ t('detail.rooms') }}</span>
+```
+
+
+
+#### 6.2 计算属性读写功能实现
+
+在 `setup` 里面读的时候要加上 `.value`
+
+```ts
+let roomList = computed(() => store.state.roomList)
+
+let roomListCopy = ref([])
+roomListCopy.value = roomList.value
+```
+
+> 在 template 中不用点 value ，因为它会自动 .value!
+
+
+
+```ts
+// 计算属性
+const computedMsg: any = computed({
+    get() {
+        // 这里返回的值是获取计算属性的值
+        return msg.value + '-'
+    },
+    set(newValue) {
+        // 参数newValue是被修改后的值
+      
+        // 这里是修改的具体逻辑
+      	/*
+		   注意这里不要使用下面的方法修改计算属性的值来达到修改目的
+           而应该直接修改源响应数据xxx的值
+		*/
+        msg.value = newValue        
+        // computedMsg.value = newValue
+    }
+})
+```
+
+
+
+#### 6.3 vuex 中无法使用el组件
+
+不能再 vuex 中使用 ElMessage, ElLoading 等组件，因为这些组件会用到 dom 元素，而调用一些 vuex 函数（特别是初始化函数）的时候可能 dom 组件还未渲染。
+
+
+
+解决办法：只能搬移到组件中调用 vuex 方法时使用这些组件了！！
+
+
+
+
+
+### 7、VUE-SSR 第二次改造方案
+
+这次改造方案的目的是让服务端获取到 vuex 里的动态数据，使得在**服务端渲染的时候把动态数据也渲染出来**
+
+服务端获取到 vuex 里的动态数据之后，再同步到 客户端的 vuex 中。
+
+下面是报错解决：
+
+- 服务端发送的请求不能是 mockjs 请求！
+- 服务端发送请求不能使用 `nprogress` 进度条
+- `asyncData` 只能在路由组件中使用
+- 我的项目 `getRoomlist` 使用的是 mockjs 接口，所以用的是客户端获取 vuex
+- `getCategoryList`  真实接口是服务端获取的！（虽然没啥用...）
+
+
+
+
+
+#### 7.1 改造 entry-server.ts
+
+- 首先匹配路由组件（**无法匹配路由组件中的子组件！！！**）
+
+  
+
+- **每次刷新页面则对匹配的路由组件调用里面的 asyncData 函数**（这里如果是路由跳转则不会调用）
+
+
+
+- 导出的 vuex 的数据 `state`
+
+```ts
+import { createApp } from './main'
+import { renderToString } from 'vue/server-renderer'
+
+export async function render(url: string) {
+    const { app, router, store } = createApp()
+
+    await router.push(url)
+    await router.isReady()
+
+    // 匹配路由组件
+    const matchedComponents = router.currentRoute.value.matched.flatMap(record =>
+        Object.values(record.components)
+    )
+
+    // 对所有匹配的路由组件调用里面的 asyncData 函数
+    await Promise.all(matchedComponents.map(function(Component) {
+        if(Component.asyncData) {
+
+            // asyncData 函数接收这些参数
+            return Component.asyncData({ store, route: router.currentRoute })
+        }
+    }))
+    
+    
+    const appHtml = await renderToString(app)
+    const state = store.state
+
+    return { appHtml, state }
+}
+```
+
+
+
+#### 7.2 实现 Vuex 数据同步
+
+服务端获取到 vuex 里的动态数据之后，再同步到 客户端的 vuex 中
+
+
+
+- **index.html**
+
+```html
+<body>
+    <div id="app"><!--ssr-outlet--></div>
+    <script type="module" src="/src/entry-client.ts"></script>
+
+    <script>
+        window.__INITIAL_STATE__ = '<!--vuex-state-->'
+    </script>
+</body>
+```
+
+
+
+- **entry-client.ts**
+
+在 `router.beforeEach` 函数前加入
+
+```ts
+if ((window as any).__INITIAL_STATE__) {
+    store.replaceState((window as any).__INITIAL_STATE__)
+}
+```
+
+
+
+#### 7.3 改造 server.js
+
+获取服务端入口文件导出的 vuex 的数据 `state` ，并和 html 文档一实现替换效果
+
+```ts
+// 4. 渲染应用的 HTML。这假设 entry-server.js 导出的 `render`
+//    函数调用了适当的 SSR 框架 API。
+const { appHtml, state } = await render(url)
+
+
+// 5. 注入渲染后的应用程序 HTML 到模板占位符中（重点！）
+const html = template.replace(`<!--ssr-outlet-->`, appHtml)
+.replace('\'<!--vuex-state-->\'', JSON.stringify(state))
+```
+
+
+
+#### 7.4 asyncData 函数的实现
+
+`asyncData` 函数会在路由组件服务端渲染的时候被调用
+
+可惜的是使用这个函数就不能使用 `setup` 语法糖了！！！！
+
+
+
+案例：asyncData 函数初始化 vuex 数据，使服务端和客户端同步获取
+
+```vue
+<script lang="ts">
+import { useStore } from '@/store'
+
+export default ({
+
+    setup() {
+        const store = useStore()
+
+        let roomList = store.state.categoryList[0]
+
+        return {
+            roomList
+        }
+    },
+
+    async asyncData({ store, route }: any) {
+        await store.dispatch('getCategoryList')
+    }
+})
+
+</script>
+
+<template>
+    <div>{{ roomList }}</div>
+</template>
+```
+
+![image-20230228181131199](mark-img/image-20230228181131199.png)
+
+![image-20230228181208631](mark-img/image-20230228181208631.png)
+
+
+
+
+
+### 8、解决el-menu不兼容SSR问题
+
+首先它会报错：`Hydration completed but contains mismatches`，并且发出关于 `Hydration` 的警告！
+
+下面讲下我是如何一步一步解决的：
+
+
+
+1、开始是真的不知道怎么解决，网上搜索报错信息也没有结果，只知道是 el-menu 不兼容 ssr
+
+
+
+2、然后进入 el-plus 官网终于发现了线索：
+
+![image-20230301092300469](mark-img/image-20230301092300469.png)
+
+
+
+3、所以我就直接加上了 `client-only` 标签，结果 vue3 无法识别该标签，才发现这是基于 `Nuxt` 框架的标签
+
+
+
+4、那如何让 Vue3 项目使用 `client-only` 呢？百度之后发现了这样一个插件 `vue-client-only`
+
+这是它的 npm 链接：https://www.npmjs.com/package/vue-client-only
+
+
+
+5、所以我立马用了起来，结果又报错了...  然后我再进入这个插件的 github 官网：https://github.com/egoist/vue-client-only ，发现这是 4年前的项目，所以这肯定只基于 vue2 不兼容 vue3 ！！
+
+
+
+6、然后就在我又又又不知道怎么办的时候，我点开了这个项目的 `Issues` ，发现已经有人问了一个问题
+
+![image-20230301093047408](mark-img/image-20230301093047408.png)
+
+
+
+下面这个回答终于拯救了我！
+
+![image-20230301093126184](mark-img/image-20230301093126184.png)
+
+
+
+7、进入他封装好且基于 Vue3 的 `vue-client-only` ：https://github.com/duannx/vue-client-only
+
+然后按照使用教程来就解决报错了！！！！
+
+`npm install --save @duannx/vue-client-only`
+
+```ts
+import ClientOnly from '@duannx/vue-client-only'
+```
+
+```html
+<client-only>
+    <el-menu
+        :default-active="activeIndex"
+        mode="horizontal"
+        @select="handleSelect"
+    >
+        <el-menu-item index="orders">{{ t('header.orders') }}</el-menu-item>
+        <el-menu-item index="records">{{ t('header.records') }}</el-menu-item>
+
+
+        <el-sub-menu index="language">
+            <template #title>{{ t('header.language') }}</template>
+            <el-menu-item index="zh">简体中文</el-menu-item>
+            <el-menu-item index="en">English</el-menu-item>
+        </el-sub-menu>
+
+
+        <el-menu-item index="logout" v-if="userStatus">
+            {{ t("login.logout") }}
+        </el-menu-item>
+
+
+        <el-menu-item index="login" v-if="!userStatus">
+            {{ t("login.loginTab") }}/{{ t("login.signTab") }}
+        </el-menu-item>
+
+    </el-menu>
+</client-only>
+```
+
+
+
+> 所以百度查不到就去找官网！！！！
+
+
+
+
+
+### 9、路由跳转时 vuex 数据预取
+
+当第二次改造完成后，我们发现必须页面刷新才能使服务端获取到 vuex 里的动态数据。这一章讲解如何在**路由跳转时服务端也能实现 vuex 数据预取**
+
+
+
+**entry-client.ts**
+
+只需要添加一个 `router.beforeResolve` **实现每次进入路由前调用 `asyncData` 函数预取数据即可**
+
+```ts
+router.beforeEach(async function () {
+	...
+
+    router.beforeResolve((to, from, next) => {
+        const toComponents = router.resolve(to).matched.flatMap(record =>
+            Object.values(record.components)
+        )
+        const fromComponents = router.resolve(from).matched.flatMap(record =>
+            Object.values(record.components)
+        )
+
+        const actived = toComponents.filter((c, i) => {
+            return fromComponents[i] !== c
+        })
+
+        if (!actived.length) {
+            return next()
+        }
+
+        // 可以添加loading（不过会和其他请求冲突，所以算了）
+
+        Promise.all(actived.map(function(Component) {
+            if (Component.asyncData) {
+
+                // 这里的参数必须和服务端渲染的中的一致！！
+                return Component.asyncData({ store, route: router.currentRoute })
+            }
+        })).then(function() {
+
+            // 结束loading
+            next()
+        })
+    })
+
+}) 
+```
+
+> router.currentRoute内部的value 和 router.currentRoute.value 不一样，大bug！
+
+
+
+插件介绍： `vuex-router-sync`
+
+这个插件作用是将当前路由数据 route 同步到 vuex 中
+
+下载：`npm i vuex-router-sync `  需要低版本的 nodejs
+
+`nvm use 12.20.0`
+
+安装完之后，启动服务又报了一个错
+
+需要再执行这个命令`node node_modules/esbuild/install.js`
+
+
+
+**main.ts**
+
+```ts
+import { sync } from 'vuex-router-sync'
+
+export function createApp() {
+	...
+    
+    sync(store, router)
+}
+```
+
+
+
+
+
+### 10、VUE-SSR 打包部署配置
+
+我们在 `package.json` 中添加以下指令用于打包
+
+```json
+"build:client": "vite build --outDir dist/client",
+"build:server": "vite build --outDir dist/server --ssr src/entry-server.ts",
+"build:ssr": "npm run build:client && npm run build:server"
+```
+
+
+
+所以使用 `npm run build:ssr` 一键打包生产 `dist` 文件夹
+
+
+
+我们使用 `server.js` 来运行开发环境的代码
+
+```json
+"dev:ssr": "node server"
+```
+
+`npm run dev:ssr`
+
+
+
+我们新建 `server_prod.js` 来运行生产环境的代码，就是运行 dist 文件夹！
+
+```json
+"pro:ssr": "node server_prod"
+```
+
+`npm run pro:ssr`
+
+
+
+#### 10.1 打包部署报错问题
+
+1、使用 vue-lazyload 图片懒加载时报错，在官网发现它在 SSR 打包的时候会被当成是 vue 指令来解析，目前还没有找到解决方案，所以只能抛弃了
+
+
+
+2、在两个 `server.js` 中无法使用 `require` 来导入文件，所以被迫拆分成两个 `server.js`
+
+
+
+#### 10.2 process.env 的使用
+
+我们将 `process.env.NODE_ENV` 作为一个全局变量使用
+
+下载依赖：`npm install cross-env -D`
+
+
+
+这样在执行命令的时候可以传入全局变量的参数了
+
+```json
+"dev:ssr": "cross-env NODE_ENV=development node server",
+"prod:ssr": "cross-env NODE_ENV=production node server",
+```
+
+
+
+在 `server.js` 中定义变量
+
+```ts
+// process.env.NODE_ENV 'development' 'production'
+const isProd = (process.env.NODE_ENV === 'production')
+
+// isProd 判断是开发环境还是生产环境
+```
+
+
+
+#### 10.3 vite 环境变量
+
+https://blog.csdn.net/weixin_46769087/article/details/128120034
+
+
+
+#### 10.4 gzip 打包压缩
+
+下载依赖：`npm i vite-plugin-compression --save-dev`
+
+
+
+在 vite.config.ts 里面配置
+
+```ts
+import vitePluginCompression from 'vite-plugin-compression'
+
+plugins: [
+	...
+    vitePluginCompression()
+],
+```
+
+
+
+然后打包就会把 js 文件变成 gz 文件，压缩了三分之一的体积
+
+
+
+但是还得在后端调配置才能使用 gz 文件！
+
+
+
+### 11、router.currentRoute问题
+
+
+
+1、问题：在客户端渲染时 `entry-client.ts`
+
+**router.currentRoute和 router.currentRoute.value 返回的路径不一样**
+
+
+
+在路由跳转时 vuex 数据预取那一章节之后存在一个bug
+
+```ts
+Promise.all(actived.map(function(Component) {
+    if (Component.asyncData) {
+
+        return Component.asyncData({ store, route: router.currentRoute })
+    }
+```
+
+这里 asyncData 函数可以获取到 store 和 route
+
+
+
+那么我们在组件的 asyncData 函数中接收一下
+
+```ts
+async asyncData({ store, route }: any) {
+    console.log(route);
+    console.log(route.value.params);
+
+    // 获取房屋详细信息
+    await store.dispatch('getRoomDetail', route)
+}
+```
+
+前面输出的时候还有 value，后面取值的时候就没了？？？
+
+<img src="mark-img/image-20230303095855576.png" alt="image-20230303095855576" style="zoom:50%;" />
+
+
+
+
+
+2、原因是 `router.currentRoute` 确确实实返回是当前的路由 route
+
+但是 `router.currentRoute.value` 返回的是**上一个路由地址的信息！！**
+
+<img src="mark-img/image-20230303103230926.png" alt="image-20230303103230926" style="zoom:50%;" />
+
+
+
+
+
+解决办法：暂时没有找到解决办法.... 只能抛弃这个 api 了！
+
+
+
+ ### 12、vite 配置代理跨域
+
+
+
+- 单个代理端口的情况
+
+`http://110.42.184.111/api/room/room/getRoomList`  代理成
+
+`http://localhost:5173/release/api/room/room/getRoomList`
+
+
+
+在 `vite.config.ts` 加入
+
+```ts
+// 配置代理
+server: {
+    // 本地端口号
+    host: 'localhost',
+    port: 5173,
+        
+    proxy: {
+        // 自定义前缀
+        '/release': {
+            
+            // 目标端口号
+            target: 'http://110.42.184.111',
+            
+            // 路径重写：去掉自定义前缀
+            rewrite: path => path.replace(/^\/release/, '')
+        }
+    }
+}
+```
+
+
+
+`http.ts`
+
+```ts
+const defaultConfig = {
+    timeout: 5000,
+    
+    // 生产环境
+    // baseURL: import.meta.env.PROD ? 'http://110.42.184.111' : 'http://localhost:3000/release'
+    
+    // 开发环境
+    baseURL: 'http://localhost:5173/release'
+}
+```
+
+
+
+`api/index.ts`
+
+```ts
+// 获取房屋列表
+export const reqgetRoomList = function (params) {
+    return http.httpRequestGet('/api/room/room/getRoomList', params)
+}
+```
+
+
+
+- 多个端口的情况
+
+```ts
+proxy: {
+    // 自定义前缀1
+    '/release': {
+
+        // 目标端口号1
+        target: 'http://110.42.184.111',
+
+        // 路径重写：去掉自定义前缀
+        rewrite: path => path.replace(/^\/release/, '')
+    },
+        
+    // 自定义前缀2
+    '/release2': {
+
+        // 目标端口号2
+        target: 'http://110.42.184.122',
+
+        // 路径重写：去掉自定义前缀
+        rewrite: path => path.replace(/^\/release2/, '')
+    }
+ 
+}
+```
+
+
+
+`http.ts`：baseURL 不能写死
+
+```ts
+const defaultConfig = {
+    timeout: 5000,
+       
+    // 开发环境
+    baseURL: 'http://localhost:5173'
+}
+```
+
+
+
+`api/index.ts`：需要区分前缀！
+
+```ts
+export const reqgetRoomList = function (params) {
+    return http.httpRequestGet('/replace/api/room/room/getRoomList', params)
+}
+
+export const reqgetRoomDetail = function (params) {
+    return http.httpRequestGet('/replace2/api/room/room/getRoomDetail', params)
+}
+```
+
+
+
+
+
+
+
+## 三、Vue3 前端组件开发
+
+### 1、Pagination 组件
+
+官方文档：https://element-plus.gitee.io/zh-CN/component/pagination.html
+
+
+
+我们把分页器封装成一个公共组件，普通分页器只需要两个参数：
+
+选择一：`page-size` 每页的数量 +  `total`  总数量
+
+选择二：`page-count`  总页数 +  `total`  总数量
+
+外加一个回调函数：`current-change`  当点击分页器时就会触发
+
+
+
+- **Pagination 组件模板**
+
+```vue
+<script setup lang="ts">
+import { ElLoading } from 'element-plus'
+
+
+const emits = defineEmits<{
+    (e: 'pageChange', num: number): void
+}>()
+
+const props = defineProps<{
+    total: number,
+    pageSize: number
+}>()
+
+
+// 切换页面回调函数
+function currentChange(p: any) {
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(255, 255, 255, 0.7)',
+    })
+
+    // 调用父组件切换页面回调函数
+    emits('pageChange', p)
+
+    setTimeout(() => { loading.close() }, 500)
+}
+
+</script>
+
+<template>
+    <el-pagination 
+        :page-size="pageSize"
+        :total="total" 
+        @current-change="currentChange"
+                   
+        显示属性           
+        layout="prev, pager, next" 
+        hide-on-single-page
+        next-text="下一页"
+        prev-text="上一页"
+    />
+</template>
+
+<style scoped>
+.el-pagination {
+    margin: 30px auto;
+    justify-content: center;
+}
+</style>
+```
+
+
+
+- **父组件引用**
+
+```ts
+// 从 vuex 中获取参数（也可以直接在组件中定义）
+const roomList = computed(() => store.state.roomList)
+const roomTotal = computed(() => store.state.roomTotal)
+const roomPageSize = computed(() => store.state.roomPageSize)
+
+
+// home页数改变回调函数
+async function roomPageChange(pageNo: any) {
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(255, 255, 255, 0.7)',
+    })
+
+    page.value = pageNo
+    await store.dispatch('getRoomList', { pageNo, cityCode: city.value })
+
+    setTimeout(() => { loading.close() }, 500)
+}
+```
+
+```vue
+<!-- 分页器 -->
+<Pagination 
+    @pageChange="roomPageChange" 
+    :total="roomTotal" :pageSize="roomPageSize"
+/>
+```
+
+
+
+- 发送请求的过程
+
+在 vuex 发送请求获取数据，保存数据列表及数据总数。例如发送一个**搜索请求**，参数：当前页数、每页数量等等，**获取的数据中会包含数据总数，所以总页数会自动计算**，只需要确定每页数量和数据总数就行。
+
+
+
+### 2、vue-lazyload 图片懒加载
+
+官网：https://github.com/hilongjw/vue-lazyload/tree/next
+
+
+
+下载：`npm i vue-lazyload -S`
+
+```ts
+import VueLazyload from 'vue-lazyload'
+import errorimage from './assets/error.png'
+
+// 图片懒加载
+app.use(VueLazyload, {
+    preLoad: 1.3,
+    error: errorimage,
+    loading: errorimage,
+    attempt: 1
+})
+```
+
+```html
+<img v-lazy="item.pictureUrl" >
+```
+
+
+
+### 3、el-carousel 轮播图的使用
+
+官网：https://element-plus.gitee.io/zh-CN/component/carousel.html
+
+
+
+在这里定义一个卡片式的轮播图
+
+```vue
+<el-carousel
+    v-if="roomDetail.imgs && roomDetail.imgs.length > 0"
+    class="imgs-wall"
+    height="350px"
+    trigger="click"
+    :interval="5000"
+    indicator-position="none"
+    type="card"
+>
+    <el-carousel-item v-for="(item, index) in roomDetail.imgs" :key="index">
+        <img v-lazy="item" />
+    </el-carousel-item>
+</el-carousel>
+```
+
+几个注意的点：
+
+- `height`：高度必须在这里定义！就是整个控制整个轮播图的高度
+- `innterval`：自动切换时间
+- `indicator-position`：设置下方指示器是否显示
+- `trigger`：切换方式
+
+
+
+还需要修改一下样式：
+
+```less
+// 整个轮播图样式 宽度默认为 100%
+.imgs-wall {
+    width: 1200px;
+    padding: 50px 0px;
+    
+    // 居中显示
+    margin: 0 auto;
+
+    // 图片样式固定模板
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    // 卡片样式
+    .el-carousel__item--card {
+        border: 8px solid #fff;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2);
+    }
+}
+```
+
+
+
+
+
+### 4、Affix 固钉固定定位
+
+官网：https://element-plus.gitee.io/zh-CN/component/affix.html
+
+
+
+先将元素样式位置写好，然后外面再套一层 `el-affix` 即可！实现当页面滑到该元素位置时即可实现固定效果
+
+```vue
+<template>
+  <el-affix :offset="120">
+    <el-button type="primary">Offset top 120px</el-button>
+  </el-affix>
+</template>
+```
+
+`offset`：固定到顶部的距离
+
+
+
+还可以设置只在盒子中固定的效果
+
+```vue
+<template>
+  <div class="affix-container">
+    <el-affix target=".affix-container" :offset="80">
+      <el-button type="primary">Target container</el-button>
+    </el-affix>
+  </div>
+</template>
+
+<style scoped>
+.affix-container {
+  text-align: center;
+  height: 400px;
+  border-radius: 4px;
+  background: var(--el-color-primary-light-9);
+}
+</style>
+```
+
+
+
+### 5、detail 组件开发过程
+
+在 home 页面点击图片后即可进入详情页，将参数 id 传入路由的 params 中
+
+
+
+在 detail/index.vue 中的 asyncData 函数中死活获取不到当前的路由信息！！！详细请看
+
+`11、router.currentRoute问题`
+
+还尝试过使用 vuex-router-sync 插件将当前路由数据 route 同步到 vuex 中
+
+结果发现 `store.state.route` 这个居然也不是当前路由信息！！！ **要疯了！！**
+
+
+
+**那么只能让详细页抛弃服务端动态数据渲染了！！**
+
+使用传统的 Vuex 获取动态数据流程
+
+```ts
+onMounted(async function () {
+    await store.dispatch('getRoomDetail', { id: route.params.id })
+})
+```
+
+```ts
+const roomDetail = computed(() => store.state.roomDetail)
+const roomDetailInfo = computed(() => store.state.roomDetail.info)
+const roomDetailOwner = computed(() => store.state.roomDetail.owner)
+```
+
+
+
+
+
+### 6、订单模块开发过程
+
+#### 6.1 抽屉功能的实现
+
+抽屉：https://element-plus.gitee.io/zh-CN/component/drawer.html
+
+
+
+- 在 vuex 里面定义一个全局的变量 `orderDrawer` 用于抽屉的显示与隐藏
+
+```ts
+state: {
+    orderDrawer: false
+},
+
+fetchorderDrawer(state, value) {
+    state.orderDrawer = value
+}
+```
+
+
+
+- 在 `order` 组件中使用：**使用计算属性来控制 `orderDrawer` **  **v-model 双向绑定**
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useStore } from '@/store'
+import ClientOnly from '@duannx/vue-client-only'
+
+const store = useStore()
+
+// 显示与隐藏
+const orderDrawer: any = computed({
+    get() {
+        return store.state.orderDrawer
+    },
+    set(newValue) {
+        store.commit('fetchorderDrawer', newValue)
+    }
+})
+
+
+</script>
+
+<template>
+    <client-only>
+    <el-drawer v-model="orderDrawer" title="I am the title" :with-header="false">
+        <span>Hi there!</span>
+    </el-drawer>
+    </client-only>
+</template>
+```
+
+
+
+- 在头部组件中只需要负责开启即可！！
+
+```ts
+if (key == 'orders') {
+    // 开启订单侧边栏
+    store.commit('fetchorderDrawer', true)
+}
+```
+
+```vue
+<!-- 订单侧边栏（放在头部组件中） -->
+<Order />
+```
+
+
+
+#### 6.2 骨架屏与异步组件
+
+骨架屏样式：https://element-plus.gitee.io/zh-CN/component/skeleton.html
+
+
+
+这里正好介绍一下如何使用异步组件并且百分百搭配骨架屏！
+
+- 父组件使用异步组件模板
+
+```ts
+// 引入异步组件方式
+import { defineAsyncComponent } from 'vue'
+
+const orderBody = defineAsyncComponent(() => import('./components/orderBody.vue'))
+```
+
+```vue
+<Suspense>
+    <template v-slot:default>
+        <orderBody @openDrawer="openDrawer" />
+    </template>
+
+    <template v-slot:fallback>
+		// 骨架屏作为 loading 效果
+        <div class="loading" v-for="item in 3"><el-skeleton :rows="5" animated /></div>
+    </template>
+</Suspense>
+```
+
+
+
+- `orderBody`：异步组件
+
+内部必须调用一个存在异步请求的函数！
+
+1、模拟一个延迟接口：
+
+```ts
+// 延迟效果接口
+export async function delayFetchOrderApi() {
+
+    // 延迟加载
+    return new Promise(function (resolve) {
+        setTimeout(() => {
+            resolve( true )
+        }, 1500)
+    })
+}
+```
+
+
+
+2、组件内使用
+
+```ts
+// 制造延迟效果
+await delayFetchOrderApi()
+```
+
+
+
+#### 6.3 实现三个 mock 接口
+
+分别是查询订单、添加订单、删除订单
+
+`@/api/order/index.ts`
+
+
+
+#### 6.4 orderList 动态获取
+
+1、将 `orderList` 存入 vuex 中，并设置 `commit`
+
+
+
+2、给抽屉实现每次打开抽屉调用其回调函数 `@open="openDrawer"`  获取 `orderList`
+
+```ts
+// 抽屉打开的回调
+async function openDrawer() {
+
+    // 获取订单列表
+    let result: any = await fetchOrderApi()
+    store.commit('fetchOrderList', result.data)
+}
+```
+
+
+
+3、在子组件中实现删除功能
+
+```ts
+let orderList: any = computed(() => store.state.orderList)
+
+// 删除订单
+async function delOrder(orderId: Number) {
+    await deleteOrderApi(orderId)
+    
+    ElMessage({
+        message: `删除订单成功`,
+        type: 'success',
+        duration: 1000
+    })
+
+    // 获取订单列表
+    let result: any = await fetchOrderApi()
+    store.commit('fetchOrderList', result.data)
+
+}  
+```
+
+
+
+
+
+### 7、Vue3 实现响应式数据
+
+我现在暂时会了在 setup 语法糖实现响应式的一个方法：使用 ref 实现组件内的响应式
+
+将数组，对象，简单数据类型都用 ref 定义
+
+```ts
+let arr = ref([])
+let obj = ref({})
+let a = ref(0)
+
+// 获取或者修改的时候都要 .value
+arr.value[0] = 1
+obj.value.name = 'cocoon'
+```
+
+
+
+在 `template` 中不用 .value ，因为它会自动 .value！！
+
+
+
+### 8、路由 mate 元信息处理
+
+这一节就是对我们的标题进行优化！
+
+- 首先进入路由中给每个路由填写基本的 mate 信息
+
+```ts
+let title = 'Airbnb爱彼迎 - 全球民宿_公寓_短租_住宿_预订平台'
+let keywords = 'Airbnb,bnb,爱彼迎,爱彼迎官网,民宿,民宿预订平台,名宿,酒店预定,公寓,短租,住宿'
+let description = 'Airbnb爱彼迎是全球民宿短租公寓预订平台,全球百万特色民宿、短租、酒店、公寓、客栈房源,价格优惠,更有树屋、海景别墅、花园洋房等多种特色住宿预订供您选择'
+
+const routes = [
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('@/views/login/index.vue'),
+        meta: {
+            title: 'Airbnb爱彼迎 - 登录注册',
+            keywords: '',
+            description: '',
+            keepAlive: false
+        }
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/home/index.vue'),
+        meta: {
+            title,
+            keywords,
+            description,
+            keepAlive: false
+        }
+    },
+    {
+        path: '/detail/:id/:title',
+        name: 'detail',
+        component: () => import('@/views/detail/index.vue'),
+        meta: {
+            title: 'Airbnb爱彼迎 - ',
+            keywords: '',
+            description: '',
+            keepAlive: false
+        }
+    },
+]
+```
+
+
+
+- 然后在 index.html 里面填写占位
+
+```html
+<title></title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+```
+
+
+
+- 服务端渲染标题：进入 `server.js`
+
+```ts
+// 获取路由中的元信息（服务端渲染时改变标题）            
+const { meta } = state.route
+const { title, keywords, description } = meta
+
+
+// 5. 注入渲染后的应用程序 HTML 到模板占位符中（重点！）
+const html = template.replace(`<!--ssr-outlet-->`, appHtml)
+.replace('\'<!--vuex-state-->\'', JSON.stringify(state))
+
+.replace('<title>', `<title>${title}`)
+.replace('<meta name="keywords" content="" />', `<meta name="keywords" content="${keywords}" />`)
+.replace('<meta name="description" content="" />', `<meta name="description" content="${description}" />`)
+```
+
+
+
+
+
+- **客户端渲染标题（重点）**：进入 `entry-client.ts`
+
+```ts
+// 新增一个路由后置守卫
+router.afterEach((to, from, next) => {
+
+    // 填充 mate 元信息
+    const { title, keywords, description } = to.meta
+    
+    // 详情页标题
+    const detailTitle = to.params?.title
+
+    if (detailTitle) {
+        document.title = title ? `${title}${detailTitle}` : ''
+    } else {
+        document.title = title ? `${title}` : ''
+    }
+
+    const keywordsMeta = document.querySelector('meta[name="keywords"]')
+    keywordsMeta?.setAttribute("content", `${keywords}`)
+
+    const descriptionMeta = document.querySelector('meta[name="description"]')
+    descriptionMeta?.setAttribute("content", `${description}`)
+})
+```
+
+
+
+到这里我们就实现了路由页面标题等信息的填写，利于 SEO
