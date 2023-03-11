@@ -1,8 +1,8 @@
-## 5、后续问题 1.0
+## 5、项目环境配置
 
-这一章主要记录 Vue 实用编程所遇到的问题、单页面多页面网站的部署、Node.js的一些问题。
+ 这里记录 Vue2 实战项目遇到的问题、单页面多页面网站的部署、Node.js的一些问题
 
-**主要利用 vue_project_sph 这个项目练习！！**
+**基于 vue_project_sph**
 
 
 
@@ -1551,7 +1551,7 @@ mutations: {
 
 
 
-## 6、后续问题 2.0
+## 6、实际功能开发
 
 
 
@@ -2122,13 +2122,9 @@ npm config get registry
 
 
 
-## 7、后续问题 3.0
-
-这个部分专门处理有关配置文件的 bug
 
 
-
-### 7.1 `jsconfig.json` 介绍
+### 6.11 `jsconfig.json` 介绍
 
 当您在工作空间中有一个定义项目上下文的 jsconfig.json 文件时，JavaScript体验会得到改进。
 
@@ -2170,7 +2166,7 @@ npm config get registry
 
 
 
-### 7.2 设置并删除定时器
+### 6.12 设置并删除定时器
 
 ```js
 let timer = setInterval(() => this.$store.commit('user/upDataCountdown'), 1000);
@@ -2180,9 +2176,9 @@ clearInterval(this.timer);
 
 
 
-###  7.3 Element UI 使用技巧
+###  6.13 Element UI 使用技巧
 
-#### 7.3.1 侧边栏实现路由跳转
+- 侧边栏实现路由跳转
 
 参考文档：https://blog.csdn.net/qq_22182989/article/details/106262211
 

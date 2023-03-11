@@ -638,15 +638,15 @@ var lis = document.querySelectorAll('li');
 for(var i = 0; i < lis.length; i++)
 {
 
-    // 不可直接用定时器，因为定时器里的函数是异步任务 所以里面的i=4
-    // setInterval(function() {                    
+    // 不可直接用延时器，因为定时器里的函数是异步任务 所以里面的i=4
+    // setTimeout(function() {                    
     //     console.log(lis[i].innerHTML);
     // },3000)
 
     // 闭包原理：将立即执行函数变为闭包函数 则参数i可以被访问
     (function(i) {
 
-        setInterval(function() {                    
+        setTimeout(function() {                    
             console.log(lis[i].innerHTML);
         },3000)
 

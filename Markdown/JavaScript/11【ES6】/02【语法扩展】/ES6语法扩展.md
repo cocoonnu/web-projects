@@ -841,7 +841,7 @@ for...of：
 const arr = [1, 2, 3];
 for (const item of arr) {
     ...
-}
+}	
 ```
 
 > for...of 循环只会遍历出那些 done 为 false 时，对应的 value 值。
