@@ -1512,6 +1512,24 @@ declare module '*.vue' {
 
 
 
+### 7.1.2 配置端口号
+
+在 `vite.config.ts` 中
+
+```js
+export default defineConfig({
+    plugins: [vue(), vueJsx()],
+  
+    server: {
+        port: 8080
+    }
+})
+```
+
+
+
+
+
 
 
 ## 7.2 Setup 语法糖

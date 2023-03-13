@@ -2,18 +2,6 @@
 
 
 
-### TS 细节记录
-
-```ts
-// 1、如果函数里面要用到 this 那么一定要箭头函数！！
-
-// 2、遍历数组：array.map(function(i: string) )
-```
-
-
-
-
-
 ### 简单实现文字居中方式
 
 ```css
@@ -661,7 +649,7 @@ animation: floaty 1.8s infinite alternate;
 
 
 
-### Vscode 快捷键
+### VScode 快捷键
 
 ```
 ctrl + i: 触发建议
@@ -699,7 +687,7 @@ ctrl + b: 空了
 
 
 
-### Vscode 插件介绍
+### VScode 插件介绍
 
 1、pritter-Code formatter - 代码格式化
 
@@ -712,6 +700,15 @@ https://blog.csdn.net/qq_45981075/article/details/114551233
 
 
 3、Vetur - Vue2 代码支持
+
+
+
+### VScode 设置记录
+
+- 在 vs code 中关闭对 js 文件校验：`搜索 validata 点击 TypeScript`
+
+
+
 
 
 
