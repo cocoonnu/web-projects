@@ -507,6 +507,7 @@ align-content: stretch;
 - flex 子项目占的份数
 - align-self 控制子项自己在侧轴的排列方式
 - order 属性定义子项的排列顺序（前后顺序）
+- **width：使用百分比，占父类的宽度 **+ flex-wrap 换行属性很方便！！
 
 
 

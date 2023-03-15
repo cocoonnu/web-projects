@@ -1,71 +1,511 @@
-# 一、Module模块
-
-## 1.1 初识Module
-
-（1）什么是模块
-
-模块：一个一个的局部作用域的代码块。
-
-（2）模块的分类
-
-内置模块（fs、path、http）、自定义模块（.js）、第三方模块
-
-（3）模块化的规定
-
-![image-20221229161749489](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221229161749489.png)
+# 一、什么是 Node.js
 
 
 
-## 1.2 Module导出
+**Node.js 是  JavaScript  语言的服务器运行环境。**
 
-### 1.2.1 module.exports
-
-- 自定义模块：
-
-  ```js
-  // 设置导出变量属性
-  module.exports.name = 'cocoon';
-  
-  module.exports.say = function() {
-      console.log(module.exports.name);
-  }
-  
-  module.exports = {
-      name: 'cocoon',
-      say() {
-          console.log(module.exports.name);
-      }
-  }
-  ```
-
-  
-
-- 服务端：
-
-  ```js
-  const obj = require('./module');
-  console.log(obj);
-  obj.say();
-  
-  //{ name: 'cocoon', say: [Function: say] }
-  //cocoon
-  ```
-  
-  
-
-### 1.2.2 exports
-
-module.exports完全可以替换成exports，但是两个不要一起用
+- Node.js 就是运行在服务端的 JavaScript。
+- Node.js 是一个基于Chrome JavaScript 运行时建立的一个平台。
+- Node.js是一个事件驱动I/O服务端JavaScript环境，基于Google的V8引擎，V8引擎执行Javascript的速度非常快，性能非常好。
 
 
 
-## 1.4 Module导入
+**为什么要用 Node.js ？**
+
+javaScript 语言本身是完善的函数式语言，在前端开发时，开发人员往往写得比较随意，让人感觉JavaScript就是个玩具语言。无法像其他编程语言一样满足工程的需要。
+
+但是，在Node环境下，通过模块化的JavaScript代码，加上函数式编程，并且无需考虑浏览器兼容性问题，直接使用最新的ECMAScript 6标准，可以完全满足工程上的需求。
+
+ 
+
+**Node.js 适合以下场景:**
+
+1、实时性应用，比如在线多人协作工具，网页聊天应用等。
+
+2、以 I/O 为主的高并发应用，比如为客户端提供 API，读取数据库。
+
+3、流式应用，比如客户端经常上传文件。
+
+4、前后端分离。
+
+
+
+**Node.js 学习任务：**
+
+- Node.js 的模块化
+
+- JS、ES6+ 语法
+- Node.js 内置 API
+- Node.js 包管理
+- Node.js 第三方工具
+- mysql 数据库基础使用
+
+
+
+## 1.1 Node.js 安装
+
+
+
+Node.js 安装与环境配置：https://blog.csdn.net/qq_43557395/article/details/124325563
+
+历史版本下载：https://nodejs.org/en/download/releases/
+
+
+
+## 1.2 nvm 安装及使用
+
+ 
+
+在工作中，我们可能同时在进行2个或者多个不同的项目开发，每个项目的需求不同，进而**不同项目必须依赖不同版本的NodeJS运行环境**，并且一些低版本的第三方库，可能需要降低版本才能安装成功。所以使用 nvm 方便的在同一台设备上进行多个 node 版本之间切换。
+
+
+
+安装教程：https://blog.csdn.net/qq_30376375/article/details/115877446
+
+
+
+使用方式如下：
 
 ```js
-const obj = require('./module');
+nvm off                     // 禁用node.js版本管理(不卸载任何东西)
+nvm on                      // 启用node.js版本管理
+nvm install <version>       // 安装node.js的命名 version是版本号 例如：nvm install 8.12.0
+nvm uninstall <version>     // 卸载node.js是的命令，卸载指定版本的nodejs，当安装失败时卸载使用
+nvm ls                      // 显示所有安装的node.js版本
+nvm list available          // 显示可以安装的所有node.js的版本
+nvm use <version>           // 切换到使用指定的nodejs版本
+nvm v                       // 显示nvm版本
+nvm install stable          // 安装最新稳定版
 ```
 
 
+
+
+
+# 二、Node.js 的模块化
+
+
+
+Node应用是由模块组成，**遵循的是 CommonJS 模块规范**。 CommonJS 是一套代码规范, 目的是为了构建 JavaScript 在浏览器之外的生态系统 (服务器端, 桌面端)。 
+
+> 通过该规范使JavaScript具备开发复杂应用、跨平台的能力
+
+
+
+ **CommonJS模块规范化的内容**
+
+- 导出模块：`moudle.exports.xxx` 或 `exports.xxx` 
+- 导入模块：`require('模块名称')`
+
+
+
+参考博客：[CommonJs 详解](https://blog.csdn.net/weixin_43877799)
+
+
+
+## 2.1 初始 module
+
+ 
+
+ 每个模块内部，都有一个 `module` 对象（直接使用），代表当前模块。它有以下属性：
+
+- `module.id` 模块的识别符，通常是带有绝对路径的模块文件名。
+- `module.filename` 模块的文件名，带有绝对路径。
+- `module.loaded` 返回一个布尔值，表示模块是否已经完成加载。
+- `module.parent` 返回一个对象，表示调用该模块的模块。
+- `module.children` 返回一个数组，表示该模块要用到的其他模块。
+- `module.exports` 表示模块对外输出的值。
+
+
+
+```js
+// 输出看看
+console.log(module.filename)
+console.log(module.loaded)
+```
+
+
+
+## 2.2 module 导出
+
+使用导出功能有两种方式：
+
+- module.exports
+- exports
+
+
+
+**（一）module.exports**
+
+
+```js
+// 设置导出变量属性
+module.exports.name = 'cocoon';
+
+module.exports.say = function() {
+    console.log(module.exports.name);
+}
+
+// 设置导出变量对象（和上面不能混用！）
+module.exports = {
+    name: 'cocoon',
+    say() {
+        console.log(module.exports.name);
+    }
+}
+```
+
+
+
+**（二）exports**
+
+为了方便，Node.js 为每个模块提供一个 `exports` 变量，指向 `module.exports`。这等同在每个模块头部，有一行这样的命令：
+
+```js
+var exports = module.exports
+```
+
+> 这使得 module.exports 完全可以替换成 exports，但是两个不要一起用！
+
+
+
+
+
+## 2.3 module 导入
+
+Node.js 使用 CommonJS 模块规范，内置的 `require` 命令用于加载模块文件。
+
+`require` 命令的基本功能是，读入并执行一个 JavaScript 文件，然后返回该模块的`exports`对象。如果没有发现指定模块，会报错。
+
+
+
+```js
+// 返回一个导出的对象
+const obj = require('./module')
+
+// 也可以解构赋值
+const { say, name } = require('./module')
+```
+
+> `require` 命令用于加载文件，后缀名默认为 `.js`
+
+
+
+
+
+# 三、npm 包管理工具
+
+
+
+**npm 是什么？**
+
+npm（即 node package manager ）是 `Node` 的包管理工具，能解决 NodeJS 代码部署上的很多问题。 到目前为止，**npm 差不多收集了60万个别人写好的包**，其实每个包就是一个功能，一个需求。如果正好我们有这些需求，那么我们就没必要自己去写代码，完全可以用别人已经写好的包。
+
+
+
+npm 官网：https://www.npmjs.com/
+
+
+
+npm 是随同 Nodejs 一起安装的包管理工具，能解决Nodejs代码部署上的很多问题，常见的使用场景：
+
+- 允许用户从NPM服务器下载别人编写的第三方包到本地使用。
+- 允许用户从NPM服务器下载并安装别人编写的命令行程序到本地使用。
+- 允许用户将自己编写的包或命令行程序上传到NPM服务器供别人使用
+
+> npm -v 查看版本号
+
+
+
+## 3.1 npm 包管理流程
+
+
+
+
+
+
+
+三种命令：
+
+1、`nodemon server.js`：运行js文件，一般是自建服务器运行
+
+
+
+2、`npx 第三方库（库名）`：运行第三方库的命令
+
+```js
+npx webpack-dev-server
+```
+
+
+
+
+
+3、在package.json下的scripts对象中添加属性  `npm run 属性名` 简化命令
+
+```js
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist",
+    "webpack": "webpack --config webpack.config.js",
+    "dev": "webpack-dev-server"
+}
+
+npm run dev  
+npm run webpack
+npm run build
+```
+
+
+
+
+
+## 5.1 安装介绍
+
+- 官网：[https://www.npmjs.com](https://www.npmjs.com/)
+
+- 包：第三方模板库就简称包
+
+- npm：下载第三方模板库所用到的工具     跟着node.js一起安装好了 
+
+  ```js
+  // 安装包命令
+  npm i moment （npm i moment@版本号）
+  
+  // 创建包对象
+  const moment = require('moment')
+  
+  // 参考第三方库调用其API
+  ```
+  
+- 目前只会在服务端调用。。。
+
+
+
+## 5.2 包管理配置
+
+### 5.2.1 配置文件初始化
+
+![image-20221214232223372](mark-img/image-20221214232223372.png)
+
+- 上传git时，**node_modules可以加入.gitignore**  但项目根目录一定要有package.json文件
+
+- package.json标记项目用了那些第三方库
+
+
+
+### 5.2.2 创建package.json（项目初始化）
+
+```js
+// 在根目录下执行命令  （根目录不能带中文、空格）
+// 安装完第三方库之后自动更新
+npm init -y
+```
+
+
+
+### 5.2.3 安装所有第三方库
+
+```js
+// 可通过根目录下的package.json安装所有第三方库
+npm i
+
+// 卸载包
+npm uninstall moment
+```
+
+
+
+### 5.2.4 包的分类
+
+*包分为项目包和全局包*
+
+- **项目包**
+
+	package.json中存在两个节点
+
+![image-20221215104045991](mark-img/image-20221215104045991.png)
+
+
+
+- 全局包
+
+	**打开Windows PowerShell安装全局包**（路径最好加双引号）
+
+![image-20221215104505190](mark-img/image-20221215104505190.png)
+
+### 5.2.5 解决下包速度慢的问题
+
+- 手动设置
+
+```bash
+# 打开Windows PowerShell
+
+# 查看当前的下载包镜像源
+npm config get registry
+
+# 将下载包镜像源切换为淘宝镜像源
+npm config set registry=https://registry.npm.taobao.org
+
+# 查看镜像源是否下载成功
+npm config get registry
+```
+
+- 利用nrm工具
+```bash
+# 安装全局包nrm
+npm i nrm -g
+
+# 查看所有可用镜像源
+nrm ls
+
+# 切换镜像源
+nrm use taobao
+```
+
+
+
+### 5.2.6 开发自定义包
+
+*自定义功能介绍：dateFormat（提供格式化时间），HTMLEscape、htmlUnEscape（html转义字符转换）*
+
+1、初始化
+
+- 新建文件夹 里面包含package.json、index.js、src文件夹、README.md
+
+2、package.json
+
+```json
+{
+    "name": "itheima-tool-cocoon",
+    "version": "1.0.0",
+    "main": "index.js",
+    "description": "提供格式化时间，HTMLEscape的功能",
+    "keywords": ["cocoon","escape","dateFormat"],
+    "license": "ISC"
+}
+```
+
+
+
+3、src文件夹：存放js文件，实现不同功能
+
+- dateFormat.js
+
+  ```js
+  function dateFormat(dateStr) {
+    const dt = new Date(dateStr)
+  
+    const y = dt.getFullYear()
+    const m = padZero(dt.getMonth() + 1)
+    const d = padZero(dt.getDate())
+  
+    const hh = padZero(dt.getHours())
+    const mm = padZero(dt.getMinutes())
+    const ss = padZero(dt.getSeconds())
+  
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+  }
+  
+  // 定义一个补零的函数
+  function padZero(n) {
+    return n > 9 ? n : '0' + n
+  }
+  
+  // 导出dateFormat
+  module.exports = {
+    dateFormat
+  }
+  ```
+
+- HTMLEscape.js
+
+  ```js
+  // 定义转义 HTML 字符的函数
+  function htmlEscape(htmlstr) {
+    return htmlstr.replace(/<|>|"|&/g, match => {
+      switch (match) {
+        case '<':
+          return '&lt;'
+        case '>':
+          return '&gt;'
+        case '"':
+          return '&quot;'
+        case '&':
+          return '&amp;'
+      }
+    })
+  }
+  
+  // 定义还原 HTML 字符串的函数
+  function htmlUnEscape(str) {
+    return str.replace(/&lt;|&gt;|&quot;|&amp;/g, match => {
+      switch (match) {
+        case '&lt;':
+          return '<'
+        case '&gt;':
+          return '>'
+        case '&quot;':
+          return '"'
+        case '&amp;':
+          return '&'
+      }
+    })
+  }
+  
+  // 导出两个方法
+  module.exports = {
+    htmlEscape,
+    htmlUnEscape
+  }
+  ```
+
+
+
+4、index.js：接收所有src文件夹下导出的功能，并全部导出
+
+```js
+// 这是包的入口文件
+const date = require('./src/dateFormat')
+const escape = require('./src/htmlEscape')
+
+// 导出所有方法 以对象展开形式！
+module.exports = {
+  ...date,
+  ...escape
+}
+```
+
+
+
+5、README.md：介绍所有功能的使用
+
+```
+dateFormat（提供格式化时间），HTMLEscape、htmlUnEscape（html转义字符转换）
+```
+
+
+
+### 5.2.7 npm发布包
+
+```bash
+# 注册npm账号后 进入终端
+npm login
+
+# 进入包的根目录  注：镜像要改为官方镜像
+npm publish
+
+# 删除包
+npm unpublish 包名 --force
+```
+
+### 5.2.8 模块的加载机制
+
+- **模块在第一次加载后会被缓存**。 这也意味着多次调用 require() 不会导致模块的代码被执行多次
+
+- 内置模块的加载优先级最高
+
+  
 
 
 
@@ -982,289 +1422,6 @@ sessionStorage 当会话结束（比如关闭浏览器）的时候，sessionStor
 
 
 
-# 五、npm和包
-
-三种命令：
-
-1、`nodemon server.js`：运行js文件，一般是自建服务器运行
-
-
-
-2、`npx 第三方库（库名）`：运行第三方库的命令
-
-```js
-npx webpack-dev-server
-```
-
-
-
-
-
-3、在package.json下的scripts对象中添加属性  `npm run 属性名` 简化命令
-
-```js
-"scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d dist",
-    "webpack": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server"
-}
-
-npm run dev  
-npm run webpack
-npm run build
-```
-
-
-
-
-
-## 5.1 安装介绍
-
-- 官网：[https://www.npmjs.com](https://www.npmjs.com/)
-
-- 包：第三方模板库就简称包
-
-- npm：下载第三方模板库所用到的工具     跟着node.js一起安装好了 
-
-  ```js
-  // 安装包命令
-  npm i moment （npm i moment@版本号）
-  
-  // 创建包对象
-  const moment = require('moment')
-  
-  // 参考第三方库调用其API
-  ```
-  
-- 目前只会在服务端调用。。。
-
-
-
-## 5.2 包管理配置
-
-### 5.2.1 配置文件初始化
-
-![image-20221214232223372](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221214232223372.png)
-
-- 上传git时，**node_modules可以加入.gitignore**  但项目根目录一定要有package.json文件
-
-- package.json标记项目用了那些第三方库
-
-
-
-### 5.2.2 创建package.json（项目初始化）
-
-```js
-// 在根目录下执行命令  （根目录不能带中文、空格）
-// 安装完第三方库之后自动更新
-npm init -y
-```
-
-
-
-### 5.2.3 安装所有第三方库
-
-```js
-// 可通过根目录下的package.json安装所有第三方库
-npm i
-
-// 卸载包
-npm uninstall moment
-```
-
-
-
-### 5.2.4 包的分类
-
-*包分为项目包和全局包*
-
-- **项目包**
-
-	package.json中存在两个节点
-
-![image-20221215104045991](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221215104045991.png)
-
-
-
-- 全局包
-
-	**打开Windows PowerShell安装全局包**（路径最好加双引号）
-
-![image-20221215104505190](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221215104505190.png)
-
-### 5.2.5 解决下包速度慢的问题
-
-- 手动设置
-
-```bash
-# 打开Windows PowerShell
-
-# 查看当前的下载包镜像源
-npm config get registry
-
-# 将下载包镜像源切换为淘宝镜像源
-npm config set registry=https://registry.npm.taobao.org
-
-# 查看镜像源是否下载成功
-npm config get registry
-```
-
-- 利用nrm工具
-```bash
-# 安装全局包nrm
-npm i nrm -g
-
-# 查看所有可用镜像源
-nrm ls
-
-# 切换镜像源
-nrm use taobao
-```
-
-
-
-### 5.2.6 开发自定义包
-
-*自定义功能介绍：dateFormat（提供格式化时间），HTMLEscape、htmlUnEscape（html转义字符转换）*
-
-1、初始化
-
-- 新建文件夹 里面包含package.json、index.js、src文件夹、README.md
-
-2、package.json
-
-```json
-{
-    "name": "itheima-tool-cocoon",
-    "version": "1.0.0",
-    "main": "index.js",
-    "description": "提供格式化时间，HTMLEscape的功能",
-    "keywords": ["cocoon","escape","dateFormat"],
-    "license": "ISC"
-}
-```
-
-
-
-3、src文件夹：存放js文件，实现不同功能
-
-- dateFormat.js
-
-  ```js
-  function dateFormat(dateStr) {
-    const dt = new Date(dateStr)
-  
-    const y = dt.getFullYear()
-    const m = padZero(dt.getMonth() + 1)
-    const d = padZero(dt.getDate())
-  
-    const hh = padZero(dt.getHours())
-    const mm = padZero(dt.getMinutes())
-    const ss = padZero(dt.getSeconds())
-  
-    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
-  }
-  
-  // 定义一个补零的函数
-  function padZero(n) {
-    return n > 9 ? n : '0' + n
-  }
-  
-  // 导出dateFormat
-  module.exports = {
-    dateFormat
-  }
-  ```
-
-- HTMLEscape.js
-
-  ```js
-  // 定义转义 HTML 字符的函数
-  function htmlEscape(htmlstr) {
-    return htmlstr.replace(/<|>|"|&/g, match => {
-      switch (match) {
-        case '<':
-          return '&lt;'
-        case '>':
-          return '&gt;'
-        case '"':
-          return '&quot;'
-        case '&':
-          return '&amp;'
-      }
-    })
-  }
-  
-  // 定义还原 HTML 字符串的函数
-  function htmlUnEscape(str) {
-    return str.replace(/&lt;|&gt;|&quot;|&amp;/g, match => {
-      switch (match) {
-        case '&lt;':
-          return '<'
-        case '&gt;':
-          return '>'
-        case '&quot;':
-          return '"'
-        case '&amp;':
-          return '&'
-      }
-    })
-  }
-  
-  // 导出两个方法
-  module.exports = {
-    htmlEscape,
-    htmlUnEscape
-  }
-  ```
-
-
-
-4、index.js：接收所有src文件夹下导出的功能，并全部导出
-
-```js
-// 这是包的入口文件
-const date = require('./src/dateFormat')
-const escape = require('./src/htmlEscape')
-
-// 导出所有方法 以对象展开形式！
-module.exports = {
-  ...date,
-  ...escape
-}
-```
-
-
-
-5、README.md：介绍所有功能的使用
-
-```
-dateFormat（提供格式化时间），HTMLEscape、htmlUnEscape（html转义字符转换）
-```
-
-
-
-### 5.2.7 npm发布包
-
-```bash
-# 注册npm账号后 进入终端
-npm login
-
-# 进入包的根目录  注：镜像要改为官方镜像
-npm publish
-
-# 删除包
-npm unpublish 包名 --force
-```
-
-### 5.2.8 模块的加载机制
-
-- **模块在第一次加载后会被缓存**。 这也意味着多次调用 require() 不会导致模块的代码被执行多次
-
-- 内置模块的加载优先级最高
-
-  
 
 
 ## 5.3 第三方库

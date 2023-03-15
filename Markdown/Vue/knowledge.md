@@ -316,9 +316,16 @@ none		保留原有元素内容的长度和宽度，也就是说内容不会被�
 img[src=""], img:not([src]) {
     opacity:0;
 }
-
-
 ```
+
+```html
+html 要想访问网络图片必须添加如下属性
+<meta name="referrer" content="no-referrer">
+```
+
+> https://blog.csdn.net/u011127019/article/details/125169827
+
+
 
 
 

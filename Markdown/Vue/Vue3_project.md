@@ -75,6 +75,8 @@
 
 
 
+组件命名规范：**https://blog.csdn.net/weixin_59229847**
+
 
 
 ### 4、ElementPlus 按需引入
@@ -106,6 +108,10 @@ plugins: [
 ],
 ...
 ```
+
+
+
+会在根目录下生成 `components.d.ts`、`auto-imports.d.ts` 这两个文件
 
 
 
@@ -1069,6 +1075,8 @@ Nuxt3 是基于 Vue3 发布的 SSR 框架，致力于将 SPA 应用转化为 SSR
 
 #### 2.1 defineEmits
 
+**父组件绑定在子组件中绑定自定义事件，子组件可用 `emits` 执行**
+
 - 父组件绑定事件：`@increase="handleIncrease"`
 
 - 父组件回调函数：`const handleIncrease = (num: number) => {}`
@@ -1135,6 +1143,8 @@ const handelClick = () => {
 
 #### 2.2 defineProps
 
+**父组件可直接向子组件传值（只读）**
+
 父组件
 
 ```vue
@@ -1161,7 +1171,7 @@ const ftext = ref('我是父组件-text')
 <template>
     <div class="Son">
         <p>我是子组件</p>
-       <!-- 展示来自父组件的值 -->
+       <!-- 展示来自父组件的值 在这里直接使用-->
        <p>接收到的值：{{ftext}}</p>
     </div>
 </template>
@@ -1174,8 +1184,71 @@ import {ref} from 'vue'
 const props = defineProps<{
     ftext: string,
 }>()
+
+// 复杂写法
+const props = defineProps<{
+    ftext: {
+        type: string,
+        required: false,
+        default: 'hhh'
+    }
+}>()
+
+
+// 在这里就用 props.sideCollapse
 </script>
 ```
+
+
+
+#### 2.3 defineEmits+defineProps
+
+当我们想把父组件传过来的参数变成双向绑定时，**即可读也可写**
+
+- `v-model:sideCollapse="sideCollapse"`
+- 相当于多绑定了一个自定义事件 `update:sideCollapse`
+- `emits('update:sideCollapse', 要变成的值)`
+
+父组件
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+let sideCollapse = ref(false)
+</script>
+
+<template>
+    <nav-header v-model:sideCollapse="sideCollapse"></nav-header>
+</template>
+```
+
+
+
+子组件
+
+```ts
+const props = defineProps<{
+    sideCollapse: boolean,
+}>()
+
+// let emits = defineEmits(['update:sideCollapse'])  js写法
+
+// ts写法
+const emits = defineEmits<{
+    (e: 'update:sideCollapse', sideCollapse: boolean): void
+}>()
+
+
+function toggle() {
+    // props.sideCollapse = !props.sideCollapse  不能直接修改！
+    
+    // 要这样修改
+    emits('update:sideCollapse', !props.sideCollapse)
+}
+```
+
+
 
 
 
@@ -2893,6 +2966,68 @@ export const reqgetRoomDetail = function (params) {
 
 
 
+### 13、ts 进行复杂类型规范
+
+参考：https://blog.csdn.net/Lyrelion/article/details/113571078
+
+- TypeScript 定义复杂变量
+
+```ts
+// bad
+columnData: any[] = []
+ 
+// good
+interface ColumnData {
+  title?: string;
+  key?: number;
+  type?: string;
+  render?: object;
+}
+ 
+columnData: ColumnData[] = []
+```
+
+
+
+- 使用 PropType 定义 vue props 数据类型
+
+```ts
+// 这是一个复杂的数据类型接口
+export interface ColumnProps {
+  _id: number;
+  title: string;
+  description: string;
+}
+
+
+// bad
+  props: {
+    list: {
+      type: ColumnProps[],
+      required: true
+    }
+  }
+ 
+// good
+import { PropType } from 'vue'
+export interface ColumnProps {
+  _id: string;
+  title: string;
+  description: string;
+}
+ 
+  props: {
+    list: {
+      // 此处的 Array 并不是变量类型，而是构造函数
+      // 通过 PropType 指定构造函数的类型
+      type: Array as PropType<ColumnProps[]>,
+      required: true
+    }
+  }
+```
+
+
+
 
 
 ## 三、Vue3 前端组件开发
@@ -3501,3 +3636,103 @@ router.afterEach((to, from, next) => {
 
 
 到这里我们就实现了路由页面标题等信息的填写，利于 SEO
+
+
+
+
+
+### 9、二次封装 el-plus 组件
+
+首先下载 el-plus 引入，这里就不写了，下载 sass 依赖
+
+
+
+样式设置：在 app.vue 中引入 `style/ui.scss` ，
+
+
+
+局部使用组件：直接引入 `components` 文件夹下对应的 vue文件即可
+
+
+
+**全局使用组件：在 mian.js 中 引入**
+
+```js
+// 引入封装的组件库
+import mUI from './components/index'
+```
+
+> 即可不用注册直接使用
+
+
+
+全局使用组件说明：
+
+在对应的 `components` 每一个组件的文件夹下都有一个 index.ts，作用是注册该组件
+
+`components` 文件夹下有一个 index.ts，作用是统一打包且 app.use(组件)
+
+
+
+ #### 9.1 图标选择器
+
+知识点：
+
+`component` 标签的使用：**is 中为标签名**
+
+```vue
+<component :is="`el-icon-${toLine(item.name)}`"></component>
+```
+
+
+
+
+
+必须要在 main.js 中注册所有图标
+
+```ts
+import * as Icons from '@element-plus/icons-vue'
+
+for (let i in Icons) {
+    // 注册全部图标组件
+    app.component(`el-icon-${toLine(i)}`, (Icons as any)[i])
+}
+
+// 把驼峰转换成横杠连接
+function toLine(value: string) {
+    return value.replace(/(A-Z)g/, '-$1').toLocaleLowerCase()
+}
+```
+
+
+
+封装 `ChooseIcon` 组件：对应 `components/ChooseIcon` 文件夹
+
+
+
+**使用：`  <choose-icon title="选择图标">选择图标</choose-icon>`**
+
+
+
+#### 9.2 城市筛选器
+
+封装 `ChooseIcon` 组件：对应 `components/ChooseArea` 文件夹
+
+
+
+使用：
+
+```vue
+<script setup lang="ts">
+import ChooseArea from '@/components/ChooseArea/index.vue'
+
+function getAreaData(areaData: any) {
+    console.log(areaData)
+}
+</script>
+
+<template>
+    <choose-area @getAreaData="getAreaData"></choose-area>
+</template>
+```
+
