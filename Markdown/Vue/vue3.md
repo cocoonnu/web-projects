@@ -4,41 +4,59 @@
 
 
 
-经典模式：**option api + vetur + webpack + js + vuex**
+未用 `<script setup>` 语法糖：
 
-
-
-所谓的 `option api` 就是和 `Vue2` 的配置差不多，然后插件还是使用 `vetur`，构建工具依然用 `webpack`，
-
-依然使用 `JS`，下面是一个 demo
+需要定义组件，props，emits 等等，还要返回变量函数等等
 
 ```html
 <script>
-    import { ref } from 'vue'
+import { ref } from 'vue'
 
-	export default {
-		name: 'Demo',
+export default {
+    name: 'Demo',
 
-		async setup() {
-            let name = ref('Demo');
+    components: [...],
+    props: [...],
+    emist: [...],
 
-            let result = await new Promise(function(resolve) {
-				setTimeout(()=>{
-					resolve({
-                        name,
-                    });
-				},2000)
-            })
+    async setup() {
+        let name = ref('Demo');
 
-            return result;
-		}
-	}
+        let result = await new Promise(function(resolve) {
+            setTimeout(()=>{
+                resolve({
+                    name,
+                });
+            },2000)
+        })
+
+        return result;
+    }
+}
 </script>
 ```
 
 
 
-Vue3模式：
+`<script setup> 语法糖` 模式：
+
+内置 `defineprops、emts` 等方法，无需注册组件、注册`props、emits`等配置，函数都一样定义，支持 await
+
+```vue
+<script setup>
+import { ref } from 'vue'
+let name = ref('Demo');
+
+let result = await new Promise(function(resolve) {
+    setTimeout(()=>{
+        resolve({
+            name,
+        });
+    },2000)
+})
+</script>
+```
+
 
 
 
@@ -87,7 +105,9 @@ Vue3模式：
 
 ## 2.1 使用 vue-cli 创建
 
-官方文档：[cli.vuejs.org/zh/guide/cr…](https://link.juejin.cn?target=https%3A%2F%2Fcli.vuejs.org%2Fzh%2Fguide%2Fcreating-a-project.html%23vue-create)
+
+
+官方文档：https://cli.vuejs.org/zh/guide/creating-a-project.html#vue-create
 
 ```bash
 ## 查看@vue/cli版本，确保@vue/cli版本在4.5.0以上
@@ -1176,9 +1196,9 @@ function addCar() {
 
 
 
-# 六、新的组件
+# 六、新的组件与变化
 
-## 6.1 Fragment
+## 6.1 Fragment 标签
 
 - 在Vue2中: 组件必须有一个根标签
 - 在Vue3中: 组件可以没有根标签, 内部会将多个标签包含在一个 `Fragment` 虚拟元素中
@@ -1186,7 +1206,7 @@ function addCar() {
 
 
 
-## 6.2 Teleport
+## 6.2 Teleport 标签
 
 什么是Teleport？—— `Teleport` 是一种能够将我们的<strong style="color:#DD5145">组件html结构</strong>移动到**指定位置**的技术。
 
@@ -1243,9 +1263,7 @@ const Child = defineAsyncComponent(() => import('./components/Child.vue'))
 
 <img src="mark-img/gif2.gif" alt="gif2" style="zoom: 50%;" />
 
-
-
-### 6.3.1 async setup
+**async setup**
 
 异步的条件：1、网速不好，加载变慢  2、**组件的 setup 返回一个 promise 对象的结果**
 
@@ -1354,7 +1372,7 @@ Demo.vue
 
 
 
-## 6.5 其他改变
+**其他改变：**
 
 - data选项应始终被声明为一个函数。
 
@@ -1419,15 +1437,17 @@ Demo.vue
 
 
 
-# 七、Setup 模式
 
-新增 setup 语法糖、vite 构建工具、vetur 语法检查、TS、pinia
+
+# 七、Vue3 全新模式
+
+新增 setup 语法糖、vite 构建工具、volar 语法检查、TS、pinia等
 
 
 
 ## 7.1 使用 vite 创建
 
-官方文档：[https://cn.vuejs.org/guide/quick-start.html](https://cn.vuejs.org/guide/quick-start.html)
+
 
 vite官网：https://vitejs.cn/
 
@@ -1528,70 +1548,7 @@ export default defineConfig({
 
 
 
-
-
-
-
-## 7.2 Setup 语法糖
-
-它是在单文件组件 (SFC) 中使用组合式 API的编译时语法糖。相比于普通的 <script> 语法，它具有更多优势：
-
-- 更少的样板内容，更简洁的代码
-- 能够使用纯 Typescript 声明 props 和抛出事件。
-- 更好的运行时性能 (其模板会被编译成与其同一作用域的渲染函数，没有任何的中间代理)。
-- 更好的 IDE 类型推断性能 (减少语言服务器从代码中抽离类型的工作)。
-
-
-
-参考文档：https://blog.csdn.net/qq_41880073/article/details/124199104
-
-
-
-一些 api 的用法：https://blog.csdn.net/weixin_45547638/article/details/127240591
-
-### 7.2.1 onMounte/ref/nextTick
-
-**onMounte：页面 dom 挂载完毕后执行（全局使用）**
-
-**nextTick：页面 dom 挂载完毕后执行（局部使用）**
-
-```ts
-import { onMounted, nextTick } from 'vue';
-
-onMounted(function() {
-    ...  
-})
-
-nextTick(function() {
-    ...  
-})
-```
-
-
-
-**ref 属性：获取单个或多个 dom 元素**
-
-```ts
-// 首先定义一个空值
-const box = ref(null);
-
-// 然后在 onMounte 函数中输出一下
-onMounte(() => {
-    console.log(box.value) // 如果是多个则为一个数组
-})
-
-// 在标签直接添加 ref 属性：<div ref="box">box</div>
-```
-
-
-
-### 7.2.2 可以直接使用 await ！
-
-
-
-
-
-## 7.3 配置 `@` 根路径
+### 7.1.3 配置 `@` 根路径
 
 **vite.config.ts**
 
@@ -1634,9 +1591,361 @@ export default defineConfig({
 
 
 
-## 7.4 配置 `vue-router4`
+## 7.2 Setup 语法糖
 
-下载： `npm i vue-router@next `
+它是在单文件组件 (SFC) 中使用组合式 API的编译时语法糖。相比于普通的 <script> 语法，它具有更多优势：
+
+- 更少的样板内容，更简洁的代码
+- 能够使用纯 Typescript 声明 props 和抛出事件。
+- 更好的运行时性能 (其模板会被编译成与其同一作用域的渲染函数，没有任何的中间代理)。
+- 更好的 IDE 类型推断性能 (减少语言服务器从代码中抽离类型的工作)。
+
+
+
+参考文档：https://blog.csdn.net/qq_41880073/article/details/124199104
+
+
+
+一些 api 的用法：https://blog.csdn.net/weixin_45547638/article/details/127240591
+
+
+
+### 7.2.1 onMounte/ref/nextTick
+
+**onMounte：页面 dom 挂载完毕后执行（全局使用）**
+
+
+
+**nextTick：页面 dom 挂载完毕后执行（局部使用）**
+
+```ts
+import { onMounted, nextTick } from 'vue';
+
+onMounted(function() {
+    ...  
+})
+
+nextTick(function() {
+    ...  
+})
+```
+
+
+
+**ref 属性：获取单个或多个 dom 元素**
+
+```ts
+// 首先定义一个空值
+const box = ref(null);
+
+// 然后在 onMounte 函数中输出一下
+onMounte(() => {
+    console.log(box.value) // 如果是多个则为一个数组
+})
+
+// 在标签直接添加 ref 属性：<div ref="box">box</div>
+```
+
+
+
+### 7.2.2 可以直接使用 await 
+
+
+
+
+
+### 7.2.3 动态组件的使用
+
+`component` 标签的使用：**is 中获取标签名称**  即会生成一个该名称的标签
+
+```vue
+<component :is="`el-icon-${toLine(item.name)}`"></component>
+```
+
+
+
+### 7.2.4 defineEmits/defineProps
+
+这两个 api 都是在 setup 语法糖里面使用的，并且不需要引入
+
+`defineProps`：父组件给子组件传递参数
+
+`defineEmits`：在子组件中调用父组件的回调函数，并且可传参
+
+
+
+#### 2.1 defineEmits
+
+**父组件绑定在子组件中绑定自定义事件，子组件可用 `emits` 执行**
+
+- 父组件绑定事件：`@increase="handleIncrease"`
+
+- 父组件回调函数：`const handleIncrease = (num: number) => {}`
+- 子组件定义 `emit`：
+
+```ts
+// ts 专有
+const emits= defineEmits<{
+    (e: 'increase', num: number): void
+}>()
+
+// js
+let emits = defineEmits(['startChange', 'endChange'])
+```
+
+- 子组件调用 `emit`
+
+```ts
+emits('increase', 1);
+```
+
+
+
+父组件
+
+```vue
+<template>
+  <section class="parent">
+    <childVue :num="nums" @increase="handleIncrease"></childVue>
+  </section>
+</template>
+
+<script setup>
+  import childVue from './child.vue';
+  import { ref } from 'vue';
+  const nums = ref(0);
+    
+  // 回调函数
+  const handleIncrease = (num: number) => {
+    nums.value += num;
+  };
+</script>
+```
+
+
+
+子组件
+
+```vue
+<template>
+  <section class="box" @click="handelClick">{{ num }}</section>
+</template>
+
+<script setup>
+// ts 专有
+const emits= defineEmits<{
+    (e: 'increase', num: number): void
+}>()
+            
+const handelClick = () => {
+    emits('increase', 1);
+};
+</script>
+```
+
+
+
+#### 2.2 defineProps
+
+**父组件可直接向子组件传值（只读）**
+
+父组件
+
+```vue
+<template>
+    <div class="Father">
+        <p>我是父组件</p>
+        <!--  -->
+        <son :ftext="ftext"></son>
+    </div>
+</template>
+    
+<script setup>
+import {ref} from 'vue'
+import Son from './son.vue'
+const ftext = ref('我是父组件-text')
+</script>
+```
+
+
+
+子组件
+
+```vue
+<template>
+    <div class="Son">
+        <p>我是子组件</p>
+       <!-- 展示来自父组件的值 在这里直接使用-->
+       <p>接收到的值：{{ftext}}</p>
+    </div>
+</template>
+    
+<script setup>
+import {ref} from 'vue'
+// se
+
+//defineProps 来接收组件的传值
+const props = defineProps<{
+    ftext: string,
+}>()
+
+// 复杂写法
+const props = defineProps<{
+    ftext: {
+        type: string,
+        required: false,
+        default: 'hhh'
+    }
+}>()
+
+
+// 在这里就用 props.sideCollapse
+</script>
+```
+
+
+
+#### 2.3 defineEmits+defineProps
+
+当我们想把父组件传过来的参数变成双向绑定时，**即可读也可写**
+
+- `v-model:sideCollapse="sideCollapse"`
+- 相当于多绑定了一个自定义事件 `update:sideCollapse`
+- `emits('update:sideCollapse', 要变成的值)`
+
+
+
+父组件
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+let sideCollapse = ref(false)
+</script>
+
+<template>
+    <nav-header v-model:sideCollapse="sideCollapse"></nav-header>
+</template>
+```
+
+
+
+子组件
+
+```ts
+const props = defineProps<{
+    sideCollapse: boolean,
+}>()
+
+// let emits = defineEmits(['update:sideCollapse'])  js写法
+
+// ts写法
+const emits = defineEmits<{
+    (e: 'update:sideCollapse', sideCollapse: boolean): void
+}>()
+
+
+function toggle() {
+    // props.sideCollapse = !props.sideCollapse  不能直接修改！
+    
+    // 要这样修改
+    emits('update:sideCollapse', !props.sideCollapse)
+}
+```
+
+
+
+### 7.2.5 defineExpose
+
+子组件导出的参数，父组件可通过 ref 属性获取到
+
+
+
+子组件
+
+```vue
+<template>
+  <div>子组件helloword.vue</div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const count = ref(123456)
+defineExpose({
+  count
+})
+</script>
+
+```
+
+
+
+父组件
+
+```vue
+<template>
+  <div @click="helloClick">父组件</div>
+  <helloword ref="hello"></helloword>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import helloword from './components/HelloWorld.vue'
+const hello = ref(null)
+const helloClick = () => {
+  console.log(hello.value.count) // 123456
+}
+</script>
+```
+
+
+
+注：无法直接在 setup 函数中获取！
+
+
+
+### 7.2.6 $attrs/$listeners
+
+$attrs：接收父组件除去 `props` 参数之外所有的参数（一般在 html 中使用，因为setup中没有this）
+
+$listeners：包含了父作用域中的 (不含 .native 修饰符) v-on 事件监听器
+
+
+
+使用说明：
+
+```vue
+<template>
+    <choose-time name="cocoon" :age="12" sex="man"></choose-time>
+</template>
+```
+
+```vue
+<template>
+    <div class="time-range">
+        {{ $attrs }}
+    </div>
+</template>
+
+<script lang="ts" setup>
+let props = defineProps({
+    name: String
+})
+</script>
+```
+
+> $attrs =  { "age": 12, "sex": "man" }
+
+
+
+## 7.3 Vue-router4 的使用
+
+官网：https://router.vuejs.org/zh/
+
+
+
+下载： `npm i vue-router@4 `
 
 
 
@@ -1694,7 +2003,12 @@ const route = useRoute() // 当前路由 route
 
 
 
-## 7.5 tsconfig.json 常用配置
+## 7.4 tsconfig.json 常用配置
+
+如果一个目录下存在一个 `tsconfig.json` 文件，那么它意味着这个目录是 TypeScript 项目的根目录。 
+
+- `tsconfig.json`文件中指定了用来编译这个项目的根文件和编译选项
+- `tsconfig.json`文件可以是个空文件，那么所有默认的文件都会以默认配置选项编译。
 
 参考文档：
 
@@ -1704,7 +2018,7 @@ https://blog.csdn.net/qq_16051405/article/details/126671093
 
 
 
-## 7.6 在Vue3中使用事件总线
+## 7.5 Vue3 使用事件总线
 
 参考文档：
 
@@ -1712,9 +2026,71 @@ https://blog.csdn.net/qq_52013792/article/details/125803290
 
 
 
+Mitt是一个微型的 EventEmitter 库，在[Vue3](https://so.csdn.net/so/search?q=Vue3&spm=1001.2101.3001.7020)中，官方推荐使用它替代已经移除的EventBus
+
+```javascript
+npm install mitt --save
+```
 
 
-## 7.7 在Vue3中使用 Vuex
+
+main.ts 注册
+
+```ts
+// 引入事件总线
+import mitt from 'mitt'
+
+// 安装事件总线
+const bus = mitt()
+app.config.globalProperties.$bus = bus
+```
+
+
+
+B组件绑定事件，回调函数接收参数
+
+```ts
+import { getCurrentInstance, onMounted, onBeforeUnmount } from 'vue'
+const cxt = getCurrentInstance()
+const bus = cxt!.appContext.config.globalProperties.$bus
+
+onMounted(() => {
+
+    // 绑定事件
+    bus.on('printMessage', (message: string) => {
+        alert(message)
+    })
+})
+
+onBeforeUnmount(() => {
+    bus.off('printMessage')
+})
+```
+
+
+
+A组件触发绑定事件，传递参数
+
+```ts
+import { getCurrentInstance } from 'vue'
+const cxt = getCurrentInstance() //相当于Vue2中的this
+const bus = cxt!.appContext.config.globalProperties.$bus
+
+function getAreaData(areaData: any) {
+    console.log(areaData)
+}
+
+function emitMitt() {
+    // 触发绑定事件事件
+    bus.emit('printMessage', '111')
+}
+```
+
+
+
+
+
+## 7.6 Vue3 中使用 Vuex4
 
 为了符合 vue3 中 ts 的特性，我们把 vuex 仓库的数据也要进行类型管理，作用是在使用 vuex 仓库数据的时候可以看到它是什么类型
 
@@ -1803,6 +2179,8 @@ store.dispatch('incrementWait', parms)
 // 调用 mutations
 store.commit('increment', parms)
 ```
+
+
 
 
 

@@ -100,7 +100,7 @@ git diff  #不带文件名，则比较多个文件
 
 ```bash
 若该文件显示已修改 modify
-git checkout -- filename #可撤销该文件的修改 即返回文件上一个版本
+git checkout -- filename #可撤销该文件的修改（工作区） 即返回文件上一个版本
 ```
 
 #### 1.3.6 从暂存区中删除文件
