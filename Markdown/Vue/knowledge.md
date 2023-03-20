@@ -2,6 +2,142 @@
 
 
 
+### 对象常见函数总结
+
+- **Object.assign**
+
+用来合并对象。如果存在同名属性则o1被o2覆盖，返回o1对象  浅拷贝
+
+```js
+Object.assign(obj1, obj2)
+```
+
+
+
+- **Object.keys、Object.values 、Object.entries**
+
+返回键、值、键值对数组
+
+```js
+const person = {
+    name: 'Alex',
+    age: 18
+};
+// 返回键数组
+console.log(Object.keys(person));		// [ 'name', 'age' ]
+// 返回值数组
+console.log(Object.values(person));		// [ 'Alex', 18 ]
+// 返回键值二维数组
+console.log(Object.entries(person));
+```
+
+
+
+
+
+### 数组常见函数总结
+
+- 普通方法总结
+
+```js
+1、arr.shift：删除数组的第一个元素   
+
+2、arr.unshift：插入数组第一个元素
+
+3、arr.concat：直接将多个数组、多个数字拼接成一个数组 
+let a= [].concat(1,2,3,[4,5],[6,7])
+
+4、arr.splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+
+5、let newArr = arr.slice(a, b) 截取下标为 a ，到下标为 b（不包括 b）的区间
+
+6、arr.reverse()：用来将一个数组中的全部项顺序置反
+```
+
+
+
+- **arr.some**
+
+some() 方法会依次执行数组的每个元素：
+
+如果有一个元素满足条件，则表达式返回 true , 剩余的元素不会再执行检测
+
+如果没有满足条件的元素，则返回false
+
+```js
+var arr = [3,6,9,12];
+ 
+if(arr.some(function checknumber(number){return number == 12;})) {
+    console.log(true)
+}
+
+// 简写：arr.some(item => item == 12)
+ 
+//因为arr数组中有12的值，所以代码块会执行，而函数checknumber中传的参数number是从数组arr中读取
+```
+
+
+
+
+- **arr.find**
+
+遍历查找数组，返回找到的值
+
+```js
+let num = arr.find(item => item == 12)
+```
+
+
+
+- **arr.forEach**
+
+遍历操作数组（可改变原数组），没有返回值
+
+```js
+arr.fonEach((item,index,arr) => {})
+```
+
+
+
+- **arr.map**
+
+遍历操作数组，返回一个新数组
+
+当数组为简单类型时，不会该变原数组，当为引用类型时，则会改变原数组！！
+
+```js
+let newArr = arr.map((item,index,arr) => {})
+```
+
+map 使用方法：https://blog.csdn.net/Anna0115/article/details/103696124
+
+
+
+- **arr.filter**
+
+遍历筛选数组，回调函数返回布尔类型，返回一个满足条件的新数组
+
+```js
+var newArr = arr.filter(function(item,index,arr) {
+    if (item > 4) return true;
+})
+```
+
+
+
+- **arr.flat**
+
+对多维数组进行扁平化处理
+
+```js
+// 按照一个可指定的深度递归遍历数组，并将所有元素与遍历到的子数组中的元素合并为一个新数组返回
+let newArr = arr.flat(Infinity)
+```
+
+
+
+
+
 ### 简单实现文字居中方式
 
 ```css
@@ -10,6 +146,14 @@ div {
     line-height: height; 
 }
 ```
+
+
+
+### e.target 和 this 的区别
+
+- 由于事件捕获、事件冒泡会导致多个对象产生监听 
+- e.target 返回真正触发事件的对象 和 this 可能不一样！！
+- 事件委托通常需要结合使用 e.target 属性
 
 
 
@@ -59,7 +203,8 @@ e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 /* 垂直滚动条和水平滚动条时交汇的部分 */
 ::-webkit-scrollbar-corner {
     display: block;
-    background-color: rgba(0, 0, 0, 0.1);
+    /* background-color: rgba(0, 0, 0, 0.1); */
+    background-color: transparent;
 }
 
 /* 滚动条上的滚动滑块 */
@@ -157,7 +302,7 @@ div {
 
 ### 充满整个屏幕且不含滚动条
 
-首先设置全局样式表 common.css
+将 html, body, #app 高度都设置为 100% 即可
 
 ```css
 * {
@@ -168,22 +313,8 @@ div {
     /* user-select: none; */
 }
 
-html, body, #app{
+html, body, #app {
     height: 100%;
-}
-```
-
-之后在 main.js 中引入即可解决 
-
-```js
-import "./assets/css/common.css"
-```
-
-```css
-/*盒子样式*/
-.login-container {
-    width: 100%;
-    height: 100vh;
 }
 ```
 
@@ -281,18 +412,6 @@ input {
 
 
 
-### 100vh / 100vw
-
-```css
-/* 规定当高度小于800px时 内容高度不再随视口高度变化而变化 宽度同理 */
-div {
-    min-height: 800px;
-    height: 100vh;
-}
-
-min-height: 100vh /* 表示高度时刻随视口高度变化而变化 */
-```
-
 
 
 ### `img` 标签属性
@@ -373,7 +492,7 @@ height: min-content;
 
 
 
-### 背景无限循环移动
+### 背景循环移动动画
 
 ```css
 body {
@@ -433,32 +552,9 @@ body {
 
 
 
-### `e.target `和 `this` 的区别
-
-- 由于事件捕获、事件冒泡会导致多个对象产生监听 
-- e.target 返回真正触发事件的对象 和 this 可能不一样！！
-- 事件委托通常需要结合使用 e.target 属性
 
 
-
-
-
-### 滚动条参数
-
-```css
-#files-list {
-    max-height: 300px;
-    overflow: hidden;
-    overflow-y: auto;
-}
-#files-list::-webkit-scrollbar {
-    width: 0;
-}
-```
-
-
-
-### JS 禁止右键、复制、快捷键
+### JS 禁止右键、复制和快捷键
 
 ```js
 // 禁止打开右键
@@ -501,6 +597,23 @@ document.onkeydown = function(event){
 ```
 
 > background-size 必须写在 background 后面！！！
+
+
+
+### BOM 操作记录
+
+- scrollIntoView
+
+将调用它的元素滚动到浏览器窗口的可见区域。（可用于锚点操作）
+
+MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/Element/scrollIntoView
+
+```js
+const two = document.getElementById('two')
+if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+```
+
+> block：垂直方向对齐方式    inline：水平方向对齐方式
 
 
 
@@ -598,7 +711,10 @@ const parser = new DOMParser().parseFromString(cards,'text/html');
 
 ```
 
+
+
 ### CSS 背面不可见属性
+
 ```css
 /* 当元素旋转时 背面不可见 */
 backface-visibility: hidden;    

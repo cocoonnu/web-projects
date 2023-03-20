@@ -1,6 +1,8 @@
 # 【BOM】
 
-> 原创内容，转载请注明出处！
+BOM常见api介绍：https://blog.csdn.net/m0_64720065/article/details/127451935
+
+
 
 # 一、BOM是什么
 

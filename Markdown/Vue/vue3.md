@@ -1610,6 +1610,10 @@ export default defineConfig({
 
 
 
+官方文档：https://cn.vuejs.org/api/sfc-script-setup.html#basic-syntax
+
+
+
 ### 7.2.1 onMounte/ref/nextTick
 
 **onMounte：页面 dom 挂载完毕后执行（全局使用）**
@@ -1619,16 +1623,30 @@ export default defineConfig({
 **nextTick：页面 dom 挂载完毕后执行（局部使用）**
 
 ```ts
-import { onMounted, nextTick } from 'vue';
+// 案例：el-input 自动聚焦
 
-onMounted(function() {
-    ...  
-})
+// 输入框ref
+let editInput = ref(null)
 
-nextTick(function() {
-    ...  
-})
+// 点击编辑函数
+function clickEdit(scope: any) {
+ 
+    nextTick(() => {
+        // @ts-ignore
+        editInput.value![0].focus()
+        
+    })
+}
 ```
+
+```vue
+<el-input 
+    ref="editInput"
+    @blur="exitEdit"
+></el-input>
+```
+
+
 
 
 
@@ -1638,13 +1656,30 @@ nextTick(function() {
 // 首先定义一个空值
 const box = ref(null);
 
-// 然后在 onMounte 函数中输出一下
+// 在 onMounte 函数中输出
 onMounte(() => {
     console.log(box.value) // 如果是多个则为一个数组
 })
 
-// 在标签直接添加 ref 属性：<div ref="box">box</div>
+// 作为参数接收
+function show(box) {
+    console.log(box.value)
+}
+
+// 直接获取则为 null！！
 ```
+
+> 只能在 onMounte、nextTick中输出或者作为参数接收！！！
+
+
+
+```html
+<div ref="box">box</div>
+
+<button @click="show(box)"></button>
+```
+
+> 注意 ref 不用加引号！
 
 
 
@@ -1672,9 +1707,11 @@ onMounte(() => {
 
 `defineEmits`：在子组件中调用父组件的回调函数，并且可传参
 
+https://cn.vuejs.org/api/sfc-script-setup.html#defineprops-defineemits
 
 
-#### 2.1 defineEmits
+
+#### 7.2.4.1 defineEmits
 
 **父组件绑定在子组件中绑定自定义事件，子组件可用 `emits` 执行**
 
@@ -1745,7 +1782,7 @@ const handelClick = () => {
 
 
 
-#### 2.2 defineProps
+#### 7.2.4.2 defineProps
 
 **父组件可直接向子组件传值（只读）**
 
@@ -1805,7 +1842,7 @@ const props = defineProps<{
 
 
 
-#### 2.3 defineEmits+defineProps
+#### 7.2.4.3 props 双向绑定
 
 当我们想把父组件传过来的参数变成双向绑定时，**即可读也可写**
 
@@ -1905,37 +1942,183 @@ const helloClick = () => {
 
 
 
-### 7.2.6 $attrs/$listeners
+### 7.2.6 $attrs 与 Attributes 继承
 
-$attrs：接收父组件除去 `props` 参数之外所有的参数（一般在 html 中使用，因为setup中没有this）
-
-$listeners：包含了父作用域中的 (不含 .native 修饰符) v-on 事件监听器
+官方文档：https://cn.vuejs.org/guide/components/attrs.html#attribute-inheritance
 
 
 
-使用说明：
+首先介绍一下什么是 Attributes 继承，即属性继承！
+
+当一个父组件给子组件绑定属性时（props属性、class属性、自定义事件、style属性等等）
 
 ```vue
-<template>
-    <choose-time name="cocoon" :age="12" sex="man"></choose-time>
-</template>
+// 父组件
+<Demo
+    @click="fn1"
+    @getname="fn2"
+    numm="111"
+    :name="slotName"
+    class="abc"
+>
+</Demo>
 ```
 
+子组件的根元素（即最外层的元素）会自动继承除去 `props`、`emits` 之外的属性
+
+**而这些属性都被封装到了 `$attrs` 对象上**
+
 ```vue
+// demo.vue
 <template>
-    <div class="time-range">
+    <div>
         {{ $attrs }}
     </div>
 </template>
 
-<script lang="ts" setup>
-let props = defineProps({
+<script setup>
+import { ref, useAttrs } from 'vue'
+
+const props = defineProps({
     name: String
 })
+
+let attrs = useAttrs()
+console.log(attrs)
 </script>
 ```
 
-> $attrs =  { "age": 12, "sex": "man" }
+> attrs = Proxy {numm: '111', class: 'abc', __vInternal: 1, onClick: ƒ, onGetname: ƒ}
+
+
+
+**$attrs：**
+
+这个 `$attrs` 对象包含了除组件所声明的 `props` 和 `emits` 之外的所有其他 attribute，例如 `class`，`style`，`v-on` 监听器等等。
+
+
+
+**禁用 Attributes 继承**：取消根节点自动继承
+
+```vue
+// 需要额外加上一个配置
+<script>
+export default {
+    inheritAttrs: false,
+}
+</script>
+
+<script setup>
+import { ref, useAttrs } from 'vue'
+
+const props = defineProps({
+    name: String
+})
+ ref(12)
+let attrs = useAttrs()
+console.log(attrs)
+</script>
+```
+
+
+
+**v-bind=$attrs**
+
+实现孙组件的 Attribute 继承
+
+我们想要所有的透传 attribute 都应用在内部的元素中， 而不是外层的根节点上。我们可以通过设定 `inheritAttrs: false` 和使用 `v-bind="$attrs"` 来实现
+
+```vue
+<div class="btn-wrapper">
+  <button class="btn" v-bind="$attrs">click me</button>
+</div>
+```
+
+> [没有参数的 `v-bind`](https://cn.vuejs.org/guide/essentials/template-syntax.html#dynamically-binding-multiple-attributes) 会将 $attrs 的所有属性都作为 attribute 应用到目标元素上
+
+
+
+![image-20230319151754468](mark-img/image-20230319151754468.png)
+
+
+
+
+
+### 7.2.7 v-model+defineProps
+
+当父组件要控制 el 组件的显示与隐藏时，以下是步骤和方法：
+
+继承了 `defineEmits+defineProps  ` 这个知识点，还多了一个步骤
+
+
+
+父组件: ` v-model:dialogVisible="dialogVisible"`
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const dialogVisible = ref<boolean>(false)
+
+
+function handleClick() {
+    dialogVisible.value = true
+}
+
+</script>
+
+<template>
+    <el-button @click="handleClick" type="primary">
+        弹出框表单
+    </el-button>
+
+    <dialog-form v-model:dialogVisible="dialogVisible"></dialog-form>
+</template>
+```
+
+
+
+ 子组件：内部还要定义一个 `dialogVisibleIn`
+
+```vue
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+
+const props = defineProps<{
+    dialogVisible: boolean,
+}>()
+
+// 初始化
+let dialogVisibleIn = ref<boolean>(props.dialogVisible)
+
+let emits = defineEmits(['update:dialogVisible'])
+
+// 同时监听两个显示变量的变化
+watch(() => props.dialogVisible, (newValue) => {
+    dialogVisibleIn.value = props.dialogVisible
+})
+
+watch(() => dialogVisibleIn.value, (newValue) => {
+    emits('update:dialogVisible', newValue)
+})
+
+</script>
+
+<template>
+	// v-model 用内部的显示变量
+    <el-dialog v-model="dialogVisibleIn" >
+        
+        <el-button type="primary" @click="emits('update:dialogVisible', false)">
+            确认
+        </el-button>
+        
+    </el-dialog>
+</template>
+```
+
+
+
+
 
 
 
@@ -2183,4 +2366,311 @@ store.commit('increment', parms)
 
 
 
+
+## 7.7 TS 使用方法总结
+
+
+
+**忽略下一行的 TS 校验**
+
+`  // @ts-ignore`
+
+
+
+**定义接口类型：用于规范对象**
+
+一般另外定义一个 `types.ts` 专门定义接口类型
+
+```ts
+import { RuleItem } from './rule'
+
+// 表单每一项的配置选项
+export interface FormOptions {
+    // 表单项显示的元素
+    type: 'cascader' | 'checkbox' | 'checkbox-group' 
+
+    // 表单项的值
+    value?: any,
+    
+    ...
+}
+```
+
+
+
+
+
+**接口的使用**
+
+```ts
+// 作为对象
+let optionsItem: FormOptions = {}
+
+// 作为数组
+let options: FormOptions[] = [{}, {}]
+```
+
+
+
+
+
+**属性不存在或类型报错**
+
+如果确定该属性存在则：`item.props!`
+
+
+
+
+
+**Vue3 中 TS 的类型声明总结**
+
+- props 参数中声明类型
+
+```ts
+// 必须用大写的 String Boolean 来 new 一个type变量
+
+let props = defineProps({
+    startPlaceholder: {
+        type: String,
+        default: '请选择开始日期'
+    },
+  
+    disableToday: {
+        type: Boolean,
+        default: true
+    }
+})
+```
+
+
+
+- **PropType 的使用**
+
+用于在用运行时 props 声明时给一个 prop 标注更复杂的类型定义。
+
+```ts
+import type { PropType } from 'vue'
+
+interface Book {
+  title: string
+  author: string
+  year: number
+}
+
+let props = defineProps({
+    // 对象数组
+    option: {
+        type: Array as PropType<Book[]>,
+        require: true
+    },
+
+    // 对象
+    book: {
+      type: Object as PropType<Book>,
+      required: true
+    }
+})
+```
+
+
+
+- 简单的 ref
+
+```ts
+let num = ref<number>(0)
+let numArr = ref<Book[]>([])
+let numObj = ref<Book>()
+```
+
+
+
+
+
+## 7.8 vue3 插槽使用方法
+
+让父组件可以向子组件指定位置插入html结构，也是一种组件间通信的方式，适用于 <strong style="color:red">父组件 ===> 子组件</strong> 。
+
+
+
+包含：默认插槽、具名插槽、作用域插槽、具名作用域插槽
+
+
+
+### 7.8.1 默认插槽
+
+没有名字的插槽，**只有一个slot**    Category标签的内容会替代slot标签
+
+
+
+App.vue
+
+```vue
+  <Category>
+       <div>html结构1</div>
+       <div>html结构2</div>
+      
+      // 通过具名插槽的方式填写
+      <template #default>
+        <p>A paragraph for the main content.</p>
+        <p>And another one.</p>
+      </template>
+      
+  </Category>
+```
+
+Category.vue
+
+
+```vue
+<template>
+  <div>
+     <!-- 定义插槽 -->
+     <slot>插槽默认内容...</slot>
+  </div>
+</template>
+```
+
+
+
+### 7.8.2 具名插槽
+
+1、在可以在子组件中用多个插槽，**子组件用 name，**
+
+2、父组件填写方式一：`slot="list"`
+
+3、**方式二：`v-slot:list` 或者简写为 `#list`**
+
+
+
+父组件
+
+
+```vue
+<Category title="foods">
+    // 多个标签
+    <template slot="list">
+        <h1>111</h1>
+        <h1>222</h1>
+    </template>
+    <template v-slot:l>
+        <h1>111</h1>
+        <h1>222</h1>
+    </template>    
+    <template #list>
+        <h1>111</h1>
+        <h1>222</h1>
+    </template>
+    
+    // 单标签
+    <a href="#" slot="ad" >我是广告</a>
+</Category>
+```
+
+子组件 Category.vue
+
+```vue
+<template>
+    <div class="category">
+        具名插槽
+        <slot name="list">列表</slot>
+        
+        <slot name="ad">广告</slot>    
+    </div>  
+</template>
+```
+
+
+
+父组件还可以用用动态插槽名：
+
+```vue
+<base-layout>
+  <template v-slot:[slotName]>
+    ...
+  </template>
+
+  <!-- 缩写为 -->
+  <template #[slotName]>
+    ...
+  </template>
+</base-layout>
+
+<script setup>
+let slotName = ref('demo')
+</script>
+```
+
+
+
+
+
+### 7.8.3 作用域插槽
+
+可以通过插槽完成组件通信，特别是传递 DOM 元素的时候
+
+
+
+**父组件插槽中可以接收子组件的参数（默认插槽）**
+
+```vue
+<!-- <MyComponent> 子组件（默认插槽） -->
+<div>
+  <slot :text="greetingMessage" :count="1"></slot>
+</div>
+```
+
+```vue
+<!-- 父组件（默认插槽） -->
+<MyComponent v-slot="slotProps">
+  {{ slotProps.text }} {{ slotProps.count }}
+</MyComponent>
+
+<!-- 还可以解构 -->
+<MyComponent v-slot="{ text, count }">
+  {{ text }} {{ count }}
+</MyComponent>
+```
+
+
+
+**具名插槽写法**
+
+```vue
+<!-- <MyComponent> 子组件（具名插槽） -->
+<slot name="header" message="header"></slot>
+<slot name="footer" message="footer"></slot>
+<slot message="defalut"></slot>
+```
+
+```vue
+<MyComponent>
+  <template #header="headerProps">
+    {{ headerProps }}
+    {{ headerProps.message }}
+  </template>
+
+  <template #default="defaultProps">
+    {{ defaultProps }}
+  </template>
+
+  <template #footer="footerProps">
+    {{ footerProps }}
+  </template>
+</MyComponent>
+```
+
+
+
+`v-slot:name="slotProps"` 简写为 `#name="slotProps"`
+
+
+
+**useSlots**
+
+```js
+import { useSlots } from 'vue'
+
+// 获取插槽内容
+let slots = useSlots()
+```
 

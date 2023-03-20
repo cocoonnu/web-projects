@@ -250,10 +250,9 @@ npm 是随同 Nodejs 一起安装的包管理工具，能解决Nodejs代码部�
 注：命令 `npm install [package name]`
 
 1、 将依赖安装到项目 node_modules 目录下。
-2、不会将依赖写入 devDependencies 或 dependencies 节点。
-3、**运行 npm install 初始化项目时不会下载模块。**
+2、不会将依赖写入 devDependencies 或 dependencies 节点（不一定。。。）
 
-> 所以最好表明是 -S 还是 -D
+> 所以最好表明是 -S 还是 -D  还是官方的命令吧！！！
 
 
 

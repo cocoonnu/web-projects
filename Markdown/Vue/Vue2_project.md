@@ -653,6 +653,7 @@ npm i lodash
 ```
 
 ```js
+// 按需引入
 import {debounce,throttle} from 'lodash'
 
 methods: {
@@ -939,7 +940,7 @@ div {
 
 
 
-安装：`npm i mockjs -D`
+安装：`npm i mockjs -D  @types/mockjs`
 
 
 

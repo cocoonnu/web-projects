@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
 
 ## 1.1 初识 Vue
 
@@ -38,31 +38,27 @@
 
 ## 1.2 模板语法
 
+官方文档：https://cn.vuejs.org/guide/essentials/template-syntax.html
+
+
+
 Vue模板语法有2大类:
 
 * 插值语法：
 
   功能：用于解析标签体内容
 
-  写法：{{xxx}}，xxx是js表达式，且可以**直接读取到vm中的所有属性**
+  写法：`{{xxx}}`，xxx是**js表达式**，且可以**直接读取到vm中的所有属性**
 
 * 指令语法:
 
   功能：用于解析标签（包括：标签属性、标签体内容、绑定事件.....）
 
-  举例：v-bind:href="xxx" ，xxx同样要写js表达式，且可以直接读取到vm中的所有属性
+  写法：`v-bind:href="xxx"` ，xxx同样要写js表达式，且可以直接读取到vm中的所有属性
 
   
   
   **`v-bind:` 可以简写为 `:`**
-
-
-
-查询是不是 JS 语句 可以在浏览器控制台里面输入看看！！
-
-
-
-> 代码
 
 ```html
 <div id="root">
@@ -89,7 +85,38 @@ Vue模板语法有2大类:
 </script>
 ```
 
+> 查询是不是 JS 语句 可以在浏览器控制台里面输入看看！
 
+
+
+**不带参数的 `v-bind` :**
+
+可通过不带参数的 `v-bind`，动态绑定多个值
+
+```vue
+<div v-bind="objectOfAttrs"></div>
+```
+
+```js
+let objectOfAttrs = {
+  id: 'container',
+  class: 'wrapper'
+}
+```
+
+
+
+等效于：
+
+```vue
+<div id="container" class="wrapper"></div>
+```
+
+
+
+JS 表达式说明
+
+https://cn.vuejs.org/guide/essentials/template-syntax.html#using-javascript-expressions
 
 
 
@@ -467,7 +494,7 @@ const vm = new Vue({
 ### 1.7.2 事件的修饰符
 
 * prevent：阻止默认事件（常用）
-* stop：阻止事件冒泡（常用）
+* **stop：阻止事件冒泡（常用）**
 * once：事件只触发一次（常用）
 * self：只监听触发该元素的事件
 

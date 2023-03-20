@@ -36,6 +36,10 @@ TypeScript 简介
 
 ## 1.2 基本类型 
 
+注：小写表示 TS 的类型，大写 Boolean、Number、String 是 JavaScript 的构造函数！！！
+
+
+
 - **类型声明**
 
   - 类型声明是TS非常重要的一个特点

@@ -261,6 +261,10 @@ css: {
 
 ### 8、对 axios 进行 ts 封装
 
+axios 官网：https://axios-http.com/zh/
+
+
+
 - 在 untils 下新建 `http.ts` ，下面是封装模板
 
 ```ts
@@ -1497,17 +1501,23 @@ let result = await userLogoutApi()
 >
 ```
 
+
+
+**必填属性：**
+
 `ref` 属性：让 ruleFormRef 变量指代整个表单
+
+内置方法：https://element-plus.gitee.io/zh-CN/component/form.html#form-methods
 
 
 
 `rules` 属性：表单校验规则 rules
 
+`model` 属性：表单双向绑定数据对象 formData
 
 
-`model` 属性：表单数据对象 formData
 
-
+**额外属性：**
 
 `label-position` 属性：label 标签位置
 
@@ -1535,17 +1545,13 @@ let result = await userLogoutApi()
 
 
 
+**form-item 属性：**
+
 `label` 属性：label 标签文字
-
-
 
 `prop` 属性：表单校验规则 rules.mobile
 
-
-
 `v-model` 属性：表单数据对象 formData.mobile
-
-
 
 `submitForm(ruleFormRef)`：点击按钮函数，传入 el-from 表单变量
 
@@ -1556,12 +1562,14 @@ let result = await userLogoutApi()
 ```ts
 // 表单数据
 const labelPosition = ref('top')
+
 const ruleFormRef = ref<FormInstance>() // 整个表单
+
+// 表单双向绑定对象
 const formData = reactive({
     mobile: '',
     password: '',
 })
-
 
 // 表单效验规则
 const rules = reactive({
@@ -3452,7 +3460,13 @@ router.afterEach((to, from, next) => {
 
 ### 9、二次封装 el-plus 组件
 
-首先下载 el-plus 引入，这里就不写了，下载 sass 依赖
+首先下载依赖： el-plus、 sass 、mitt
+
+```
+npm install element-plus --save
+npm i sass -D
+npm install mitt --save
+```
 
 
 
@@ -3525,3 +3539,301 @@ function getAreaData(areaData: any) {
 </template>
 ```
 
+
+
+
+
+#### 9.3 时间选择器
+
+
+
+
+
+#### 9.4 城市选择器
+
+scrollIntoView 用法：https://blog.csdn.net/learn8more/article/details/108047794
+
+
+
+
+
+#### 9.5 表单生成器
+
+**组件介绍**
+
+```html
+<el-form 
+    v-bind="$attrs" 
+    :model="formModel"
+    :rules="formRules"
+    :validate-on-rule-change="false" 
+>
+
+    <el-form-item 
+        v-for="item in options"
+        :prop="item.prop"
+        :label="item.label"
+        v-bind="item.attrs"
+    >
+
+        <component 
+            v-model="formModel[item.prop]"
+            :is="`el-${item.type}`"
+            :placeholder="item.placeholder"
+        ></component>
+
+    </el-form-item>
+
+</el-form>
+```
+
+
+
+必要属性介绍：
+
+- ` :model="formModel"`：表单双向绑定数据对象
+
+```ts
+const formModel = reactive({
+    mobile: '',
+    password: '',
+})
+```
+
+
+
+- `:rules="formRules"`：表单验证规则对象
+
+```ts
+const rules = reactive({
+    mobile: [
+        {
+            min: 11,
+            max: 11,
+            ...
+        }
+    ],
+    password: [
+        {
+            pattern: /^[\w]{6,16}$/, // 弱密码
+            ...
+        }
+    ]
+})
+```
+
+
+
+- `:prop="item.prop"`：表单验证规则对象属性名
+
+```ts
+rules.mobile  rules.password
+```
+
+
+
+- ` v-model="formModel[item.prop]"`：表单双向绑定数据对象属性名
+
+```ts
+formModel.mobile  formModel.password
+```
+
+
+
+- `v-bind="item.attrs"`：formItem额外参数
+
+参考：https://element-plus.gitee.io/zh-CN/component/form.html#formitem-attributes
+
+
+
+- `v-bind="$attrs"`：el-form额外参数
+
+参考：https://element-plus.gitee.io/zh-CN/component/form.html#form-attributes
+
+
+
+**组件的使用**
+
+```vue
+<script setup lang="ts">
+import { FormOptions } from '@/components/ModalForm/type/types'
+
+
+// 表单选项数组: 每一项的类型为FormOptions
+let options: FormOptions[] = [
+
+    // 用户名输入框
+    {
+        type: 'input',
+        value: '',
+        label: '用户名',
+        prop: 'username',
+        placeholder: '请输入用户名',
+
+        // 验证规则可以有多条
+        rules: [
+            {
+                required: true,
+                message: '用户名不能为空',
+                trigger: 'blur'
+            },
+            {
+                min: 2,
+                max: 6,
+                message: '用户名在2-6位之间',
+                trigger: 'blur'
+            }
+        ],
+
+        // formItem额外配置项
+        attrs: {
+            clearable: true
+        }        
+    },
+
+    // 密码输入框
+]
+
+</script>
+
+<template>
+    <!-- 直接添加自定义属性可对el-form添加额外配置项 -->
+    <modal-form 
+        :options="options" 
+        label-width="80px" 
+        :show-message="false"
+        status-icon
+    ></modal-form>
+</template>
+```
+
+
+
+
+
+**验证表单和重置表单**
+
+```ts
+import type { FormInstance } from 'element-plus'
+
+let formRef = ref<FormInstance>()
+```
+
+```vue
+<el-form 
+    ref="formRef"
+    ...
+>
+
+<!-- 提交重置按钮 -->
+<el-form-item>
+    <el-button type="primary" @click="confirmForm(formRef)">提交</el-button>
+    <el-button @click="cancelForm(formRef)">重置</el-button>
+</el-form-item>
+```
+
+```ts
+// 提交重置函数
+function confirmForm(formRef: FormInstance | undefined) {
+    if (!formRef) return false
+
+    formRef.validate(function(valid) {
+        if (!valid) {
+            ElMessage.error('请完成表单填写')
+            return false
+        }
+
+        emits('getForm', formModel.value)
+        ElMessage({
+            message: `提交成功`,
+            type: 'success',
+            duration: 1000
+        })
+    })
+}
+
+function cancelForm(formRef: FormInstance | undefined) {
+    if (!formRef) return false
+
+    formRef.resetFields()
+    ElMessage({
+        message: `重置成功`,
+        type: 'success',
+        duration: 1000
+    })
+
+}
+```
+
+
+
+#### 9.6 表格生成器
+
+巩固了插槽的使用，熟练了mitt事件总线的使用
+
+表格用 `data` 存入，通过传递 `scope` 行数据进行对表格数据的修改，而且会生效！
+
+```vue
+```
+
+
+
+
+
+### 10、wangEditor 使用方法
+
+wangEditor v4 版本文档：https://www.wangeditor.com/v4/
+
+
+
+vue 里面使用
+
+```
+npm i wangeditor --save
+```
+
+
+
+```ts
+import E from 'wangeditor'
+
+nextTick(function() {
+
+    const editor = new E('#editor')
+
+    // 富文本编辑器配置选项
+    editor.config.height = 200
+    
+    editor.config.excludeMenus = [
+        'video'
+    ]                    
+
+    editor.config.placeholder = item.placeholder!
+
+    editor.config.focus = false
+
+    editor.create()
+
+    // 设置初始值
+    editor.txt.text(item.value)
+
+    // 设置回调函数
+    editor.config.onchange = function (newHtml: string) {
+        formModel.value[item.prop!] = newHtml
+    }            
+})
+```
+
+
+
+```html
+<div id="editor"></div>
+```
+
+
+
+
+
+### 11、mockjs 使用方法
+
+官网：http://mockjs.com/
