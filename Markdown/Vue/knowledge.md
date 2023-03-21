@@ -33,6 +33,16 @@ console.log(Object.entries(person));
 
 
 
+- **for in 循环**
+
+for...in 遍历一个对象的可枚举属性，如对象、数组、字符串。针对属性，所以获得 key
+
+```js
+for (let key in obj) {}
+```
+
+
+
 
 
 ### 数组常见函数总结
@@ -136,6 +146,16 @@ let newArr = arr.flat(Infinity)
 
 
 
+- for of 循环
+
+for...of 遍历一个可迭代对象，如数组、字符串、Map/Set（无对象） 。针对一个迭代对象，所以获得 value
+
+```js
+for (let key of arr) {}
+```
+
+
+
 
 
 ### 简单实现文字居中方式
@@ -180,12 +200,98 @@ e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 
 
 ### DOM 高度宽度属性
+主要考察盒子模型
 
-1、`offsetWidth`：该 DOM 元素宽度
+- offsetHeight offsetWidth：包括盒子的 border + padding + content
+
+- clientHeight clientWidth：包括盒子的 padding + content
+
+- scrollHeight scrollWidth：包括盒子的 padding + 实际内容的尺寸
+
+> 实际内容是指该盒子可能含有子盒子，子盒子内容尺寸大于该盒子内容尺寸
+
+- scrollTop scrollLeft：DOM 内部元素滚动的距离
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>offsetHeight</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            background-color: #f1f1f1;
+        }
+
+        #container {
+            width: 300px;
+            height: 200px;
+            padding: 20px;
+            margin: 30px;
+            border: 5px solid #ccc;
+            box-sizing: border-box;
+            overflow: auto;
+            background-color: #fff;
+        }
+        #content {
+            width: 600px;
+            height: 500px;
+            background-color: #f1f1f1;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <p>offsetHeight</p>
+
+    <div id="container">
+        <div id="content">
+            <p>offsetHeight scrollHeight clientHeight 区别</p>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container')
+        console.log('offsetHeight', container.offsetHeight)
+        console.log('offsetWidth', container.offsetWidth)
+        console.log('clientWidth', container.clientWidth)
+        console.log('clientHeight', container.clientHeight)
+        console.log('scrollWidth', container.scrollWidth)
+        console.log('scrollHeight', container.scrollHeight)
+
+        // scrollTop scrollLeft 需滚动之后获取
+    </script>
+</body>
+</html>
+```
 
 
 
-2、`offsetHeight`：该 DOM 元素高度
+
+
+### BOM 操作记录
+
+- scrollIntoView
+
+将调用它的元素滚动到浏览器窗口的可见区域。（可用于锚点操作）
+
+MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/Element/scrollIntoView
+
+```js
+const two = document.getElementById('two')
+if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+```
+
+> block：垂直方向对齐方式    inline：水平方向对齐方式
+
+
 
 
 
@@ -597,23 +703,6 @@ document.onkeydown = function(event){
 ```
 
 > background-size 必须写在 background 后面！！！
-
-
-
-### BOM 操作记录
-
-- scrollIntoView
-
-将调用它的元素滚动到浏览器窗口的可见区域。（可用于锚点操作）
-
-MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/Element/scrollIntoView
-
-```js
-const two = document.getElementById('two')
-if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
-```
-
-> block：垂直方向对齐方式    inline：水平方向对齐方式
 
 
 

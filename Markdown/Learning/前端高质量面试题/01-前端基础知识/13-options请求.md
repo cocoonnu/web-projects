@@ -8,6 +8,9 @@
 
 浏览器同源策略，默认限制跨域请求。跨域的解决方案
 - jsonp
+
+![image-20230320200920773](mark-img/image-20230320200920773.png)
+
 - CORS
 
 ```js
@@ -30,5 +33,5 @@ response.setHeader("Access-Control-Allow-Credentials", "true") // 允许跨域�
 
 ## 答案
 
-options 请求就是对 CORS 跨域请求之间的一次预检查，检查成功再发起正式请求，是浏览器自行处理的。<br>
+**options 请求就是对 CORS 跨域请求之间的一次预检查**，检查成功再发起正式请求，是浏览器自行处理的。<br>
 了解即可，实际开发中不用过于关注。

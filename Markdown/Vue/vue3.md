@@ -2365,6 +2365,35 @@ store.commit('increment', parms)
 
 
 
+- 计算属性中使用 `mapState` 方法也保留了，为了方便读取数据
+
+文档：https://vuex.vuejs.org/zh/guide/state.html
+
+```ts
+computed: mapState({
+    // 箭头函数可使代码更简练
+    count: state => state.count,
+
+    // 传字符串参数 'count' 等同于 `state => state.count`
+    countAlias: 'count',
+
+    // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+    countPlusLocalState (state) {
+      return state.count + this.localCount
+    }
+})
+```
+
+```ts
+// 或者更简洁一点
+computed: mapState([
+  // 映射 this.count 为 store.state.count
+  'count'
+])
+```
+
+
+
 
 
 ## 7.7 TS 使用方法总结
