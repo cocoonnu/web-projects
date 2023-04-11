@@ -2,6 +2,95 @@
 
 
 
+### CSS 常用样式记录
+
+- **calc() 函数**
+
+参考文档：https://blog.csdn.net/p1967914901/article/details/127405749
+
+```scss
+width: calc(50% - 10px);
+width: calc((100% - 184.62px) / 2);
+```
+
+
+
+- **CSS 变量**
+
+```css
+:root {
+  --hue:180;
+}
+```
+
+
+
+- 宽度取内容宽度
+
+```css
+width: fit-content
+```
+
+
+
+- **渐变色定义**
+
+`0deg` 将创建一个从下到上的渐变，`90deg` 将创建一个从左到右的渐变。设置 0% - 100%
+
+```scss
+background: linear-gradient(90deg, rgba(223, 229, 230, 0) 0%,
+rgba(223, 229, 230, 1) 100%);
+```
+
+
+
+
+
+### CSS 选择器详解
+
+- 伪类选择器
+
+```css
+.test:first-of-type、first-child 选中类名为test并且为父元素的第一个元素，若不满足条件则无法选中
+
+
+.test:last-of-type、last-child 选中类名为test并且为父元素的最后一个元素，若不满足条件则无法选中
+
+
+.test:nth-child(n) 选中类名为test并且为在父元素指定位置n的一个元素，若不满足该条件则无法选中
+
+.test:nth-last-of-type(n) 选中类名为test并且为在父元素指定位置n的一个元素（从末尾开始计数）若不满足该条件则无法选中
+
+
+:link ：选择未被访问的链接
+:visited：选取已被访问的链接
+:active：选择活动链接
+:hover ：鼠标指针浮动在上面的元素
+:focus ：选择具有焦点的
+:root 设置HTML文档
+:empty 指定空的元素
+:enabled 选择可用元素
+:disabled 选择被禁用元素
+:checked 选择选中的元素
+:not(selector) 选择与 <selector> 不匹配的所有元素
+```
+
+
+
+- 属性选择器
+
+```csss
+[attribute*=value]：选择attribute属性值包含value的所有元素
+[attribute^=value]：选择attribute属性开头为value的所有元素
+[attribute$=value]：选择attribute属性结尾为value的所有元素
+```
+
+
+
+
+
+
+
 ### 对象常见函数总结
 
 - **Object.assign**
@@ -46,6 +135,10 @@ for (let key in obj) {}
 
 
 ### 数组常见函数总结
+
+https://vue3js.cn/interview/JavaScript/array_api.html
+
+
 
 - 普通方法总结
 
@@ -146,12 +239,148 @@ let newArr = arr.flat(Infinity)
 
 
 
-- for of 循环
+- **for of 循环**
 
 for...of 遍历一个可迭代对象，如数组、字符串、Map/Set（无对象） 。针对一个迭代对象，所以获得 value
 
 ```js
 for (let key of arr) {}
+```
+
+
+
+- **arr.sort(compareFn(a,b))**
+
+自定义规则排序数组：[MDN Array.prototype.sort()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+
+如果没有指定比较函数，那么数组按照转换后的字符串的各字符的[Unicode](https://so.csdn.net/so/search?q=Unicode&spm=1001.2101.3001.7020)位点进行排序。
+
+如果指明了比较函数，那么数组按照调用**该函数的返回值**进行排序。规则如下：
+
+- 函数遍历数组，a 和 b 为前一项和后一项
+
+- 如果`compareFunction(a,b)`小于0，那么`a`排`b`前面
+- 如果`compareFunction(a,b)`大于0，那么`a`排`b`后面
+- 如果`compareFunction(a,b)`等于0，那么`a,b`的相对位置不变
+
+
+
+```js
+// 默认排序从小到大
+arr.sort()
+
+// 自定义排序
+var items = [
+  { name: 'Edward', value: 21 },
+  { name: 'Sharpe', value: 37 },
+  { name: 'And', value: 45 },
+  { name: 'The', value: -12 },
+  { name: 'Magnetic' },
+  { name: 'Zeros', value: 37 }
+];
+
+items.sort((a, b) => {
+	const nameA = a.name.toUpperCase()
+	const nameB = b.name.toUpperCase()
+	if(nameA < nameB)	return -1
+	if(nameA > nameB)	return 1
+	return 0
+})
+```
+
+> 该方法会改变原数组
+
+
+
+
+
+### JS 常用函数总结
+
+- 30 个常用函数
+
+https://juejin.cn/post/7145036326373425159
+
+
+
+- JSON.stringify
+
+https://juejin.cn/post/7191712569394987065
+
+
+
+- Math
+
+```js
+Math.ceil() // 数字向上取整
+
+Math.round() // 四舍五入
+
+Math.abs() // 绝对值
+
+Math.floor() // 向下
+
+parseInt(a) // 字符串转化为整数（向下取整）
+
+isNaN(a * 1) // 判断 a 是不是数字
+
+toFixed：// 保留小数位
+
+Math.floor(Math.random() * num)：// 返回0到num-1的整数
+```
+
+
+
+- 字符串
+
+https://vue3js.cn/interview/JavaScript/string_api.html
+
+```js
+substr：// 截取字符串
+
+Arr.join() , Str.split() // 数组与字符串互相转化
+
+String.fromCharCode(ASCII码)：// 通过ASCII码返回字符 A从6
+
+charCodeAt(str)：// 返回str的ASCII码
+```
+
+
+
+
+
+- 其他函数
+
+```js
+navigator.clipboard.writeText(123); // 实现用户复制内容为123
+
+// 判断闰年
+function isLeapYear(year) { 
+    return (
+        (year % 4 == 0 && year % 100 != 0 && year % 400 !=0) ||
+        (year % 100 == 0 && year % 400 == 0)
+    );
+}
+
+// 显示当前时间
+setInterval(function() {
+    const timer = new Date();
+    let option = {hour : 'numeric',minute : 'numeric',second : 'numeric',hour12 : false,}
+    let formateTimer = new Intl.DateTimeFormat('en-us',option).format(timer)
+    console.log(formateTimer);
+},1000)
+```
+
+
+
+- **获取随机值**
+
+使用 `Mock.Random`：https://github.com/nuysoft/Mock/wiki/Mock.Random
+
+```js
+import Mock from 'mockjs'
+const Random = Mock.Random
+
+console.log(Random.date())
 ```
 
 
@@ -277,6 +506,8 @@ e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 
 
 ### BOM 操作记录
+
+https://vue3js.cn/interview/JavaScript/BOM.html
 
 - scrollIntoView
 
@@ -621,23 +852,6 @@ body {
 
 
 
-### calc 宽度计算
-
-```css
-.wrapper .buttons {
-    display: flex;
-    /* 宽度占父类的100% 并且子元素两边对齐 */
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.wrapper .buttons button {
-    /* 宽度基于父类的计算！！ */
-    width: calc(50% - 10px);
-}
-```
-
 
 
 ### CSS 输入框样式
@@ -704,62 +918,6 @@ document.onkeydown = function(event){
 
 > background-size 必须写在 background 后面！！！
 
-
-
-### 常用 JS 函数
-
-```js
-Math.ceil() // 数字向上取整
-
-Math.round() // 四舍五入
-
-Math.abs() // 绝对值
-
-Math.floor() // 向下
-
-parseInt(a) // 字符串转化为整数（向下取整）
-
-isNaN(a * 1) // 判断 a 是不是数字
-
-toFixed：// 保留小数位
-
-substr：// 截取字符串
-
-Arr.join() , Str.split() // 数组与字符串互相转化
-
-for (let i of items)：// 循环遍历
-
-String.fromCharCode(ASCII码)：// 通过ASCII码返回字符
-
-charCodeAt(str)：// 返回str的ASCII码
-
-Math.floor(Math.random() * num)：// 返回0到num-1的整数
-
-navigator.clipboard.writeText(123); // 实现用户复制内容为123
-
-arr.splice(下标，个数，替换的值) // 数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
-
-arr.splice(i,1) /删除数组中下标为i的值
-
-// 判断闰年
-function isLeapYear(year) { 
-    return (
-        (year % 4 == 0 && year % 100 != 0 && year % 400 !=0) ||
-        (year % 100 == 0 && year % 400 == 0)
-    );
-}
-
-// 显示当前时间
-setInterval(function() {
-    const timer = new Date();
-    let option = {hour : 'numeric',minute : 'numeric',second : 'numeric',hour12 : false,}
-    let formateTimer = new Intl.DateTimeFormat('en-us',option).format(timer)
-    console.log(formateTimer);
-},1000)
-
-// 新对象拥有全部属性，相同属性，后者覆盖前者
-const obj = {...apple, ...pen};
-```
 
 
 
@@ -917,11 +1075,19 @@ https://blog.csdn.net/qq_45981075/article/details/114551233
 
 ### VScode 设置记录
 
-- 在 vs code 中关闭对 js 文件校验：`搜索 validata 点击 TypeScript`
+- 在 vs code 中关闭对 js、ts 文件校验：`搜索 validata 点击 TypeScript`
 
 
 
+### VScode 配置全局代码片段
 
+快捷键：Ctrl + Shift + P 打开搜索，搜索 snippets 选择配置用户代码片段
+
+在下面选择 vue.json 配置vue的代码片段，进入网站：https://snippet-generator.app/
+
+配置然后粘贴即可。参考：https://blog.csdn.net/sinat_36359516/article/details/128042359
+
+ 
 
 
 ### Python 安装

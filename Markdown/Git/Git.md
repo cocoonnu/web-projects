@@ -35,7 +35,7 @@ git init
 >
 - 查看全局配置
 ```bash
-git config --lsit --global
+git config --lit --global
 git config 单项
 ```
 
@@ -96,12 +96,20 @@ git diff commitID 文件名  #和历史中的一个版本比较
 git diff  #不带文件名，则比较多个文件
 ```
 
-#### 1.3.5 撤销对文件的修改
+#### 1.3.5 撤销对文件的修改/
 
 ```bash
-若该文件显示已修改 modify
-git checkout -- filename #可撤销该文件的修改（工作区） 即返回文件上一个版本
+# 若该文件显示已修改或者已删除
+# 可撤销该文件的修改（工作区） 
+
+git checkout filename 
+
+git checkout . # 撤销工作区的所有修改
 ```
+
+> https://blog.csdn.net/qq_45677671/article/details/129022522
+
+
 
 #### 1.3.6 从暂存区中删除文件
 
@@ -393,6 +401,16 @@ git clone -b v0.1 地址   #指定tag下载代码
 ```
 
 
+
+#### 1.8 部署静态网站
+
+将项目 dist 文件夹部署到一个仓库中，进入仓库的 `setting` -> `pages`
+
+![image-20230325224204122](mark-img/image-20230325224204122.png)
+
+
+
+选择根路径然后点 `Save` 即可！
 
 
 

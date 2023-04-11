@@ -46,9 +46,15 @@ javaScript 语言本身是完善的函数式语言，在前端开发时，开发
 
 
 
-Node.js 安装与环境配置：https://blog.csdn.net/qq_43557395/article/details/124325563
+Node.js 安装与环境配置：https://blog.csdn.net/qq_42006801/article/details/124830995
+
+注意里面要更改 npm 安装位置，不要安装到 C盘！
 
 历史版本下载：https://nodejs.org/en/download/releases/
+
+
+
+安装依赖选择：npm 、yarn、cnpm
 
 
 
@@ -61,6 +67,8 @@ Node.js 安装与环境配置：https://blog.csdn.net/qq_43557395/article/detail
 
 
 安装教程：https://blog.csdn.net/qq_30376375/article/details/115877446
+
+直接安装即可，不用先卸载 Node.js
 
 
 
@@ -82,7 +90,7 @@ nvm install stable          // 安装最新稳定版
 
 
 
-## 1.3 node/nodemon 的使用
+## 1.3 nodemon 的使用
 
 直接 `node xxx.js` 即可编译 JS 文件，可在终端中输出结果
 
@@ -91,6 +99,91 @@ nvm install stable          // 安装最新稳定版
 全局安装nodemon（可自动监听 JS 文件的变化并重新编译）：`npm i -g nodemon`
 
 `nodemon xxx.js`
+
+
+
+## 1.4 yarn 的安装及使用
+
+yarn 是 facebook 发布的一款取代 npm 的包管理工具。在执行代码之前，Yarn 会通过算法校验每个安装包的完整性。Yarn 缓存了每个下载过的包，所以再次使用时无需重复下载。 同时利用并行下载以最大化资源利用率，因此安装速度更快。
+
+
+
+全局安装：
+
+```bash
+npm install -g yarn
+
+yarn --version
+```
+
+
+
+
+
+基本命令如下：
+
+- **初始化项目及安装依赖**
+
+```bash
+yarn init # 同npm init，执行输入信息后，会生成package.json文件
+
+yarn install # 安装package.json里所有包，并将包及它的所有依赖项保存进yarn.lock
+yarn install --flat # 安装一个包的单一版本
+yarn install --force # 强制重新下载所有包
+yarn install --production # 只安装dependencies里的包
+yarn install --no-lockfile # 不读取或生成yarn.lock
+yarn install --pure-lockfile # 不生成yarn.lock
+```
+
+
+
+- **添加项目依赖**
+
+```bash
+yarn add [package] # 在当前的项目中添加一个依赖包，会自动更新到package.json和yarn.lock文件中
+yarn add [package]@[version] # 安装指定版本
+yarn add [package]@[tag] # 安装某个tag（比如beta,next或者latest）
+
+# 指定依赖类型
+yarn add [package] --save/-S # 加到 dependencies（默认）
+yarn add [package] --dev/-D # 加到 devDependencies
+yarn add [package] --peer/-P # 加到 peerDependencies
+yarn add [package] --optional/-O # 加到 optionalDependencies
+```
+
+
+
+- **其他命令操作**
+
+```bash
+yarn publish # 发布包
+ 
+yarn remove <packageName> # 移除一个包，会自动更新package.json和yarn.lock
+ 
+yarn upgrade <packageName> # 用于更新包到基于规范范围的最新版本
+
+yarn run # 用来执行在 package.json 中 scripts 属性下定义的脚本
+ 
+yarn info <packageName> # 显示某个包的信息
+ 
+yarn cache # 缓存当前项目依赖 
+yarn cache list # 列出已缓存的每个包 
+yarn cache dir # 返回 全局缓存位置 
+yarn cache clean # 清除缓存
+```
+
+
+
+- **全局配置项**
+
+```bash
+yarn config list # 显示所有配置项
+yarn config get <key> # 显示某配置项
+yarn config delete <key> # 删除某配置项
+yarn config set <key> <value> [-g|--global] # 设置配置项
+```
+
+
 
 
 
@@ -171,7 +264,9 @@ module.exports = {
 
 **（二）exports**
 
-为了方便，Node.js 为每个模块提供一个 `exports` 变量，指向 `module.exports`。这等同在每个模块头部，有一行这样的命令：
+为了方便，Node.js 为每个模块提供一个 `exports` 变量，指向 `module.exports`。
+
+这等同在每个模块头部，有一行这样的命令：
 
 ```js
 var exports = module.exports
@@ -250,7 +345,9 @@ npm 是随同 Nodejs 一起安装的包管理工具，能解决Nodejs代码部�
 注：命令 `npm install [package name]`
 
 1、 将依赖安装到项目 node_modules 目录下。
-2、不会将依赖写入 devDependencies 或 dependencies 节点（不一定。。。）
+2、不会将依赖写入 devDependencies 或 dependencies 节点
+
+3、会写在 package-lock.json，所以 `npm i` 时还是会下载
 
 > 所以最好表明是 -S 还是 -D  还是官方的命令吧！！！
 
@@ -296,10 +393,6 @@ package-lock.json 是在运行 `npm install` 时生成的一个文件，用于�
 
 
 
-
-
-
-
 ## 3.3 切换下载镜像源
 
 - 手动设置
@@ -336,9 +429,31 @@ nrm use taobao
 
 - 利用 cnpm 命令
 
-参考文档：https://blog.csdn.net/fyq158797/article/details/126500120
+```
+// 全局安装
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+
+cnpm -v
+```
 
 
+
+
+
+## 3.4 修改包的版本
+
+先将 `node_modules`、`package-lock.json` 删除
+
+```
+rm -rf node_modules
+rm -rf package-lock.json
+```
+
+再修改 `package.json` 中包的版本，最后在 `npm i`
+
+
+
+最好不要不要直接卸载依赖！！会莫名其妙有很多错误！！！
 
 
 
@@ -743,7 +858,7 @@ const userHandler = require('../router_handler/user');
 // 响应
 userRouter.post('/login',userHandler.login);
 
-userRouter.post('/regUser',userHandler.regUser);
+userRouter.post('/regUser',userHandler.regUser);	
 
 // 记得导出！
 module.exports = userRouter

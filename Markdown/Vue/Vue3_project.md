@@ -172,19 +172,37 @@ ElMessage.error(result.data)
 
 
 
-### 6、配置 Eslint
+### 6、Vue3 项目配置 Eslint
+
+
+
+- **安装 Eslint**
+
+安装 Eslint
 
 `npm i eslint`
 
+
+
+生成 `.eslintrc` 文件
+
 `npx eslint --init`
 
-
-
-最后配置选项按照这个
+配置选项按照这个：
 
 ![image-20230221102452](mark-img/image-20230221102452.png)
 
 
+
+
+
+- **配置 Eslint**
+
+安装 Eslint 插件，启用即可
+
+vscode 配置：https://blog.csdn.net/my_new_way/article/details/105177909
+
+eslint 官网：https://zh-hans.eslint.org/docs/latest/
 
 
 
@@ -204,6 +222,8 @@ sass 帮助我们集中式管理 css 样式
 // 定义变量
 $red: red;
 
+$name: name-container;
+
 // 定义函数（css 集中样式）
 @mixin background-black {
     background-color: black;
@@ -215,6 +235,9 @@ $red: red;
 }
 
 @include turn-red(red) // 传了就变成红色！
+    
+// 插值语法
+#{}
 ```
 
 
@@ -230,7 +253,14 @@ div {
     height: 200px;
     color: $red;
     @include background-black;
-}   
+    
+    // 插值语法的使用
+    color: #{$primaryColor}
+}
+    
+.#{$name} {
+
+}
 </style>
 ```
 
@@ -265,6 +295,10 @@ axios 官网：https://axios-http.com/zh/
 
 
 
+首先确定请求域名，详细请看 vite 配置代理那一节
+
+
+
 - 在 untils 下新建 `http.ts` ，下面是封装模板
 
 ```ts
@@ -272,8 +306,14 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
 const defaultConfig = {
     timeout: 5000,
-    // baseURL: import.meta.env.PROD ? 'http://110.42.184.111' : 'http://localhost:3000/release'
-    // baseURL: '/api'
+    
+    // 生产环境
+    // baseURL: import.meta.env.PROD ? 'http://110.42.184.111' : 'http://localhost:5137/release'
+    
+    // 开发环境
+    baseURL: 'http://localhost:5173/release'   
+    
+    // 如果没配置 vite 代理也可以不写 baseURL
 }
 
 // TS 封装
@@ -342,6 +382,8 @@ export const reqgetCategoryList = function () {
 ```
 
 > 接口函数返回一个 promise 对象，分为成功态和失败态，需要 `async/await` 函数接收
+>
+> 没有 baseURL 就要把地址写全来！
 
 
 
@@ -1980,7 +2022,7 @@ export async function render(url: string) {
 
 ```ts
 import { http } from '@/utils/http'
-import mockRequests from '@/mock/mockRequests'
+import mockHttp from '@/mock/mockHttp'
 
 
 // 真实接口
@@ -1991,7 +2033,7 @@ export const reqgetRoomList = function () {
 
 // mock 接口（需要提起封装好 mock 请求）
 // export const reqgetRoomList = function () {
-//     return mockRequests.get('/roomList');
+//     return mockHttp.get('/roomList');
 // }
 ```
 
@@ -2661,7 +2703,17 @@ async asyncData({ store, route }: any) {
 
 
 
- ### 12、vite 配置代理跨域
+ ### 12、Vite 配置代理跨域
+
+- **前提是 axios 必须进行过二次封装！！！**
+
+
+
+- 配置代理跨域就是使得发送请求时不用把整个 url 写出来，同时解决跨域问题
+
+对于只在开发环境运行的话，单端或多端都知道怎么配置
+
+对于要调试生产环境目前只知道单端
 
 
 
@@ -2698,19 +2750,21 @@ server: {
 
 
 
-`http.ts`
+`utils/http.ts`（axios 封装的入口文件）
 
 ```ts
 const defaultConfig = {
     timeout: 5000,
     
     // 生产环境
-    // baseURL: import.meta.env.PROD ? 'http://110.42.184.111' : 'http://localhost:3000/release'
+    // baseURL: import.meta.env.PROD ? 'http://110.42.184.111' : 'http://localhost:5173/release'
     
     // 开发环境
     baseURL: 'http://localhost:5173/release'
 }
 ```
+
+> 配置 baseURL，生产环境下必须是原域名？！
 
 
 
@@ -2765,6 +2819,8 @@ const defaultConfig = {
 }
 ```
 
+> 生产环境怎么办？？？？好像是将本地域名改成已上线的域名即可
+
 
 
 `api/index.ts`：需要区分前缀！
@@ -2780,68 +2836,6 @@ export const reqgetRoomDetail = function (params) {
 ```
 
 
-
-
-
-### 13、ts 进行复杂类型规范
-
-参考：https://blog.csdn.net/Lyrelion/article/details/113571078
-
-- TypeScript 定义复杂变量
-
-```ts
-// bad
-columnData: any[] = []
- 
-// good
-interface ColumnData {
-  title?: string;
-  key?: number;
-  type?: string;
-  render?: object;
-}
- 
-columnData: ColumnData[] = []
-```
-
-
-
-- 使用 PropType 定义 vue props 数据类型
-
-```ts
-// 这是一个复杂的数据类型接口
-export interface ColumnProps {
-  _id: number;
-  title: string;
-  description: string;
-}
-
-
-// bad
-  props: {
-    list: {
-      type: ColumnProps[],
-      required: true
-    }
-  }
- 
-// good
-import { PropType } from 'vue'
-export interface ColumnProps {
-  _id: string;
-  title: string;
-  description: string;
-}
- 
-  props: {
-    list: {
-      // 此处的 Array 并不是变量类型，而是构造函数
-      // 通过 PropType 指定构造函数的类型
-      type: Array as PropType<ColumnProps[]>,
-      required: true
-    }
-  }
-```
 
 
 
@@ -3209,11 +3203,21 @@ if (key == 'orders') {
 
 骨架屏样式：https://element-plus.gitee.io/zh-CN/component/skeleton.html
 
+Suspense 文档：https://cn.vuejs.org/guide/built-ins/suspense.html
+
+
+
+实现 Suspense 的满足条件：
+
+-  组件 `<script setup>` 有顶层 `await` 表达式
+
+- 组件通过异步加载引入
+
 
 
 这里正好介绍一下如何使用异步组件并且百分百搭配骨架屏！
 
-- 父组件使用异步组件模板
+- 父组件引入异步组件
 
 ```ts
 // 引入异步组件方式
@@ -3517,7 +3521,7 @@ import mUI from './components/index'
 
 
 
-#### 9.2 城市筛选器
+#### 9.2 地区筛选器
 
 封装 `ChooseIcon` 组件：对应 `components/ChooseArea` 文件夹
 
@@ -3545,7 +3549,7 @@ function getAreaData(areaData: any) {
 
 #### 9.3 时间选择器
 
-
+实现了时间、日期的区间选择
 
 
 
@@ -3553,7 +3557,7 @@ function getAreaData(areaData: any) {
 
 scrollIntoView 用法：https://blog.csdn.net/learn8more/article/details/108047794
 
-
+这个组件使用的是 Ant Design of Vue 组件库
 
 
 
@@ -3733,7 +3737,7 @@ let formRef = ref<FormInstance>()
 ```
 
 ```ts
-// 提交重置函数
+// 提交表单
 function confirmForm(formRef: FormInstance | undefined) {
     if (!formRef) return false
 
@@ -3752,6 +3756,8 @@ function confirmForm(formRef: FormInstance | undefined) {
     })
 }
 
+
+// 重置表单
 function cancelForm(formRef: FormInstance | undefined) {
     if (!formRef) return false
 
@@ -3772,11 +3778,6 @@ function cancelForm(formRef: FormInstance | undefined) {
 巩固了插槽的使用，熟练了mitt事件总线的使用
 
 表格用 `data` 存入，通过传递 `scope` 行数据进行对表格数据的修改，而且会生效！
-
-```vue
-```
-
-
 
 
 
@@ -3834,6 +3835,207 @@ nextTick(function() {
 
 
 
-### 11、mockjs 使用方法
+### 11、Mockjs 使用方法
 
-官网：http://mockjs.com/
+Mockjs 使用文档：https://github.com/nuysoft/Mock/wiki/Mock.Random
+
+
+
+Mock.js用于生成随机数据或者自己模拟数据，然后再通过发送 mock 请求来获取，可实现拦截 ajax 请求，返回 mock 数据的效果
+
+
+
+安装：`npm i mockjs -D` （ TS 安装：`npm i mockjs -D  @types/mockjs`）
+
+
+
+- **先封装 mockHttp**
+
+我们将 mock 接口和普通接口使用的 Http.js（axios 二次封装入口文件）区分开来
+
+`utils/mockHttp.js`
+
+```js
+// mock接口的ajax封装
+
+import axios from 'axios';
+
+// 进度条
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css';
+
+const mockHttp = axios.create({
+
+    //基础路径 请求url默认开头会加上baseURL
+    baseURL: "/mock",
+    
+    //请求不能超过5S
+    timeout: 5000,
+
+});
+
+//请求拦截器----在项目中发请求前执行的函数
+mockHttp.interceptors.request.use(function(config) {
+
+    // 加载进度条
+    nprogress.start();
+
+    return config;
+})
+
+//响应拦截器----当服务器响应请求后的回调函数
+mockHttp.interceptors.response.use(
+    // 成功回调
+    function(res) {
+        // 进度条结束
+        nprogress.done();
+
+        // 直接返回响应体的 data 作为 promise对象 的value
+        return res.data
+    },
+
+    // 失败回调
+    function(err) {
+        nprogress.done();
+
+        console.log('mock数据请求失败');
+        return err;
+    }
+)
+
+export default mockHttp;
+```
+
+
+
+- **再自定义 mock 请求**
+
+自定义 mock 请求分为两种： `post`、`get` 请求
+
+新建 mock 文件夹，在 `mockServer.js` 文件设置请求响应
+
+
+
+**`get` 请求**
+
+`mockServer.js`
+
+```js
+import Mock from 'mockjs'
+
+// 引入 json 数据
+import banner from './data/banner.json'
+
+// 设置响应
+Mock.mock('/mock/banner',{
+    data: banner,    
+})
+```
+
+
+
+**`post` 请求**
+
+`data/list.ts`
+
+```ts
+import Mock from 'mockjs'
+const Random = Mock.Random
+
+// 数据接口类型
+interface DataList {
+    date: string,
+    name: string,
+    address: string
+}
+
+// 用于接受生成数据的数组
+const dataList: DataList[] = []
+for (let i = 0; i < 100; i++) {
+    const template = {
+        date: Random.date(), // 生成一个随机日期,可加参数定义日期格式
+        name: Random.name(), // 生成姓名
+        address: Random.province() // 生成地址
+    }
+    dataList.push(template)
+}
+
+export defalut dataList
+```
+
+`mockServer.js`
+
+```ts
+import dataList from './data/list'
+
+// list 分页接口
+Mock.mock('/mock/list', 'post', (params: any) => {
+
+    let info = JSON.parse(params.body)
+    let [index, size, total] = [info.current, info.pageSize, dataList.length]
+    let len = total / size
+    let totalPages = len - parseInt(String(len)) > 0 ? parseInt(String(len)) + 1 : len
+    let newDataList = dataList.slice(index * size, (index + 1) * size)
+
+    return {
+        'code': '200',
+        'message': '获取成功',
+        'data': {
+            'current': index,
+            'pageSize': size,
+            'rows': newDataList,
+            'total': total,
+            'totalPages': totalPages
+        }
+    }
+})
+```
+
+> Mock.Random 的使用方法在文档中
+
+
+
+
+
+- **最后在 main.ts 中激活 mock 服务**
+
+```js
+import '@/mock/mockServe'
+```
+
+
+
+- **请求函数的编写**
+
+`api/index.ts`
+
+```js
+import mockHttp from '@/utils/mockHttp'
+
+// get
+export const reqgetBannerList = function() {
+    return mockHttp.get('/banner');
+}
+
+// post
+export const fetchTableData = function (currentPage: number, pageSize: number) {
+    return mockHttp.post('/list', {
+        current: currentPage,
+        pageSize: pageSize,
+    })
+}
+```
+
+
+
+```ts
+let result = await fetchTableData(currentPage.value, pageSize.value)
+
+if (result.data.code == '200') {
+
+    totalData.value = result.data.data.total
+    pageSize.value = result.data.data.pageSize
+    tableData.value = result.data.data.rows
+}
+```
+

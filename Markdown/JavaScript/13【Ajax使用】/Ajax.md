@@ -422,11 +422,21 @@ console.log(xhr.response);
 
 [ Axios 中文网 | Axios 是一个基于 promise 的网络请求库，可以用于浏览器和 node.js (axios-http.cn)](https://www.axios-http.cn/)
 
-[https://www.bootcdn.cn/axios/](https://www.bootcdn.cn/axios/)
+CDN：[https://www.bootcdn.cn/axios/](https://www.bootcdn.cn/axios/)
+
+
+
+axios 无法发送 `https` 请求？！
+
+
 
 ### 3.1 引入Axios
 
+```html
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+```
+
+
 
 ### 3.2 使用Axios
 

@@ -921,6 +921,8 @@ setup(){
 
 # 四、其它 Composition API
 
+
+
 ## 4.1 shallowReactive/shallowRef
 
 - shallowReactive：只处理对象**最外层**属性的响应式（浅响应式）。
@@ -1168,31 +1170,6 @@ function addCar() {
 
 
 
-
-
-# 五、Composition API 的优势
-
-
-
-## 4.1 Options API 存在的问题
-
-使用传统 OptionsAPI 中，新增或者修改一个需求，就需要分别在data，methods，computed里修改 。
-
-<div>
-<img src="mark-img/f84e4e2c02424d9a99862ade0a2e4114tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=left/>
-<img src="mark-img/e5ac7e20d1784887a826f6360768a368tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=right/>
-</div>
-
-
-
-## 4.2 Composition API 的优势
-
-我们可以更加优雅的组织我们的代码，函数。让相关功能的代码更加有序的组织在一起。
-
-<div>
-<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bc0be8211fc54b6c941c036791ba4efe~tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=left/>
-<img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6cc55165c0e34069a75fe36f8712eb80~tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;" align=right/>
-</div>
 
 
 
@@ -1447,8 +1424,6 @@ Demo.vue
 
 ## 7.1 使用 vite 创建
 
-
-
 vite官网：https://vitejs.cn/
 
 - 什么是vite？—— 是Vue团队打造的新一代前端构建工具。
@@ -1548,7 +1523,7 @@ export default defineConfig({
 
 
 
-### 7.1.3 配置 `@` 根路径
+### 7.1.3 配置绝对路径
 
 **vite.config.ts**
 
@@ -2048,7 +2023,7 @@ console.log(attrs)
 
 当父组件要控制 el 组件的显示与隐藏时，以下是步骤和方法：
 
-继承了 `defineEmits+defineProps  ` 这个知识点，还多了一个步骤
+继承了上面 `props 双向绑定  ` 这个知识点，还多了一个步骤
 
 
 
@@ -2088,10 +2063,11 @@ const props = defineProps<{
     dialogVisible: boolean,
 }>()
 
+let emits = defineEmits(['update:dialogVisible'])
+
 // 初始化
 let dialogVisibleIn = ref<boolean>(props.dialogVisible)
 
-let emits = defineEmits(['update:dialogVisible'])
 
 // 同时监听两个显示变量的变化
 watch(() => props.dialogVisible, (newValue) => {
@@ -2259,10 +2235,6 @@ import { getCurrentInstance } from 'vue'
 const cxt = getCurrentInstance() //相当于Vue2中的this
 const bus = cxt!.appContext.config.globalProperties.$bus
 
-function getAreaData(areaData: any) {
-    console.log(areaData)
-}
-
 function emitMitt() {
     // 触发绑定事件事件
     bus.emit('printMessage', '111')
@@ -2270,6 +2242,20 @@ function emitMitt() {
 ```
 
 
+
+如果报错试一试这样引入：
+
+```ts
+// 定义事件总线
+import { getCurrentInstance } from 'vue'
+const cxt = getCurrentInstance()
+let bus: any = null
+if (cxt) bus = cxt.appContext.config.globalProperties.$bus
+```
+
+
+
+注：这个不能抽离成单独的函数或者 hook
 
 
 
@@ -2435,7 +2421,7 @@ export interface FormOptions {
 // 作为对象
 let optionsItem: FormOptions = {}
 
-// 作为数组
+// 作为对象数组
 let options: FormOptions[] = [{}, {}]
 ```
 
@@ -2701,5 +2687,399 @@ import { useSlots } from 'vue'
 
 // 获取插槽内容
 let slots = useSlots()
+```
+
+
+
+
+
+## 7.9 v-model 详细介绍
+
+
+
+**基础的 v-model 理解：**
+
+https://cn.vuejs.org/guide/essentials/forms.html
+
+当使用表单数据双向绑定时，手动绑定会比较麻烦：
+
+```vue
+<input
+  :value="text"
+  @input="event => text = event.target.value"
+>
+```
+
+使用 v-model 会自动将**表单的 value 值**进行双向绑定
+
+```vue
+<input v-model="text">
+```
+
+
+
+除了 input 表单，还可以自动绑定其他表单类型的值，例如：
+
+- 多行文本
+
+```vue
+<textarea v-model="message" placeholder="add multiple lines"></textarea>
+```
+
+
+
+- 复选框
+
+```vue
+<input type="checkbox" id="checkbox" v-model="checked" />
+<label for="checkbox">{{ checked }}</label>
+```
+
+
+
+- 单选框
+
+```vue
+<input type="radio" id="one" value="One" v-model="picked" />
+<label for="one">One</label>
+```
+
+
+
+>另外还有 v-model 修饰符：https://cn.vuejs.org/guide/essentials/forms.html#lazy
+
+
+
+
+
+**组件上的 v-model：**
+
+https://cn.vuejs.org/guide/components/v-model.html
+
+
+
+如果对组件进行 v-model，会默认对一个 `modelValue` 变量进行绑定
+
+```vue
+<CustomInput v-model="searchText" />
+
+// 等效于
+<CustomInput
+  :modelValue="searchText"
+  @update:modelValue="newValue => searchText = newValue"
+/>
+```
+
+因此子组件需要接收 props、emits
+
+```js
+props: ['modelValue'],
+emits: ['update:modelValue'],
+    
+this.$emit('update:modelValue', value)
+```
+
+
+
+同时还可以指定变量名进行绑定
+
+```vue
+<MyComponent v-model:title="bookTitle" />
+```
+
+```js
+props: ['title'],
+emits: ['update:title'],
+    
+this.$emit('update:title', value)
+```
+
+
+
+# 八、Pinia 使用教程
+
+官方网址：https://pinia.vuejs.org/zh/
+
+参考文档：https://blog.csdn.net/weixin_42365757/article/details/123848276
+
+
+
+## 8.1 创建仓库
+
+在 `store` 下新建 `index.ts` 文件
+
+```ts
+import { defineStore} from 'pinia'
+
+export const useMainStore = defineStore('main',{
+  state:()=>{
+    return {}
+  },
+  getters:{},
+  actions:{}
+})
+```
+
+> 这就是一个仓库的基础结构了
+
+
+
+
+
+## 8.2 实现响应式数据
+
+这里介绍在组件中使用 store 中的数据，第一种方式直接可修改，后两种方式把变量当成 ref 就行了
+
+
+
+- 直接使用
+
+```ts
+import { useMainStore } from '@/store'
+const store = useMainStore()
+
+// 使用
+console.log(store.count)
+
+// 直接修改
+store.count++
+```
+
+
+
+- 通过计算属性简化
+
+```ts
+import { useMainStore } from '@/store'
+const store = useMainStore()
+
+const doubleValue = computed(() => store.doubleCount)
+console.log(doubleValue.value)
+```
+
+> doubleValue 本质是一个 ref 响应式代理
+
+
+
+- 通过解构赋值简化
+
+```js
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
+const store = useMainStore()
+
+const { helloPinia, count } = storeToRefs(store)
+console.log(count.value)
+console.log(helloPinia.value)
+```
+
+> helloPinia, count 本质是一个 ref 响应式代理
+
+
+
+## 8.3 $patch 修改仓库数据
+
+可在组件中使用 $patch 直接修改仓库数据
+
+
+
+- 使用方式一：对象形式
+
+```js
+const handleClickPatch = () => {
+    store.$patch({
+        count: store.count + 2,
+        helloPinia: store.helloPinia === 'Hello Pinia!' ? 'Hello World!' : 'Hello Pinia!' 
+    })
+}
+```
+
+
+
+- 使用方式二：函数形式
+
+```js
+const handleClickMethod = ()=> {
+    store.$patch((state)=>{
+        state.count ++
+        state.helloPinia = state.helloPinia + 'Hello Pinia!'
+    })
+}
+```
+
+> state 就是 store 仓库里的 state
+
+
+
+
+
+## 8.4 action 的使用
+
+如果你有一个修改的过程非常复杂，你可以先在store里，定义好actions中的函数，然后在组件里再调用函数。
+
+```js
+actions: {
+    changeState() {
+        this.count++
+        this.helloPinia = 'change helloPinia!!!'
+    }
+}
+```
+
+> this 直接指向仓库对象
+
+
+
+组件中直接调用 action
+
+```js
+const handleClickActions = ()=>{
+    store.changeState()
+}
+```
+
+
+
+
+
+## 8.5 getters 的使用 
+
+就是当成计算属性使用即可
+
+
+
+- 普通定义
+
+```js
+state:() => { 
+    return {
+        helloPinia: 'Hello Pinia!',
+        count: 0,
+        phone:'17808098401'
+    } 
+},
+
+getters:{
+  phoneHidden(state) {
+    return state.phone.toString().replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2')
+  }
+},
+```
+
+```js
+console.log(store.phoneHidden)
+```
+
+
+
+getters 的缓存特性：只有当所依赖项 `state.phone` 发生改变时，`phoneHidden()` 才会被执行，普通调用并不会被执行
+
+
+
+- 可接收参数
+
+```js
+export const useStore = defineStore('main', {
+  getters: {
+      
+    getUserById: (state) => {
+      return (userId) => state.users.find((user) => user.id === userId)
+    },
+      
+  },
+})
+```
+
+```vue
+<script setup>
+import { useUserListStore } from './store'
+const userList = useUserListStore()
+
+console.log(store.getUserById(2))
+</script>
+
+<template>
+  <p>{{ getUserById(2) }}</p>
+</template>
+```
+
+
+
+## 8.6 创建多个仓库
+
+在 `store` 下再新建 `home.ts` 
+
+```js
+import { defineStore} from 'pinia'
+
+export const useHomeStore = defineStore('home',{
+  state:()=>{
+    return {}
+  },
+  getters:{},
+  actions:{}
+})
+```
+
+
+
+在组件中或者在其他仓库中使用都是可以的
+
+```js
+import { useHomeStore } from './home.ts'
+const homeStore = useHomeStore()
+```
+
+
+
+## 8.7 TypeScript 支持
+
+
+
+**state 数据**
+
+- 接口形式
+
+```ts
+interface State {
+  userList: UserInfo[]
+  user: UserInfo | null
+}
+
+const useStore = defineStore('storeId', {
+  state: (): State => {
+    return {
+      userList: [],
+      user: null,
+    }
+  },
+})
+
+interface UserInfo {
+  name: string
+  age: number
+}
+```
+
+
+
+- 普通形式
+
+```ts
+const useStore = defineStore('storeId', {
+  state: () => {
+    return {
+        
+      userList: [] as UserInfo[],
+      user: null as UserInfo | null,
+        
+    }
+  },
+})
+
+interface UserInfo {
+  name: string
+  age: number
+}
 ```
 
