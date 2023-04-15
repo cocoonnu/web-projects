@@ -599,6 +599,8 @@ JWT 的三个组成部分，从前到后分别是 Header、Payload、Signature�
 
 案例：设置进入首页时，如果没登录则进入登录页面，登录过则可以进入首页
 
+github：https://github.com/auth0/node-jsonwebtoken
+
 
 
 #### 2.2.2.1 初始化
@@ -701,7 +703,7 @@ app.post('/index',function(req,res) {
             const data = {
                 statue: 1,
                 msg: 'token有效',
-                decoded: decoded
+                decoded: decoded // 一个对象，里面有解密后的jwt
             };
 
             res.send(data);

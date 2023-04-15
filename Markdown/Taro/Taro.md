@@ -366,15 +366,57 @@ export default definePageConfig({
 
 
 
-### 1.3.2 组件报错记录
+
+
+### 1.3.3 components组件记录
+
+记录所有用到的组件，页面组件放在 `page` 中，单独组件放在 `components`，部分单独组件还存在子组件（放在该组件的文件夹中）。`hooks` 的文件夹名对应组件名的 `hook` 函数 
 
 
 
-- `image` 标签居然无法绑定事件！
+- Home：首页
+
+- Order：订单页
+
+- WeLogin：微信登录页
+
+- QueryTicket：查询订单页
+
+- Calendar：日历页
+
+- OrderDetail：单个订单预定页
+
+  
+
+- BuyFrame：首页 tab 栏
+
+- BuyContent：首页 tab 栏 - 订机票内容组件
+
+- CityChoose：首页城市选择模态框
+
+- OrderItem：首页订单信息组件
+
+- HomeTop：首页顶部显示组件
+
+- SwiperBox：首页轮播图组件
+
+- CalendarTab：查询订单页面的顶部滑动日历栏
+
+- FlightInfo：查询订单页面的内容区域
+
+- FlightItem：查询订单页面的内容区域 - 子组件
+
+- OrderScroll：订单页内容区域
+
+- PageOrder：订单页内容区域 - 订单组件
+
+- OrderFrame：订单页顶部tab栏
 
 
 
-### 1.3.3 ScrollView 使用方法
+
+
+### 1.3.4 ScrollView 使用方法
 
 官网：https://nervjs.github.io/taro-docs/docs/components/viewContainer/scroll-view
 
@@ -514,6 +556,30 @@ export default definePageConfig({
 
 
 
+**滚动到顶部的方法：**
+
+```ts
+// 滚动条位置 初始化先为-1（默认在顶部）
+let scrollTop = ref<number>(-1)
+```
+
+当滚动时发现 `scrollTop` 并不会变化，所以并不会双向绑定
+
+但是后期如果改变 `scrollTop` 的值，那么滚动条会跟着变化
+
+```ts
+onMounted(function() {
+
+    // 监听事件 点击顶部日历栏时回到顶部
+    Taro.eventCenter.on('toTopFlightInfo', () => {
+        scrollTop.value = 0
+    })
+
+})
+```
+
+
+
 
 
 ## 1.4 Taro 项目问题汇总
@@ -556,22 +622,15 @@ const config = {
 
 
 
-### 1.4.2 components组件说明
+### 1.4.2 登录组件构建流程
 
-记录所有用到的组件，页面组件放在 `page` 中，单独组件放在 `components`，部分单独组件还存在子组件（放在该组件的文件夹中）。`hooks` 的文件夹名对应组件名的 `hook` 函数 
+- 首先确保服务端 `login` 接口已经实现，创建 `weLogin.vue` 页面组件，通过 `weChatLogin` 函数发送请`loginCallBack` 处理之后的回调。
 
+- 如果登录成功，则前端会将服务端发送的 `loginToken` 进行存储
 
+- 如果登录失败，可以去查看报错信息，通常是 `ip` 地址不是白名单。（只需开发阶段设置，开启后只有白名单内的IP可以调用参数为AppSecret的接口）
 
-- BuyFrame：首页 tab 栏
-- BuyContent：首页 tab 栏 - 订机票内容组件
-- CityChoose：城市选择模态框
-- OrderItem：首页的订单信息组件
-- HomeTop：首页顶部显示组件
-- OrderDetail：订单页的订单信息组件
-- SwiperBox：首页轮播图组件
-- CalendarTab：查询订单页面的顶部滑动日历栏
-
-
+- 进入 微信小程序开发者平台 - 开发管理 - 开发设置- 添加**IP白名单**即可
 
 
 
@@ -889,6 +948,8 @@ handleDelete() {
 
 ### 1.4.9 Taro 编译报错记录
 
+- **问题一**
+
 Issues：https://github.com/NervJS/taro/issues/13544
 
 ![image-20230411151506245](mark-img/image-20230411151506245.png)
@@ -899,7 +960,45 @@ https://github.com/NervJS/taro/issues/13544#issuecomment-1491244715
 
 
 
+- **问题二**
 
+Issues：https://github.com/jdf2e/nutui/issues/2126，使用 `NutCalendar` 组件之后报错
+
+![image-20230413212929791](mark-img/image-20230413212929791.png)
+
+报错原因：https://github.com/NervJS/taro/issues/7160
+
+解决方法也在 组件与组件库 那里，但是治标不治本
+
+
+
+- **问题三**
+
+Issuses：https://github.com/jdf2e/nutui/issues/1219，使用 `nut-cascader` 组件之后报错
+
+![image-20230413213312380](mark-img/image-20230413213312380.png)
+
+`chooseCity` 组件中 `onMounted` 的出现问题
+
+```ts
+if (Taro.getStorageSync('cityList')) {
+
+    cityList.value = Taro.getStorageSync('cityList')
+
+} else {
+
+    cityList.value = await getCityList()
+    Taro.setStorageSync('cityList', cityList.value)
+}
+```
+
+当通过获取缓存的方式给 `cityList` 赋值时，就会报这个错误。太奇怪了！！！
+
+那就不用缓存的方式来减少 `http` 请求了，直接赋值
+
+```ts
+cityList.value = await getCityList()
+```
 
 
 
@@ -923,7 +1022,7 @@ mysql2：https://github.com/sidorares/node-mysql2
 
 安装 mysql 数据库即初始化流程：`D:\文档\Downloads\Software\MySQL for Windows\安装教程\README.md`
 
-进入 navicat 新建数据库 `taro-mysql`，新建表 `users`
+进入 navicat 新建数据库 `taro-mysql`，在 `server` 文件夹下新建 `build` 文件夹，当有数据库表需要建立的时候在此文件夹下执行
 
 
 
@@ -1402,7 +1501,7 @@ select  *  from  student  order  by  math  desc, english  desc;
 
 **GET参数的获取**
 
-Express 框架中使用 `req.query` 即可 获取 GET 参数 ，框架内部会将GET参数转换为 JS 对象
+Express 框架中使用 `req.query` 即可 获取 GET 参数，`req.query` 为参数对象
 
 ```js
 flightRouter.get('/getflightList', async function(req, res) {
@@ -1415,6 +1514,10 @@ flightRouter.get('/getflightList', async function(req, res) {
     })
 })
 ```
+
+**注意：**
+
+- 如果 `req.query.item` 为一个对象类型，则必须 `JSON.parse(req.query.item)` 一下
 
 
 
@@ -1454,13 +1557,15 @@ flightRouter.post('/getflightList', async function(req, res) {
 
 
 
-### 1.5.6 爬取城市机场数据
+### 1.5.6 服务端创建数据库表
 
 在 `server` 文件夹中新建 `build` 文件夹，执行内部 JS 文件即可爬取数据。
 
 
 
-爬取城市机场列表数据流程：`build/airport.js`
+- **爬取城市机场列表数据流程**
+
+`build/airport.js`
 
 ```js
 const sqlQuery = require('../mysql')
@@ -1518,10 +1623,17 @@ buildAirPortList()
 
 
 
-- 执行 `node airport.js` 一次即可！本地数据库可更新数据
+1、执行 `node airport.js` 一次即可！本地数据库可更新数据
 
-- 注意模板字符串那里，如果是**字符串类型**那么还需要加一层引号：`'${cityName}'`
-- 插入数据的 sql 语句不能换行！！
+2、注意模板字符串那里，如果是**字符串类型**那么还需要加一层引号：`'${cityName}'`
+
+3、插入数据的 sql 语句不能换行！！
+
+
+
+- **创建用户订单数据表**：`build/useInfo.js`
+
+
 
 
 
@@ -1589,6 +1701,38 @@ const dayString = dayjs('2019-01-25').format('[YYYYescape] YYYY-MM-DDTHH:mm:ssZ[
 ```
 
 
+
+
+
+### 1.5.8 login 接口配置指南
+
+微信小程序实现登录业务流程：https://blog.csdn.net/weixin_41973410/article/details/113241813
+
+- 首先前端通过 `taro.login` 获取到 `code`
+- 再将 `code` 发送请求到服务端，地址：`src\pages\WeLogin\index.vue`
+- 服务端通过设置 `login` 接口向微信服务器发送请求获取到 `openid`
+- `openid` 为微信用户唯一标识，服务端加密成 `token` 字符串返回给前端
+- 前端存储 `token`，当发送涉及用户信息的请求时携带
+
+
+
+**login 接口实际作用：返回前端一个加密且具有时限的 `openid` 的 `token` 字符串**
+
+对应地址：`server/models/login.js/getLoginKey`
+
+
+
+### 1.5.9 开通服务器域名配置
+
+开发阶段并且小程序在电脑端预览的时候，服务端可以使用本地端口调用请求：`http://localhost:3000`
+
+但是在手机端预览或者上线时必须用**云服务器端口！！**
+
+文档说明：https://developers.weixin.qq.com/miniprogram/dev/framework/ability/network.html
+
+
+
+进入 微信小程序开发者平台 - 开发管理 - 开发设置 - 配置服务器域名
 
 
 
@@ -1758,7 +1902,7 @@ Taro.navigateBack()
 
 **路由传参和获取参数**
 
-可以通过在所有跳转的 `url` 后面添加查询字符串参数进行跳转传参。
+可以通过在所有跳转的 `url` 后面添加查询**字符串参数**进行跳转传参。
 
 在目标页面的**生命周期**方法中，可以通过 `Taro.getCurrentInstance().router.params` 获取路由参数。
 
@@ -1772,7 +1916,7 @@ Taro.navigateTo({
 ```js
 mounted() {
     // 获取路由参数
-    console.log(Taro.getCurrentInstance().router.params.router.params) 
+    console.log(Taro.getCurrentInstance().router.params) 
     // 输出 { id: 2, type: 'test' }
 },
 ```
@@ -1908,7 +2052,7 @@ Taro.removeStorage({
 
 
 
-### 1.6.7 微信小程序授权详解
+### 1.6.7 小程序地理位置授权
 
 一些接口 API 需要授权之后才能使用！微信小程序官方文档的授权接口如下：
 
@@ -1988,12 +2132,7 @@ async function applyLocation() {
 
     // 已授权
     if (res.authSetting[scope]) {
-        // 直接读储存即可
-        const cityName = Taro.getStorageSync('cityName')
-        // 更新顶部城市名
-        homeStore.homeTopCity = cityName
-        // 更新左边城市名
-        homeStore.leftCityName = cityName.substr(0, cityName.length - 1)
+        ...
     }
 }
 ```
@@ -2023,3 +2162,231 @@ async function applyLocation() {
 
 - `getLocation`，所以用 `getFuzzyLocation` 代替。下面是公告
 - https://developers.weixin.qq.com/community/develop/doc/000aee91a98d206bc6dbe722b51801
+
+
+
+
+
+### 1.6.9 Taro封装发送请求
+
+记录一下封装 Taro.request 的具体模板
+
+
+
+`utils/tools.ts`
+
+```ts
+// 发送请求函数
+export TaroRequest = function(options: any) {
+
+    // 拆解配置参数
+    const {
+        url, 
+        data = {}, 
+        method = 'GET', 
+        ...rests
+    } = options
+
+
+    // 返回一个 Promise
+    return new Promise(function (resolve, reject) {
+
+        // 请求拦截器
+        Taro.addInterceptor(function(chain) {
+            const requestParams = chain.requestParams
+            const { method, data, url } = requestParams
+
+            ...做点什么
+            
+            return chain.proceed(requestParams).then(res => res)
+        })            
+
+
+        // 发送 Taro.request
+        Taro.request({
+            url, data, method, ...rests,
+
+            // 请求成功的回调
+            success: function ({ data }) {
+
+                if (data.code) resolve(data)
+                else reject('发送请求失败！请检查接口地址是否正确')
+            },
+
+            // 请求失败的回调
+            fail: function(err) {
+                reject(err)
+                console.log('发送请求失败！请检查接口地址是否合规')
+            }
+        })
+
+    })
+}
+```
+
+```ts
+const baseURL = 'http://localhost:3000'
+
+export function getUsersData() {
+    return taroRequest({ url: `${baseURL}/user/getUsers`})
+}
+```
+
+
+
+## 1.7 Taro 性能编译优化配置
+
+性能优化官方文档：https://nervjs.github.io/taro-docs/docs/optimized
+
+编译优化官方文档：https://nervjs.github.io/taro-docs/docs/compile-optimized
+
+> [taro-plugin-compiler-optimization] 无法在 vue 创框架中使用 
+
+
+
+### 1.7.1 长列表渲染优化
+
+前面我们使用 `SrcollView` 组件进行列表渲染，当第一步我们生成或加载的数据量非常大时就可能会产生严重的性能问题，导致视图无法响应操作一段时间。Taro 提供了一种以只渲染 **当前可视区域(visible viewport)** 的视图，非可视区域的视图在用户滚动到可视区域再渲染。
+
+
+
+**`virtual-list` 的使用方法：**https://nervjs.github.io/taro-docs/docs/virtual-list#vue
+
+
+
+- 页面组件
+
+```vue
+<template>
+  <virtual-list
+    wclass="List"
+    :height="500"
+    :item-data="list"
+    :item-count="list.length"
+    :item-size="100"
+    :item="Row"
+    width="100%"
+  />
+</template>
+```
+
+- 单项组件
+
+```vue
+<template>
+  <view :id="id" :class="index % 2 ? 'ListItemOdd' : 'ListItemEven'">
+      Row {{ index }} : {{ data[index] }} 
+  </view>
+</template>
+```
+
+
+
+**`virtual-list` 组件的属性解析：**https://nervjs.github.io/taro-docs/docs/virtual-list#props
+
+
+
+### 1.7.2 小程序分包机制
+
+在小程序启动时，默认会下载主包并启动主包内页面，当用户进入分包内某个页面时，客户端会把对应分包下载下来，下载完成后再进行展示。
+
+微信小程序文档：https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/basic.html
+
+Taro 提供了自动分包编译：https://nervjs.github.io/taro-docs/docs/mini-split-chunks-plugin
+
+
+
+**分包机制必须要文件夹对应！！**
+
+```
+├── app.js
+├── app.json
+├── app.wxss
+├── packageA
+│   └── pages
+│       ├── cat
+│       └── dog
+├── packageB
+│   └── pages
+│       ├── apple
+│       └── banana
+├── pages
+│   ├── index
+│   └── logs
+└── utils
+```
+
+在 app.json `subpackages` 字段声明项目分包结构：**`root` 对应分包根目录！！**
+
+```json
+{
+  "pages":[
+    "pages/index",
+    "pages/logs"
+  ],
+  "subpackages": [
+    {
+      "root": "packageA",
+      "pages": [
+        "pages/cat",
+        "pages/dog"
+      ]
+    }, {
+      "root": "packageB",
+      "name": "pack2",
+      "pages": [
+        "pages/apple",
+        "pages/banana"
+      ]
+    }
+  ]
+}
+```
+
+
+
+
+
+### 1.7.3 多端编译兼容配置
+
+通过使用全局变量：`process.env.TARO_ENV` 来进行多端编译兼容，通常只需要样式兼容
+
+官方文档：https://nervjs.github.io/taro-docs/docs/envs
+
+
+
+使用方式
+
+```js
+/** 源码 */
+if (process.env.TARO_ENV === 'weapp') {
+  require('path/to/weapp/name')
+} else if (process.env.TARO_ENV === 'h5') {
+  require('path/to/h5/name')
+}
+
+/** 编译后（微信小程序）*/
+if (true) {
+  require('path/to/weapp/name')
+}
+/** 编译后（H5）*/
+if (true) {
+  require('path/to/h5/name')
+}
+```
+
+
+
+指定文件夹进行同时多端编译输出
+
+```js
+// 先将原 dist 文件夹删除
+// config/index.ts
+
+const Taro_ENV = process.env.TARO_ENV
+
+outputRoot: `dist${Taro_ENV}`,
+```
+
+
+

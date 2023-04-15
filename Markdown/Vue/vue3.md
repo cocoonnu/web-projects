@@ -2201,7 +2201,7 @@ import mitt from 'mitt'
 
 // 安装事件总线
 const bus = mitt()
-app.config.globalProperties.$bus = bus
+app.config.globalProperties.$bus = bus	
 ```
 
 

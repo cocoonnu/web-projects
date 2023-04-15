@@ -132,6 +132,8 @@ for (let key in obj) {}
 
 
 
+- **delete obj.name：删除对象属性**
+
 
 
 ### 数组常见函数总结
@@ -817,6 +819,12 @@ letter-spacing: 1px;
 
 文字段落间距
 word-spacing
+
+垂直位置
+vertical-align
+
+水平位置
+text-align
 ```
 
 
