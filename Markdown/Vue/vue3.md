@@ -2382,32 +2382,92 @@ computed: mapState([
 
 
 
-## 7.7 TS 使用方法总结
+## 7.7 TypeScript 使用总结
+
+推荐入门文档教程：https://www.dengwb.com/typescript/
+
+TypeScript 中文网：https://www.tslang.cn/docs/home.html
 
 
 
-**忽略下一行的 TS 校验**
+**忽略 TS 校验**
 
-`  // @ts-ignore`
+`  // @ts-ignore`：单行
+
+`// @ts-nocheck `：整个文件
 
 
 
-**定义接口类型：用于规范对象**
-
-一般另外定义一个 `types.ts` 专门定义接口类型
+**接口 interface 的详细使用**：针对对象类型
 
 ```ts
-import { RuleItem } from './rule'
-
-// 表单每一项的配置选项
-export interface FormOptions {
-    // 表单项显示的元素
-    type: 'cascader' | 'checkbox' | 'checkbox-group' 
-
-    // 表单项的值
-    value?: any,
+// 接口定义
+interface List {
+    name: string
     
-    ...
+    stringArr: string[] // 数组
+    
+    readonly id: number // 只读
+ 
+    age?: number // 可选
+    
+    [propsName: string]: number | string | undefined // 可添加其他属性
+}
+
+
+// 接口继承
+interface Predators extends List {
+  run (): void
+}
+```
+
+```ts
+// 作为对象
+let optionsItem: FormOptions
+
+// 作为对象数组
+let options: FormOptions[]
+
+// 数字索引
+interface StringArray {
+  [i: number]: string
+}
+let chars: StringArray = ['a', 'b']
+```
+
+
+
+
+
+**type 关键字定义一个类型变量**
+
+注：type 不是创建新的类型，只是为一个给定的类型起一个名字
+
+```ts
+// 普通类型
+type str = string
+
+// 函数类型
+type Add = (x: number, y: number) => number
+
+type Add = (x: number, y: number) => void // 返回空
+
+type Add = (x: number, y: number) => never
+```
+
+> `never` 类型表示的是那些永不存在的值的类型
+
+```ts
+// 函数使用
+
+// never
+let add: Add = function(a, b) {
+    throw console.error('2222');
+}
+
+// void 或者 number
+let add: Add = function(a, b) {
+    return a + b
 }
 ```
 
@@ -2415,23 +2475,43 @@ export interface FormOptions {
 
 
 
-**接口的使用**
+**as 类型断言**
 
 ```ts
-// 作为对象
-let optionsItem: FormOptions = {}
-
-// 作为对象数组
-let options: FormOptions[] = [{}, {}]
+// 将一个变量类型断言
+render({
+  data: [
+    { id: 1, name: 'A', sex: 'male'},
+    { id: 2, name: 'B' }
+  ]
+} as Result)
 ```
 
 
 
+**TS 函数定义的方式**
+
+https://www.dengwb.com/typescript/basics/function.html
 
 
-**属性不存在或类型报错**
 
-如果确定该属性存在则：`item.props!`
+**泛型约束**
+
+```ts
+interface Lengthwise {
+  length: number
+}
+
+function loggingIdentity<T extends Lengthwise>(arg: T): T {
+  console.log(arg.length)
+  return arg
+}
+
+// 传入的参数自动推断泛型
+loggingIdentity(5) // 报错 5不具有 length
+```
+
+
 
 
 

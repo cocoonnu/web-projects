@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
 
 ## 1.1 初识 Vue
 
@@ -156,29 +156,6 @@ Vue中有2种数据绑定的方式：
 	})
 </script>
 ```
-
-
-
-- **img标签动态绑定src不生效的问题**
-
-要加上 `require`
-
-```js
-<img :src="item.img" v-for="(item,index) in data" :key="index" alt="">
- 
-const data = [
-    {
-        title: '开始',
-        img: require("@/public/menu/menu-body/img/clock.svg")
-    },
-    {
-        title: '小记',
-        img: require("@/public/menu/menu-body/img/clock.svg")
-    }
-];
-```
-
-
 
 
 
