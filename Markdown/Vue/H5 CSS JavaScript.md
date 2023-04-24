@@ -95,8 +95,6 @@ rgba(223, 229, 230, 1) 100%);
 
 
 
-
-
 ### 1.3 CSS 滚动条样式
 
 全局 css 设置
@@ -141,155 +139,7 @@ rgba(223, 229, 230, 1) 100%);
 
 
 
-### 1.4 媒体查询 Rem布局
-
-
-
-**Rem 布局**
-
-html 默认 font-size 为16px ,  `1rem = html-font-size * 1`
-
-
-
-**媒体查询**
-
-概念：通过视口宽度实现不同适配方案
-
-作用：手动设置 `html-font-size `  、  手动修改不同视口宽度的样式
-
-使用方法：
-
-- 先把常规布局写完（视口宽度为1024px）
-- 然后从大到下 设置媒体查询   **下面的会继承上面的样式**
-- 通过不同视口宽度下 修改某些元素的布局或样式
-
-``` css
-/* 常规 css（750 - ） */
-...
-
-/* 视口宽度：320 - 750 */
-@media screen and (max-width: 750px) {...}
-
-/* 视口宽度：0 - 320 */
-@media screen and (max-width: 30px) {...}
-```
-
-
-
-### 1.5 CSS 常用代码记录
-
-#### 1.5.1 CSS 初始化属性
-
-```css
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-li {
-    list-style: none;
-}
-/* 去除图片之间的空隙 */
-img {
-    vertical-align: middle;
-}
-a {
-    color: #666;
-    text-decoration: none;
-
-    /* 去除在移动端下a标签点击的蓝色背景 */
-    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-    -webkit-user-select: none;
-    -moz-user-focus: none;
-    -moz-user-select: none;
-
-}
-input {
-    border: 0;
-    outline: none;
-}
-input::placeholder {
-    color: #aaa;
-}
-```
-
-
-
-#### 1.5.2 绝对定位内容居中
-
-```css
-/* 在有定位的父盒子中实现垂直水平居中 */
-div {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    left: 50%;
-}
-```
-
-
-
-#### 1.5.3 Flex/Grid 布局技巧
-
-```css
-/* flex实现居中 */
-div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* flex行列间隙：column-gap  row-gap */
-
-
-/* grid实现居中 */
-div {
-    display: grid;
-    place-items: center;
-}
-
-/* grid将两个子元素按比例划分 */
-div {
-    display: grid;
-    grid-template-columns: 15% 85%;   
-}
-```
-
-
-
-#### 1.5.4 CSS 文字属性
-
-```scss
-// 引入字体
-font-family: 'Varela Round';
-@font-face {
-    font-family: 'Poppins';
-    src: url("./Poppins.ttf");
-}
-
-// 引入在线谷歌字体
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
-
-// 文字间距
-letter-spacing: 1px;
-
-// 文字段落间距
-word-spacing
-
-// 垂直位置
-vertical-align
-
-// 水平位置
-text-align
-```
-
-
-
-
-
-
-
-### 1.6 Img 属性图片使用
+### 1.5 Img 属性图片使用
 
 - **保持盒子内图片匹配**
 
@@ -358,6 +208,155 @@ div {
 
 
 
+### 1.6 媒体查询 Rem布局
+
+
+
+**Rem 布局**
+
+html 默认 font-size 为16px ,  `1rem = html-font-size * 1`
+
+
+
+**媒体查询**
+
+概念：通过视口宽度实现不同适配方案
+
+作用：手动设置 `html-font-size `  、  手动修改不同视口宽度的样式
+
+使用方法：
+
+- 先把常规布局写完（视口宽度为1024px）
+- 然后从大到下 设置媒体查询   **下面的会继承上面的样式**
+- 通过不同视口宽度下 修改某些元素的布局或样式
+
+``` css
+/* 常规 css（750 - ） */
+...
+
+/* 视口宽度：320 - 750 */
+@media screen and (max-width: 750px) {...}
+
+/* 视口宽度：0 - 320 */
+@media screen and (max-width: 30px) {...}
+```
+
+
+
+### 1.7 CSS 常用代码记录
+
+#### 1.7.1 CSS 初始化属性
+
+```css
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+li {
+    list-style: none;
+}
+/* 去除图片之间的空隙 */
+img {
+    vertical-align: middle;
+}
+a {
+    color: #666;
+    text-decoration: none;
+
+    /* 去除在移动端下a标签点击的蓝色背景 */
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    -webkit-user-select: none;
+    -moz-user-focus: none;
+    -moz-user-select: none;
+
+}
+input {
+    border: 0;
+    outline: none;
+}
+input::placeholder {
+    color: #aaa;
+}
+```
+
+
+
+#### 1.7.2 绝对定位内容居中
+
+```css
+/* 在有定位的父盒子中实现垂直水平居中 */
+div {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    left: 50%;
+}
+```
+
+
+
+#### 1.7.3 Flex/Grid 布局技巧
+
+```css
+/* flex实现居中 */
+div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* flex行列间隙：column-gap  row-gap */
+
+
+/* grid实现居中 */
+div {
+    display: grid;
+    place-items: center;
+}
+
+/* grid将两个子元素按比例划分 */
+div {
+    display: grid;
+    grid-template-columns: 15% 85%;   
+}
+```
+
+
+
+#### 1.7.4 CSS 文字属性
+
+```scss
+// 引入字体
+font-family: 'Varela Round';
+@font-face {
+    font-family: 'Poppins';
+    src: url("./Poppins.ttf");
+}
+
+// 引入在线谷歌字体
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
+
+// 文字间距
+letter-spacing: 1px;
+
+// 文字段落间距
+word-spacing
+
+// 垂直位置
+vertical-align
+
+// 水平位置
+text-align
+```
+
+
+
+
+
+
+
+
 ## 第二章 JavaScript
 
 
@@ -370,7 +369,11 @@ Map：https://juejin.cn/post/7106898275290054692
 
 WeakMap：https://juejin.cn/post/7107261631859523615
 
-Symbol：https://juejin.cn/post/7074608058369835015
+Symbol 内置符号：https://juejin.cn/post/7074608058369835015
+
+Symbol 类型：https://juejin.cn/post/7073852491695128583
+
+
 
 原型和原型链：
 
@@ -401,7 +404,12 @@ console.log(a);
 // 构造函数的使用
 let a1 = new a.constructor() // 等效于 new Arrar()
 console.log(a1);
+
+// 复制内容
+let a1 = new a.constructor(a)
 ```
+
+
 
 
 
@@ -438,10 +446,21 @@ console.log(Object.entries(person));
 
 - **for in 循环**
 
-for...in 遍历一个对象的可枚举属性，如对象、数组、字符串。针对属性，所以获得 key
+for...in 遍历一个对象的**可枚举属性**，如对象、数组、字符串。针对属性，所以获得 key
+
+注意：key 可以得到该对象所有的属性，包括原型链上的属性
 
 ```js
 for (let key in obj) {}
+```
+
+```js
+// hasOwnProperty：判断一个对象有某个属性或对象，无法检查到原型链上
+for (const key in target) {
+    if (target.hasOwnProperty(key)) {
+
+    }
+}
 ```
 
 
@@ -453,6 +472,14 @@ for (let key in obj) {}
 ### 2.3 数组常见函数
 
 https://vue3js.cn/interview/JavaScript/array_api.html
+
+容易搞混的几个api
+
+`arr.splice`：arr.splice(下标，个数，替换的值)
+
+`arr.slice`：截取下标为 a ，到下标为 b（不包括 b）的区间（字符串也适用）
+
+`str.split('')`：将字符串变成数组
 
 
 
@@ -466,12 +493,29 @@ https://vue3js.cn/interview/JavaScript/array_api.html
 3、arr.concat：直接将多个数组、多个数字拼接成一个数组 
 let a= [].concat(1,2,3,[4,5],[6,7])
 
-4、arr.splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+4、let newArr = arr.slice(a, b) 截取下标为 a ，到下标为 b（不包括 b）的区间
 
-5、let newArr = arr.slice(a, b) 截取下标为 a ，到下标为 b（不包括 b）的区间
+5、arr.reverse()：用来将一个数组中的全部项顺序置反
 
-6、arr.reverse()：用来将一个数组中的全部项顺序置反
+6、arr.indexOf(value)：数组存在value则返回下标 不存在返回
 ```
+
+
+
+- **arr.splice**
+
+arr.splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+
+```js
+// 删除下标为index的项
+arr.splice(index, 1)
+```
+
+
+
+- **arr.reduce**
+
+使用方法：https://blog.csdn.net/hannah2233/article/details/128367223
 
 
 
@@ -510,7 +554,7 @@ let num = arr.find(item => item == 12)
 
 - **arr.forEach**
 
-遍历操作数组（可改变原数组），没有返回值
+遍历操作数组，**没有返回值**，对item进行操作不会改变原数组。但是如果item为复杂类型则会产生改变
 
 ```js
 arr.fonEach((item,index,arr) => {})
@@ -525,7 +569,7 @@ arr.fonEach((item,index,arr) => {})
 当数组为简单类型时，不会该变原数组，当为引用类型时，则会改变原数组！！
 
 ```js
-let newArr = arr.map((item,index,arr) => {})
+let newArr = arr.map((item,index,arr) => item + 1)
 ```
 
 map 使用方法：https://blog.csdn.net/Anna0115/article/details/103696124
@@ -623,8 +667,7 @@ https://juejin.cn/post/7145036326373425159
 https://juejin.cn/post/7191712569394987065
 
 
-
-#### 2.4.1 Math
+- Math
 
 ```js
 Math.ceil() // 数字向上取整
@@ -646,7 +689,7 @@ Math.floor(Math.random() * num)：// 返回0到num-1的整数
 
 
 
-#### 2.4.2 字符串
+- 字符串
 
 https://vue3js.cn/interview/JavaScript/string_api.html
 
@@ -662,7 +705,7 @@ charCodeAt(str)：// 返回str的ASCII码
 
 
 
-#### 2.4.3 其他函数
+- 其他函数
 
 ```js
 navigator.clipboard.writeText(123); // 实现用户复制内容为123
@@ -686,7 +729,7 @@ document.onkeydown = function(event){
 
 
 
-#### 2.4.4 获取随机值
+- 获取随机值
 
 使用 `Mock.Random`：https://github.com/nuysoft/Mock/wiki/Mock.Random
 
@@ -730,6 +773,8 @@ e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
 
 
 #### 2.5.2 DOM 高度宽度属性
+
+https://vue3js.cn/interview/JavaScript/visible.html
 
 主要考察盒子模型，一个 DOM 对象包含如下的高宽度属性：
 

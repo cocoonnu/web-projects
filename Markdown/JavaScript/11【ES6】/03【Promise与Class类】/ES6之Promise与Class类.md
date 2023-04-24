@@ -46,10 +46,9 @@ Promise 实质上是一个构造函数，所以我们一般通过实例化的方
 
 
 
-简单使用
+创建 promise 对象
 
 ```js
-// 创建promise对象
 let p = new Promise(function(resolve,reject) {
     let flag = 1;
 
@@ -59,12 +58,31 @@ let p = new Promise(function(resolve,reject) {
     // 失败时调用reject
     if (flag == 0) reject('defeat');
 })
+```
 
+
+
+使用 then 处理
+
+```js
 // 设置回调函数then resolve调用第一个函数 rejec调用第二个函数
 p.then(function(value) {
     console.log(value);
 },function(reason) {
     console.log(reason);
+})
+```
+
+
+
+使用 then 和 catch 一起处理
+
+```js
+// 或者使用then和catch搭配使用，等同于上面的写法
+p.then(function(result) {
+    console.log(result, 'result')
+}).catch(function(err) {
+    console.log(err, 'err')
 })
 ```
 
@@ -277,7 +295,7 @@ new Promise(function(resolve,reject) {
 
 
 
-## 1.4 Promise.catch()
+## 1.4 Promise.catch
 
 由之前的例子可以看出，我们在使用 Promise 的时候，大部分情况下，我们只用 resolve() 方法（成功态），所以在 Promise 回调函数中我们常常省略 reject 函数参数，**在 then 中我们常常省略第二个回调函数。**
 
@@ -324,7 +342,7 @@ new Promise((resolve, reject) => {
 
 
 
-## 1.5 Promise.finally()
+## 1.5 Promise.finally
 
  当 Promise 状态发生变化时，不论如何成功或失败都会执行内部函数
 
@@ -356,9 +374,104 @@ p.finally(function() {
 
 
 
-## 1.6 all/race/allSettled
+## 1.6 resolve/reject
 
-- Promise.all()
+这里介绍一下 `Promise.resolve` 和 `Promise.reject` 的使用方法。
+
+感觉作用就是实现直接原地执行一个异步函数，不用通过封装一个函数返回了。
+
+参考：https://blog.csdn.net/lq15310444798/article/details/81275278
+
+
+
+- **Promise.resolve**
+
+返回一个指定 `value` 的成功的 `Promise` 对象
+
+> 参数如果不是 `thenable` 对象，则原封不动的 `resolve` 返回（包括参数是一个 	Promise`）
+
+```js
+Promise.resolve('foo');
+
+//等价于如下
+new Promise((resolve)=>{
+    resolve('foo');
+})
+```
+
+> 参数如果是 `thenable` 对象
+
+```js
+//thenable对象（存在then属性）
+let thenable = {
+    then:function(resolve,reject){
+        resolve(42);
+    }
+}
+
+//下面会将thenable对象转换为Promise对象
+let p = Promise.resolve(thenable);
+p.then((value)=>{
+    console.log(value);//42
+});
+```
+
+
+
+
+
+- **Promise.reject**
+
+返回一个指定 `value` 的失败的 `Promise` 对象，参数可以是一个 `Promise`，也可以是一个值 `value`
+
+会原封不动的将 `reject` 的理由变成后续方法的参数
+
+```js
+const p = Promise.reject('出错了');
+// 等同于
+const p = new Promise((resolve, reject) => reject('出错了'))
+ 
+p.then((value)=>{
+    	console.log(value);
+	},
+    (reason)=>{
+    	console.log(reason);
+    }
+);
+//输出 '出错了'
+```
+
+
+
+
+
+- **异步执行时机**
+
+异步执行时机 `resolve` 是在本轮事件循环 `event loop` 结束时，不是在下一轮“事件循环”开始时
+
+```js
+setTimeout(function () {
+    console.log(3);
+}, 0);
+Promise.resolve().then(function () {
+    console.log(2);
+});
+console.log(1);
+ 
+//输出 1 2 3
+```
+
+
+
+
+
+## 1.7 all/race/allSettled
+
+参考文档：https://blog.csdn.net/m0_68324632/article/details/126459643
+
+
+
+- **Promise.all()**
 
  ```js
  const result = Promise.all([p1,p2,p3])
@@ -418,19 +531,40 @@ async delCheckedCart() {
 
 
 
-- Promise.race()
+- **Promise.race()**
 
-Promise.race() 的状态取决于第一个完成的 Promise 实例对象，如果第一个完成的成功了，那么最终就是成功的；如果第一个完成的失败了，那么最终就是失败的。
+Promise.race() 的状态取决于**第一个完成的 Promise 实例对象**，如果第一个完成的成功了，那么最终就是成功的；如果**第一个完成的失败了**，那么最终就是失败的。
+
+```js
+var p1 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 1000, 'one');
+});
+var p2 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 2000, 'two');
+});
+var p3 = new Promise((resolve, reject) => {
+    // setTimeout(reject, 2000, 'err');
+    setTimeout(reject, 500, 'err');
+});
+
+Promise.race([p1, p2, p3]).then(values => {
+    console.log(values)
+}, reason => {
+    console.log(reason) // err
+});
+```
 
 
 
-- Promise.allSettled()
+
+
+- **Promise.allSettled()**
 
 Promise.allSettled() 的状态与传入的 Promise 状态无关。它永远都是成功的，只会执行 then 的第一个回调函数。用途：用于记录下各个 Promise 的表现。
 
 
 
-## 1.7 async/await 函数
+## 1.8 async/await 函数
 
 当我们需要处理一个 promise 对象时，如果我们要获取该 promise 对象的结果 PromiseResult，那么我们就需要用到 async/await 。
 
@@ -537,7 +671,7 @@ main(); // 000
 
 
 
-## 1.8 Promise 的注意事项
+## 1.9 Promise 的注意事项
 
 
 
@@ -554,6 +688,18 @@ new Promise((resolve, reject) => {
     // console.log('hi');	// 不输出
 });
 ```
+
+
+
+**2、手写 promise**
+
+参考文档：https://blog.csdn.net/Niall_Tonshall/article/details/122547763
+
+
+
+**3、手写实现 promise 三大件**
+
+https://juejin.cn/post/7223046446941110328?share_token=a538459f-309c-43e0-b154-dab71d7c745d#heading-10
 
 
 
