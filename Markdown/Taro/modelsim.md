@@ -733,3 +733,137 @@ endmodule
 ```
 
 ![image-20230424163851186](mark-img/image-20230424163851186.png)
+
+
+
+
+
+### 出租车计价器
+
+3公里内：8
+
+3-10公里内：8 + 0.75 * [( x - 3 ) / 0.5]
+
+10公里之外：18.5 + 1 * [( x - 10 ) / 0.5]
+
+```verilog
+module taxi(clk,reset,int_cnt,dec_cnt,int_price,dec_price_true);
+
+input clk,reset;
+output[5:0] int_cnt,dec_cnt,int_price,dec_price_true;
+reg[5:0] int_cnt,dec_cnt,int_price;
+reg[7:0] dec_price,dec_price_true;
+
+always @(posedge clk)
+begin
+  if(!reset)
+  begin
+    int_cnt <= 0;
+    dec_cnt <= 0;
+  end
+
+  else if(dec_cnt == 9)
+  begin
+    int_cnt <= int_cnt + 1;
+    dec_cnt <= 0;
+  end
+
+  else
+  begin
+    int_cnt <= int_cnt;
+    dec_cnt <= dec_cnt + 1;
+  end        
+end
+
+always @(posedge clk)
+begin
+  if(!reset)
+	begin
+	  int_price <= 8;
+	  dec_price <= 0;
+	  dec_price_true <= 0;
+	end
+
+  else if(int_cnt < 3)
+	begin
+	  int_price <= 8;
+	  dec_price <= 0;
+	  dec_price_true <= 0;
+	end	
+end
+
+always @(posedge clk)
+begin
+  if (((dec_cnt == 4) || (dec_cnt == 9)) && (int_cnt > 2) && (int_cnt < 10))
+  begin
+      
+  if(dec_price == 0)
+	begin
+	  int_price <= int_price;
+	  dec_price <= dec_price + 75;
+	  dec_price_true <= 75;
+	end
+
+  else if(dec_price == 75)
+	begin
+	  int_price <= int_price + 1;
+	  dec_price <= dec_price + 75;
+	  dec_price_true <= 50;
+	end
+	
+  else if(dec_price == 150)
+	begin
+	  int_price <= int_price + 1;
+	  dec_price <= dec_price + 75;
+	  dec_price_true <= 25;
+	end
+
+  else if(dec_price == 225)
+	begin
+	  int_price <= int_price + 1;
+	  dec_price <= 0;
+	  dec_price_true <= 0;
+	end      
+      
+  end
+end
+
+always @(posedge clk)
+begin
+	if(((dec_cnt == 4) || (dec_cnt == 9)) && (int_cnt >= 10))
+	begin
+	  int_price <= int_price + 1;
+	  dec_price <= dec_price;
+	  dec_price_true <= dec_price_true;
+	end
+end
+
+endmodule
+```
+```verilog
+module taxi_tb;
+  
+reg clk,reset;
+wire[5:0] int_cnt,dec_cnt,int_price;
+wire[7:0] dec_price_true;
+ 
+always
+begin
+	#1 clk = ~clk;
+end
+ 
+initial
+begin
+	clk = 1'b0;
+	reset = 1'b0;
+	
+	#3 reset = 1'b1;
+end
+
+taxi u0(.clk(clk),.reset(reset),.int_cnt(int_cnt),.dec_cnt(dec_cnt),.int_price(int_price),.dec_price_true(dec_price_true));
+endmodule
+```
+
+![image-20230427153619920](mark-img/image-20230427153619920.png)
+
+![image-20230427153714894](mark-img/image-20230427153714894.png)

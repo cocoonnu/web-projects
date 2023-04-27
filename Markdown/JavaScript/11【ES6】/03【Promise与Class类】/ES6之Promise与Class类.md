@@ -388,7 +388,7 @@ p.finally(function() {
 
 返回一个指定 `value` 的成功的 `Promise` 对象
 
-> 参数如果不是 `thenable` 对象，则原封不动的 `resolve` 返回（包括参数是一个 	Promise`）
+> 参数如果不是 `thenable` 对象，则原封不动的 `resolve` 返回，如果参数是promise则直接返回这个promise
 
 ```js
 Promise.resolve('foo');
@@ -397,6 +397,16 @@ Promise.resolve('foo');
 new Promise((resolve)=>{
     resolve('foo');
 })
+
+// promise 对象直接返回
+var p1 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 1000, 'one');
+});
+Promise.resolve(p1).then(values => {
+    console.log(values); // o
+}, reason => {
+    console.log(reason)
+});
 ```
 
 > 参数如果是 `thenable` 对象
@@ -471,7 +481,7 @@ console.log(1);
 
 
 
-- **Promise.all()**
+- **Promise.all**
 
  ```js
  const result = Promise.all([p1,p2,p3])
@@ -531,7 +541,7 @@ async delCheckedCart() {
 
 
 
-- **Promise.race()**
+- **Promise.race**
 
 Promise.race() 的状态取决于**第一个完成的 Promise 实例对象**，如果第一个完成的成功了，那么最终就是成功的；如果**第一个完成的失败了**，那么最终就是失败的。
 
@@ -558,9 +568,46 @@ Promise.race([p1, p2, p3]).then(values => {
 
 
 
-- **Promise.allSettled()**
+- **Promise.allSettled**
 
-Promise.allSettled() 的状态与传入的 Promise 状态无关。它永远都是成功的，只会执行 then 的第一个回调函数。用途：用于记录下各个 Promise 的表现。
+`Promise.allSettled` 会**等待数组中所有的 promise 执行完毕**，最后返回一个结果对象数组。里面存在成功态也存在失败态。并且 `Promise.allSettled` 本身返回的 `promise` 对象永远是成功态
+
+```js
+var p1 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 4000, 'one');
+});
+var p2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 3000, 'two');
+});
+var p3 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 2000, 'three');
+});
+var p4 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 1000, 'four');
+});
+var p5 = new Promise((resolve, reject) => {
+  reject('reject');
+});
+
+Promise.allSettled([p1, p2, p3, p4, p5]).then(values => {
+  console.log(values);
+}, reason => {
+  console.log(reason) // 不可能执行
+});
+```
+
+```js
+// 打印
+[
+  { status: 'fulfilled', value: 'one' },
+  { status: 'fulfilled', value: 'two' },
+  { status: 'fulfilled', value: 'three' },
+  { status: 'fulfilled', value: 'four' },
+  { status: 'rejected', reason: 'reject' }
+]
+```
+
+
 
 
 
@@ -693,13 +740,19 @@ new Promise((resolve, reject) => {
 
 **2、手写 promise**
 
+实现一个 promise 类，并包含三种原生的方法（then、catch、finally）
+
 参考文档：https://blog.csdn.net/Niall_Tonshall/article/details/122547763
 
+参考文档：https://github.com/Sunny-117/js-challenges/issues/8
 
 
-**3、手写实现 promise 三大件**
 
-https://juejin.cn/post/7223046446941110328?share_token=a538459f-309c-43e0-b154-dab71d7c745d#heading-10
+实现其他 promise API（all、race、allSettled、resolve、reject）
+
+手写题代码里面有
+
+
 
 
 

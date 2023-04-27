@@ -373,6 +373,15 @@ Symbol 内置符号：https://juejin.cn/post/7074608058369835015
 
 Symbol 类型：https://juejin.cn/post/7073852491695128583
 
+Error 类型：https://juejin.cn/post/7169017392016654372
+
+```js
+// 直接抛出一个错误 可以使得后面的代码不再执行
+throw new Error('参数不是一个可迭代对象')
+```
+
+迭代器/生成器：https://juejin.cn/post/7141685685940912136
+
 
 
 原型和原型链：
@@ -414,6 +423,12 @@ let a1 = new a.constructor(a)
 
 
 ### 2.2 对象常见函数
+
+MDN 官方文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+内含多个 API 使用方法
+
+
 
 - **Object.assign**
 
@@ -466,6 +481,12 @@ for (const key in target) {
 
 
 - **delete obj.name：删除对象属性**
+
+
+
+- **obj.hasOwnProperty**：只会检查**对象的自有属性**，对象原形上的属性其不会检测
+
+
 
 
 

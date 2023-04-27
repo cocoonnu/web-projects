@@ -2,6 +2,14 @@
 
 
 
+interactive_website_mis：基于 Node.js 搭建，只有三个网页的小型项目；实现了登录注册用户页交互
+
+
+
+Vue_components_poj：个人基于 Vue2 框架而封装的一些个性化网页组件
+
+
+
 #### 静态页面预览
 
 1、随机密码生成器
