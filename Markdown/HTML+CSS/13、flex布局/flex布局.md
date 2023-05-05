@@ -1,5 +1,9 @@
 # 一、flex原理及模板
 
+可参考文档：https://vue3js.cn/interview/css/flexbox.html
+
+
+
 ## 1.1 布局原理
 
 flex 是 flexible Box 的缩写，意为 “弹性布局”，用来为盒状模型**提供最大的灵活性**，**任何一个容器都可以指定为 flex 布局**。

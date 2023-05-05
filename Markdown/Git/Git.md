@@ -1,527 +1,747 @@
-## Git命令行操作
+# 第一章 Git 命令行操作指南
 
-### 1.1本地库初始化
+首先一个文件有四种操作：跟踪、修改、删除、新增
 
-`进入文件夹`
+- 新增一个文件：该文件默认为**未跟踪状态，无法监测文件状态**
+- 修改、删除：已跟踪的文件进入修改、删除状态
+- `git add .` ：将所有状态的文件添加至暂存区，**未跟踪状态的文件进入跟踪状态**
+- `git commit`：版本提交，**所有暂存区的文件恢复成未修改状态**
+- `git rm --cached`：移除跟踪指定的文件，在本地仓库的文件夹中保留该文件
 
-```bash
-git init
-# 注意：生成的 .git 目录中存放的是本地库相关文件，不要删除
+
+
+区域分为工作区和暂存区
+
+- `git add`：将工作区的文件提交至暂存区，状态变为未修改
+- `add` 命令可多次执行，将将工作区的文件提交，以更新暂存区
+- `git commit`：执行之后暂存区为空
+- 当使用分支时，工作区和暂存区是共享的！！因此当工作区有文件状态被修改或者暂存区有文件时，但是又没有 commit，这个时候想切换分支 Git 是不支持的
+
+![image-20230504210409516](mark-img/image-20230504210409516.png)
+
+
+
+简单介绍一下 Git 工作流程
+
+```
+1.在工作区开发，添加，修改文件。
+2.将修改后的文件放入暂存区。
+3.将暂存区域的文件提交到本地仓库。
+4.将本地仓库的修改推送到远程仓库。
 ```
 
 
 
-### 1.2设置签名
+参考的文档和视频
 
-- 项目(仓库)级别`仅在当前本地库有效`
+- https://juejin.cn/post/6974184935804534815
 
-    ```bash
-    git config user.name tom  #设置用户名tom
-    git config user.email liu@qq.com #设置用户邮箱
-    ```
+- https://juejin.cn/post/6978812726411788295
 
-- 系统用户级别`仅在当前登录的操作系统用户有效`
+- https://www.bilibili.com/video/BV1pX4y1S7Dq/?spm_id_from=444.41
 
-  ```bash
-  git config --global user.name tom
-  git config --global user.email liu@qq.com
-  ```
 
-> 仅仅加了一个 `--global`
->
-> 优先级别：`项目级别`  >  `系统级别`
->
-> 信息保存位置：` ~/.gitconfig 文件 `   
->
-- 查看全局配置
+
+## 1.1 本地库初始化
+
+官网下载 Git：https://git-scm.com/download/
+
+镜像高速下载：https://registry.npmmirror.com/binary.html?path=git-for-windows/
+
+
+
+**设置签名**
+
 ```bash
-git config --lit --global
+# 初次配置 git 需要设置签名 随便填写即可
+git config --global user.name cocoon
+git config --global user.email 2806525575@qq.com
+```
+
+
+
+**初始化一个仓库**
+
+```bash
+# 先新建一个文件夹
+git init
+```
+
+
+
+**或者直接克隆一个仓库**
+
+```bash
+# 在父文件夹下克隆一个仓库 会在本地生成一个文件夹并带有git记录
+git clone https://github.com/cocoonnu/WebProjects.git
+```
+
+
+
+**查看全局配置**
+
+```bash
+git config --list --global
 git config 单项
 ```
 
 
 
-### 1.3基本操作
+## 1.2 Git 基本操作指令
 
-#### 1.3.1 状态查看
+### 1.2.1 状态修改指令
+
+**git status**
 
 ```bash
-git status   #查看工作区、暂存区状态
+git status # 会区分暂存区和工作区
 
 git status -s #精简查看 
 ```
 
-![image-20221208195041775](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221208195041775.png)
 
 
-
-#### 1.3.2 添加
+**git add**
 
 ```bash
-git add fileName  #指定文件
-git add . #所有
-说明：将工作区的文件添加到暂存区
+# 把指定的文件（新增、修改、删除等状态）添加到暂存区中
+$ git add 文件路径
+$ git add . # 等同于 git add -A
 ```
 
-![image-20221208195143046](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221208195143046.png)
-
-
-
-#### 1.3.3 提交
-
 ```bash
-git commit -m 'commit message' fileName
-说明：将暂存区内容提交到本地库
-```
+# 以下命令省略文件路径则为当前目录
 
-当commit之后，git status 为空
+# 添加所有修改、已删除的文件到暂存区中
+$ git add -u
+$ git add -u 文件路径
+$ git add --update 文件路径
 
-![image-20221208195540440](C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221208195540440.png)
+# 添加所有修改、已删除、新增的文件到暂存区中
+$ git add -A
+$ git add -A 文件路径
+$ git add --all 文件路径
 
-
-
-跳过暂存区 直接将所有工作区的文件添加到本地git仓库
-
-```bash
-git commit -a -m 'commit message'
+# 查看所有修改、已删除但没有提交的文件，进入一个子命令系统
+$ git add -i
+$ git add -i 文件路径
+$ git add --interactive 文件路径
 ```
 
 
 
-#### 1.3.4 文件差异比较
+**git commit**
 
 ```bash
-git diff #文件名
-git diff commitID 文件名  #和历史中的一个版本比较
-git diff  #不带文件名，则比较多个文件
-```
+# 把暂存区中的文件提交到本地仓库，调用文本编辑器输入该次提交的描述信息
+$ git commit
 
-#### 1.3.5 撤销对文件的修改/
+# 把暂存区中的文件提交到本地仓库中并添加描述信息
+$ git commit -m "<提交的描述信息>"
 
-```bash
-# 若该文件显示已修改或者已删除
-# 可撤销该文件的修改（工作区） 
+# 把所有修改、已删除的文件提交到本地仓库中
+# 不包括新增文件或其他未跟踪的文件，等同于先调用了 "git add -u"
+$ git commit -a -m "<提交的描述信息>"
 
-git checkout filename 
-
-git checkout . # 撤销工作区的所有修改
-```
-
-> https://blog.csdn.net/qq_45677671/article/details/129022522
-
-
-
-#### 1.3.6 从暂存区中删除文件
-
-```bash
-git reset HEAD filename
+# 修改上次提交的描述信息
+$ git commit --amend
 ```
 
 
 
-#### 1.3.7 移除文件
 
-- 从git仓库和工作区中同时移除
+
+### 1.2.2 信息查询指令
+
+**git diff**
+
+文件差异比较，同时不使用该指令而是使用 vscode 插件
 
 ```bash
-git rm -f fliename
+# 比较暂存区中的文件和上次提交时的差异
+$ git diff --cached
+$ git diff --staged
+
+# 比较当前文件和上次提交时的差异
+$ git diff HEAD
+
+# 查看从指定的版本之后改动的内容
+$ git diff <commit ID>
+
+# 比较两个分支之间的差异
+$ git diff <分支名称> <分支名称>
 ```
 
-- 只从git仓库中移除
-```bash
-git rm --cached fliename
-```
 
 
-
-#### 1.3.8 `.gitignore`
-
-在根目录下创建`.gitignore`配置文件 即可实现忽略文件的效果
-
-<img src="C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221208202357369.png" alt="image-20221208202357369" style="zoom: 50%;" />
-
-<img src="C:\Users\LENOVO\AppData\Roaming\Typora\typora-user-images\image-20221208202447272.png" alt="image-20221208202447272" style="zoom:50%;" />
-
-
-
-#### 1.3.9 查看历史提交版本
+**git log**
 
 ```bash
-# git log 展示当前版本之前的历史版本
-git log # 冒号后面 enter继续显示 q键退出显示
-
-git log -n # 显示最近n次的提交历史
-
-git log -n --pretty=oneline # 在一行上显示
-
-git log --greph #图形显示,更直观
-git log --oneline #简洁显示
+# 打印当前分支的所有提交记录
+$ git log # 输入 enter 继续显示 q 退出显示
 
 # 展示所有的版本
 git reflog
+
+# 打印从第一次提交到指定的提交的记录
+$ git log <commit ID>
+
+# 打印指定数量的最新提交的记录
+$ git log -n
+
+$ git log --graph # 图形显示 	
+
+$ git log --oneline # 简洁显示
+```
+
+```bash
+# 查看所有分支的提交记录
+$ git log --all --graph
 ```
 
 
 
-#### 1.3.10 版本前进后退
+**git config**
 
-- 基于索引值`推荐`
-
-  ```bash
-  git reset --hard commitID
-  ```
-  
-- 使用 **^** 符号`只能后退`
-
-  ```bash
-  git reset --hard HEAD^
-  例子：git reset --hard HEAD^^
-  # 注意：几个 ^ 表示后退几步
-  ```
-
-- 使用 **~** 符号`只能后退`
-
-  ```bash
-  git reset --hard HEAD~n
-  例子：git reset --hard HEAD~3
-  ```
-
-- reset的三个参数比较
-
-  ```
-  soft: 
-  - 仅本地库移动HEAD 指针
-  mixed:
-  - 在本地库移动HEAD指针
-  - 重置暂存区
-  hard:
-  - 在本地库移动HEAD指针
-  - 重置暂存区
-  - 重置工作区
-  ```
+使用文档：https://juejin.cn/post/6978812726411788295#heading-7
 
 
 
-#### 1.3.11 其他命令
+
+
+### 1.2.3 状态撤销指令
+
+**git checkout**
+
+```bash
+# 可撤销对工作区中指定文件的修改或删除
+# 新增的文件和已经添加到暂存区的文件不受影响
+$ git checkout -- 文件路径 
+
+$ git checkout . # 撤销工作区的所有修改和删除
 ```
-cd    ：  改变目录
-cd ..    回退到上一个目录，直接cd进入默认目录
-pwd   ： 显示当前所在的目录路径 
-ls    ： 都是列出当前目录中的所有文件
-touch :新建一个文件  如touch index.js就会在当前目录下新建一个index.js
-rm  ：删除一个文件， rm index.js就会把index.js文件删除
-mkdir  :新建一个目录，就是新建一个文件夹
-rm -r 删除一个文件夹，rm -r src 删除src目录
-mv  移动文件， mv index.html src        index.html 是我们要移动的文件，src是目标文件夹
-reset 重新初始化终端/清屏
-clear 清屏
-history 查看命令历史
-help 帮助
-exit 退出
-# 表示注释
-esc 清空本行命令
+
+
+
+**git rm**
+
+```bash
+# 移除跟踪指定的文件，并从本地仓库的文件夹中删除
+$ git rm 文件路径
+
+# 移除跟踪指定的文件夹，并从本地仓库的文件夹中删除
+$ git rm -r 文件夹路径
+
+# 移除跟踪指定的文件，在本地仓库的文件夹中保留该文件
+$ git rm --cached 文件路径
+```
+
+
+
+**git reset**
+
+- 文件处理
+
+```bash
+# 将指定文件移出暂存区
+$ git reset 文件路径
+$ git reset # 移出所有暂存区文件
+```
+
+- 版本切换（将 HEAD 的指向改变）
+
+```bash
+# 回退到指定版本，并且前面提交的版本会被删（git log 时不再显示），暂存区清空
+# 使用 --hard 会对工作区的文件也进行版本回退！ 
+$ git reset --hard commitID
+
+$ git reset --hard HEAD^ # 只能后退
+
+$ git reset --hard HEAD~n # 只能后退
+```
+> 理解为删除前面的提价记录，并本地代码同步回退
+
+
+
+```bash
+# 回退到指定版本，并且前面提交的版本会被删除，暂存区清空
+# 使用 --mixed 不会对工作区的文件进行版本回退
+$ git reset --mixed commitID
+```
+
+> 可以理解为只是删除前面的提交记录
+
+
+
+
+```bash
+# 回退到指定版本，并且前面提交的版本会被删除，暂存区不清空
+# 使用 --soft 不会对工作区的文件进行版本回退
+$ git reset --soft commitID
+```
+
+>  相当于调用 git reset --mixed 命令后又做了一次 git add .
+
+
+
+
+
+### 1.2.4 bash 指令整理
+```bash
+$ cd
+
+$ cd ..
+
+$ pwd 
+
+$ ls
+
+$ touch # 新建一个文件
+
+$ rm # 删除一个文件
+
+$ mkdir # 新建一个目录
+
+$ rm -r # 删除一个文件夹
+
+$ reset # 重新初始化终端/清屏
+
+$ cls # 清屏
+
+$ history # 查看命令历史
+
+$ exit # 退出
+
+$ esc # 清空本行命令
 
 复制: `ctrl + insert`
 
 粘贴: `shift + insert`
-
-清空：`clear`
 ```
 
 
 
-### 2.2 分支管理
+## 1.3 Git 分支管理指令
 
-`hot_fix` `master` `feature_x` `feature_y`
+每一个分支可以理解为一个指针，默认使用的是 master/main 分支。header 指针永远指向最新的分支提交对象
 
-#### 2.2.1 什么是分支管理
+![image-20230504111547454](mark-img/image-20230504111547454.png)
 
-- 在版本控制中，使用推进多个任务
 
-#### 2.2.2 分支的好处
 
-- 同时并行推进多个功能开发，提高开发效率
-- 某一分支开发失败，不会对其它分支有任何影响
+### 1.3.1 分支基本操作指令
 
-#### 2.2.3 分支操作
-
-- 创建分支
-
-~~~bash
-git branch 分支名 # 创建分支后并不会跳转到刚创建的分支上
-~~~
-
-- 查看分支
-
-~~~bash
-git branch
-git branch -v 
-
-git remote show 远程仓库名称 # 查看远程仓库所有分支
-~~~
-
-- 切换分支
-
-~~~bash
-git checkout 分支名
-git checkout -b 分支名   #创建分支并直接切换到该分支
-~~~
-
-- 合并分支`相当于把修改了的文件拉过来`
-
-~~~bash
-git checkout master
-git merge 分支名
-~~~
-
-- 删除分支
-
-~~~bash
-git branch -d 分支名
-
-git push origin --delete 分支名 # 删除远程分支名
-~~~
-
-#### 2.2.4 解决冲突
-
-- 冲突的表现
-- 冲突的解决
-  - 第一步：编辑，删除特殊标记`<<<` `===`
-  - 第二步：修改到满意位置，保存退出
-  - 第三步：添加到缓存区  `git  add 文件名`
-  - 第四步：提交到本地库`git commit -m '日志信息' `  `注意：后面一定不能带文件名`
-
-#### 2.2.5 跟踪分支
-
-当远程仓库存在一个分支，而本地没有该分支则需要跟踪分支
+**git branch**
 
 ```bash
-git checkout 远程仓库分支名 # 在本地下载该分支
+# 列出本地的所有分支，当前所在分支以 "*" 标出
+$ git branch
 
-git checkout -b 本地分支名称 远程仓库名称/远程仓库分支名 # 下载并改名
+# 列出本地的所有分支并显示最后一次提交，当前所在分支以 "*" 标出
+$ git branch -v
+$ git branch --list
+
+# 创建新分支，新的分支基于上一次提交建立
+$ git branch <分支名名称>
+```
+
+```bash
+# 修改分支名称
+
+# 如果不指定原分支名称则为当前所在分支
+$ git branch -m <原分支名称> <新的分支名称>
+
+# 强制修改分支名称
+$ git branch -M <原分支名称> <新的分支名称>
+```
+
+```bash
+# 删除指定的本地分支
+$ git branch -d <分支名称>
+
+# 强制删除指定的本地分支
+$ git branch -D <分支名称>
 ```
 
 
 
-## `Git` 结合`Github`
+**git checkout**
 
-远程仓库名称：origin 
+切换分支后，暂存区、工作区的文件内容也会跟着切换
 
-#### 1.1 连接
+```bash
+# 切换到已存在的指定分支
+$ git checkout <分支名称>
 
-*注：本地的一个文件夹对应`Github`的一个仓库*
+# 创建并切换到指定的分支，保留所有的提交记录
+# 等同于 "git branch" 和 "git checkout" 两个命令合并
+$ git checkout -b <分支名称>
 
-- 基于`https`连接
+# 创建并切换到指定的分支，删除所有的提交记录
+$ git checkout --orphan <分支名称>
+```
+
+
+
+实际上当工作区有文件状态被修改，但是又没有 commit。这个时候想切换分支 Git 是不支持的。
+
+
+
+### 1.3.2 合并分支与解决冲突
+
+![image-20230504203739451](mark-img/image-20230504203739451.png)
+
+![image-20230504203802430](mark-img/image-20230504203802430.png)
+
+
+
+- `rebase` 并没有进行合并操作，只是提取了当前分支的修改，将其复制在了目标分支的最新提交后面
+- `merge` 是一个合并操作，会将两个分支的修改合并在一起
+
+
+
+**git merge**
+
+把两个分支最新的2个 commit 合并成一个 commit。最后的分支树呈现非线性的结构
+
+```bash
+# 合并所有分支
+$ git merge
+
+# 把指定的分支合并到当前所在的分支下，并自动进行新的提交
+$ git merge <分支名称>
+
+# 把指定的分支合并到当前所在的分支下，不进行新的提交
+$ git merge --no-commit <分支名称>
+```
+
+产生冲突后根据前后的比较，进行修改即可
+
+
+
+**git  rebase**
+
+git reabse 将需要合并的分支的当前 commit 复制到 master 的最新 commit 之后，会形成一个线性的分支树
+
+```bash
+$ git rebase <分支名称>
+```
+
+
+
+**使用 git rebase 合并多次 commit 的方法**
+
+https://juejin.cn/post/6844903600976576519
+
+
+
+
+
+
+## 1.4 Github 使用指南
+
+### 1.4.1 Github 连接记录
+
+- **基于 https 连接**
 
 ~~~bash
+# 添加一个远程仓库
 git remote add origin https://github.com/cocoonnu/WebProjects.git
+
+# 修改主分支名称
 git branch -M main
-git push -u origin main # 第一次push 且需要登录
+
+# 第一次 push 且需要登录
+git push -u origin main 
 ~~~
 
-- 基于`ssh`连接
 
-1、输入:`ssh-keygen -t rsa -C GitHub邮箱地址`  
 
-2、进入`c/users/lenovo/.ssh`目录，复制`id_rsa.pub`文件内容
+- **基于 ssh 连接**
 
-3、登录`GitHub`  `Settings`  --> `SSH and GPG keys ` --> `New SSH Key
+输入: `ssh-keygen -t rsa -C <GitHub注册的邮箱>`  
+
+进入 `c/users/lenovo/.ssh` 目录，复制 `id_rsa.pub` 文件内容
+
+登录 `GitHub`  `Settings`  ->  `SSH and GPG keys`  -> `New SSH Key`
 
 ```bash
 git remote add origin git@github.com:cocoonnu/WebProjects.git
 git branch -M main
-git push -u origin main # 第一次push
+git push -u origin main
 ```
 
-#### 1.2 推送
 
-~~~bash
-git push # 推送主分支main（不是第一次）
 
-git push -u origin 分支名 # 推送分支（第一次）
-git push # 推送分支（不是第一次）
-~~~
 
-#### 1.3 克隆
 
-克隆就是将仓库复制到本地生成一个文件夹
+### 1.4.2 远程仓库连接指令
 
-~~~bash
-git clone  远程地址
-~~~
-
-#### 1.4 拉取
-
- 将远程仓库的分支同步到本地
+**git remote**
 
 ```bash
-git pull # 默认主分支
+# 添加远程仓库
+$ git remote add <远程仓库的别名> <远程仓库的URL地址>
 
-git pull origin 分支名
+# 修改远程仓库的别名
+$ git remote rename <原远程仓库的别名> <新的别名>
+```
+
+```bash
+# 列出已经存在的远程仓库
+$ git remote
+
+# 列出远程仓库的详细信息，在别名后面列出URL地址
+$ git remote -v
+$ git remote --verbose
+
+# 删除指定名称的远程仓库
+$ git remote remove <远程仓库的别名>
+
+# 修改远程仓库的 URL 地址
+$ git remote set-url <远程仓库的别名> <新的远程仓库URL地址>
 ```
 
 
 
-#### 1.5 解决冲突
+**git clone**
 
-`注意：解决冲突后的提交是不能带文件名的`
+```bash
+# 默认在当前目录下创建和版本库名相同的文件夹并下载版本到该文件夹下
+$ git clone <远程仓库的网址>
 
-`如果不是基于远程库最新版做的修改不能推送，必须先pull下来安装冲突办法解决`
+# 指定本地仓库的目录
+$ git clone <远程仓库的网址> <本地目录>
 
-#### 1.6 跨团队合作
-
-`代码review之后合并`
-
-- **适用于个人**
-
-  **邀请成员**:`Settings` --> `Collaborators` -->`填写用户名` -->`打开链接接受邀请`
-
-- **企业**   `创建一个组织` `方便管理`
-
-- **review**
-
-    `组织做review`  `通过Pull request`
-
-- **给开源社区共享代码**
-
-    `点击别人仓库的fork 到自己的仓库`   -- > `然后clone下来 修改后推送到远程库`  --> `点击Pull Request请求` --> `Create pull request发消息`
-
-#### 1.7 Tag标签
-
-`为了清晰的版本管理，公司一般不会直接使用commit提交`
-
-```
-git tag -a v1.0 -m '版本介绍'   #创建本地tag信息
-git tag -d v1.0    		#删除tag
-git push origin --tags   #将本地tag信息推送到远程库
-git pull origin --tags    #拉取到本地
-
-git checkout v.10    #切换tag
-git clone -b v0.1 地址   #指定tag下载代码
+# -b 指定要克隆的分支，默认是主分支
+$ git clone <远程仓库的网址> -b <分支名称> <本地目录>
 ```
 
 
 
-#### 1.8 部署静态网站
+### 1.4.3 远程仓库拉取指令
 
-将项目 dist 文件夹部署到一个仓库中，进入仓库的 `setting` -> `pages`
+**git fetch**
+
+只是将远程仓库的分支最新版本取回（拉取）到本地，**工作区无变化**
+
+```bash
+# 将远程仓库所有分支的最新版本全部取回到本地
+$ git fetch <远程仓库的别名>
+
+# 将远程仓库指定分支的最新版本取回到本地
+$ git fetch <远程主机名> <分支名>
+```
+
+
+
+**跟踪分支**
+
+从远程仓库拉取分支之后，执行切换命令就自动变成本地分支了，并进行了跟踪
+
+```bash
+# 简写形式 从本地切换一下即可
+git checkout 远程仓库分支名 
+
+# 完整写法 切换分支并支持改名
+git checkout -b 本地分支名称 远程仓库名称/远程仓库分支名 
+```
+
+
+
+**git pull**
+
+从远程仓库获取分支最新版本并合并到本地。 **首先会执行 `git fetch`，然后执行 `git merge`**，把获取的分支的 HEAD 合并到当前分支。工作区直接变化
+
+```bash
+# 从远程仓库获取当前分支的最新版本并合并
+$ git pull
+
+# 从远程仓库获取指定分支的最新版本并合并本地指定分支
+git pull <远程主机名> <远程分支名>:<本地分支名>
+
+# 使用 rebase 的模式进行合并
+git pull --rebase <远程主机名> <远程分支名>:<本地分支名>
+```
+
+```bash
+# 将远程主机 origin 的 master 分支拉取过来，与本地的 brantest 分支合并。
+git pull origin master:brantest
+
+# 如果远程分支是与当前分支合并，则冒号后面的部分可以省略。
+git pull origin master
+```
+
+
+
+
+
+### 1.4.4 远程仓库提交指令
+
+**git push**
+
+```bash
+# 把本地仓库的分支推送到远程仓库的指定分支
+# 如果远程分支名和本地分支名同名则只需要写一个
+$ git push <远程仓库名> <本地分支名>:<远程分支名>
+$ git push origin master
+
+# 如果当前分支与远程分支之间存在追踪关系，则本地分支和远程分支都可以省略
+$ git push <远程仓库名>
+
+# 指定 origin 为默认远程仓库
+$ git push -u origin master
+
+# 如果只有一个分支，并指定了默认远程仓库
+$ git push
+```
+
+```bash
+# 删除指定的远程仓库的分支
+$ git push <远程仓库名> --delete <远程分支名>
+
+# 等效
+$ git push <远程仓库的别名> :<远程分支名>
+```
+
+
+
+**如果你的本地仓库版本落后于远程仓库版本，那么有两种方式**
+
+拉取一下远程仓库的最新版本，解决冲突后再提交
+
+```bash
+$ git pull
+
+$ git add .
+
+$ git commit
+```
+
+
+
+直接强制提交，远程仓库的最新版本会被覆盖
+
+```bash
+$ git push -f
+```
+
+
+
+
+
+### 1.4.5 本地分支提交步骤
+
+参考文档：https://juejin.cn/post/7012617882148274190
+
+首先创建一个本地分支
+
+```bash
+# 创建一个基于远程仓库某个分支开辟的本地分支
+$ git checkout -b 分支名 origin/远程分支名
+
+# 或者直接创建一个基于当前分支开辟的分支
+$ git checkout -b 分支名
+```
+
+
+
+然后提交至远程仓库
+
+```bash
+# 将本地分支推送至与其存在“追踪关系”的远程分支（一般两者是同名的）
+# 若该远程分支不存在，则会自动新建一个同名的远程分支
+$ git push <远程主机名> <分支名>
+
+$ git push <远程仓库名> <本地分支名>:<远程分支名>
+```
+
+
+
+建立追踪关系并指定默认主机
+
+```bash
+# 首次提交需要
+$ git push -u origin <分支名>
+
+# 下一次提交直接
+$ git push
+```
+
+> 切换不同分支也只需要 git push 即可
+
+
+
+
+
+## 1.5 日常使用业务记录
+
+### 1.5.1 使用 stash 来暂存文件
+
+会有这么一个场景，现在你正在用你的 feature 分支上开发新功能。这时，生产环境上出现了一个 bug 需要紧急修复，但是你这部分代码还没开发完，不想提交，怎么办？这个时候可以用 `git stash` 命令先把工作区已经修改的文件暂存起来，然后切换到 hotfix 分支上进行 bug 的修复，修复完成后，切换回 feature 分支，从堆栈中恢复刚刚保存的内容。
+
+
+
+**git  stash**
+
+每次缓存之后，工作区就会变干净。
+
+```bash
+# 把本地工作区的改动暂存起来
+$ git stash
+
+# 执行存储时，添加备注，方便查找
+$ git stash save "message"
+
+# 应用最近一次暂存的修改，并删除暂存的记录
+$ git stash pop 
+
+# 应用某个存储,但不会把存储从存储列表中删除，默认使用第一个存储
+$ git stash apply
+
+# 应用某个指定的存储
+$ git stash apply stash@{n}
+
+# 查看 stash 有哪些存储
+$ git stash list
+
+# 删除所有缓存的 stash
+$ git stash clear
+```
+
+存储以堆的形式将工作区的修改缓存，`stash@{0}` 永远指向最新的缓存
+
+![image-20230504212258082](mark-img/image-20230504212258082.png) 
+
+
+
+
+
+### 1.5.2 工作区撤销更改方式
+
+对工作区的修改、删除进行撤销
+
+```bash
+$ git checkout -- <filename>
+```
+
+
+
+对暂存区文件进行删除并撤销修改
+
+```bash
+$ git reset <filename>
+
+$ git checkout -- <filename>
+```
+
+
+
+### 1.5.3 Github 部署静态网站
+
+将项目 dist 文件夹部署到一个仓库中，进入仓库的 `setting` -> `pages`，选择根路径然后点 `Save` 即可！
 
 ![image-20230325224204122](mark-img/image-20230325224204122.png)
 
 
-
-选择根路径然后点 `Save` 即可！
-
-
-
-## Git工作流
-
-*1、上传git时，node_modules可以加入.gitignore  但项目根目录一定要有package.json文件*
-
-
-
-
-
-#### 1.1 概念
-
-```
-在项目开发过程中使用Git的方式
-```
-
-#### 1.2 分类
-
-##### 1.2.1 集中式工作流
-
-```
-像SVN一样，集中式工作流有一个中央仓库，所有的修改都提交到了Master分支上
-```
-
-##### 1.2.2 `GitFlow`工作流 
-
-主干分支`master`  开发分支`develop`  修复分支`hotfix`   预发布分支`release`  功能分支`feature`
-
-```
-GitFlow 有独立的分支，让发布迭代过程更流畅。
-```
-
-##### 1.2.3 Forking 工作流    
-
-```
-在 GitFlow 基础上， 充分利用了 Git 的 Fork 和 pull request 的功能以达到代码审核的目的。 
-安全可靠地管理大团队的开发者
-```
-
-
-
-
-
-## Git 报错问题处理
-
-### 删除工作区内容
-
-即回到该版本初始状态
-
-```bash
-```
-
-
-
-
-
-
-
-### 低于远程的版本
-
- 报错：`Updates were rejected because the tip of your current branch is behind`：
-
-原因是本地仓库中有部分代码版本低于远程的版本，肯定是版本回退导致的！！
-
-```bash
-git pull origin master //将远程代码拉取到本地，但存在冲突无法merge
-
-git add -u  //将冲突的文件resolve掉之后才能成功pull，-u的意思是将文件的修改、文件的删除，添加到暂存区
-
-git commit -m "注释"
-
-git pull
-```
-
-之后手动解决冲突
-
-```
-<<<<<<< HEAD
-
-本地代码
-
-=======
-
-拉下来的代码
-
->>>>>>>
-
-```
-
-
-
-解决完所有冲突后
-
-```
-git add. 
-git commit -m "描述"//不加描述的话可能会弹出一个窗口要求填写描述信息，填上保存关掉即可
-git push master origin
-```
-
-
-
-如果 `git push master origin` 还报错
-
-```
-// 重新尝试连接
-git remote remove origin
-
-git remote add origin git@github.com:cocoonnu/airbnb-ssr.git
-
-// 推送
- git push --set-upstream origin main^
-```
 

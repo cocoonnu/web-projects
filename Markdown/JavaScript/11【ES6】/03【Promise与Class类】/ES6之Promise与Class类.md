@@ -3,37 +3,70 @@
 
 ## 1.1 Promise 是什么？
 
-Promise 是异步操作的一种解决方案。具体八股文自己去搜，这里主要讲怎么用！！
+Promise 是异步操作的一种解决方案。不过它不止可以解决异步的问题，还可以通过它返回的不同状态返回其他的问题。得到 promise 对象的状态有两种方式：**`then` 回调、`async/await`**
 
 
 
-Promise 的特点是异步执行，它不会按照 js 代码执行顺序而执行，通常会安排到后面
+**`then` 回调：**
 
-
-
-什么时候使用 Promise 呢？
-
-Promise 一般用来解决层层嵌套的回调函数（回调地狱 callback hell）的问题。
-
-
-
-**下面展示回调地狱的例子：**
-
-案例：分别间隔一秒打印省市县
+我们在同步代码中直接输出一个 promise 对象的状态，永远得到的是一个 `pending`！那么我们需要 `then` 回调异步的获取 promise 对象的状态。**回调函数的代码会等到同步代码执行完毕，再作为微任务（异步任务）执行**
 
 ```js
-// 通过回调函数的方式，实现异步
-setTimeout(() => {
-    console.log("云南省");
-    let str01 = "云南省";
-    setTimeout(() => {
-        console.log(str01 + "玉溪市");
-        let str02 = "云南省玉溪市";
-        setTimeout(() => {
-            console.log(str02 + "峨山县");
-        }, 1000, str02);
-    }, 1000, str01);
-}, 1000);
+new Promise((resolve, reject)=>{
+    console.log('new Promise')
+    resolve()
+}).then(()=>{
+    console.log('then')
+})
+
+console.log(3)
+// new Promise 3 then
+```
+
+
+
+**`async/await:`**
+
+我们可以定义一个 async 函数再加上 await 语句，使得**我们直接可以在同步代码中得到 promise 对象的状态！**
+
+```js
+async function test() {
+    let res = await new Promise((resolve, reject)=>{
+    	console.log('new Promise')
+    	resolve()
+	})
+    
+    console.log(3)
+}
+
+test() // new Promise  3
+```
+
+
+
+**Promise 同时可以解决回调地狱的问题**
+
+```js
+doSomething(function(result) {
+  doSomethingElse(result, function(newResult) {
+    doThirdThing(newResult, function(finalResult) {
+      console.log('得到最终结果: ' + finalResult);
+    }, failureCallback);
+  }, failureCallback);
+}, failureCallback);
+```
+
+```js
+doSomething().then(function(result) {
+  return doSomethingElse(result);
+})
+.then(function(newResult) {
+  return doThirdThing(newResult);
+})
+.then(function(finalResult) {
+  console.log('得到最终结果: ' + finalResult);
+})
+.catch(failureCallback);
 ```
 
 
@@ -43,8 +76,6 @@ setTimeout(() => {
 ## 1.2 Promise 的基本用法
 
 Promise 实质上是一个构造函数，所以我们一般通过实例化的方式来使用它。
-
-
 
 创建 promise 对象
 
@@ -60,8 +91,6 @@ let p = new Promise(function(resolve,reject) {
 })
 ```
 
-
-
 使用 then 处理
 
 ```js
@@ -72,8 +101,6 @@ p.then(function(value) {
     console.log(reason);
 })
 ```
-
-
 
 使用 then 和 catch 一起处理
 
@@ -378,7 +405,7 @@ p.finally(function() {
 
 这里介绍一下 `Promise.resolve` 和 `Promise.reject` 的使用方法。
 
-感觉作用就是实现直接原地执行一个异步函数，不用通过封装一个函数返回了。
+**作用就是接收参数并直接生成一个新的 Promise 对象**
 
 参考：https://blog.csdn.net/lq15310444798/article/details/81275278
 
@@ -613,9 +640,9 @@ Promise.allSettled([p1, p2, p3, p4, p5]).then(values => {
 
 ## 1.8 async/await 函数
 
-当我们需要处理一个 promise 对象时，如果我们要获取该 promise 对象的结果 PromiseResult，那么我们就需要用到 async/await 。
+当我们需要处理一个 promise 对象时，如果我们要获取该 promise 对象的结果 PromiseResult，那么我们就需要用到 async/await 。通常搭配 try...catch 语句一起实现。
 
-简单代码介绍：
+简单代码预览：
 
 ```js
 async function main() {
@@ -636,7 +663,15 @@ main(); // 000
 
 
 
-**1、async**
+MDN：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function
+
+>async 函数可能包含 0 个或者多个 [`await`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/await) 表达式。await 表达式会暂停整个 async 函数的执行进程并出让其控制权，只有当其等待的基于 promise 的异步操作被兑现或被拒绝之后才会恢复进程。promise 的解决值会被当作该 await 表达式的返回值。使用 `async`/`await` 关键字就可以在异步代码中使用普通的 `try`/`catch` 代码块。
+
+由此可得，async 函数中的代码并不是异步执行的。而是必须等 await 语句执行完成，才会执行下一条语句！
+
+
+
+**async**
 
 当一个普通函数加上 `async` 则 **返回值一定是一个 promise 对象**！
 
@@ -664,7 +699,7 @@ let result = addShopCart();
 
 
 
-**2、await**
+**await**
 
 await 只能运用在 async 函数中！它的右边为 promise 对象或者其他值
 
@@ -689,7 +724,9 @@ main(); // 222 111
 
 
 
-**3、`try {} catch(err) {}`**
+**`try {} catch(err) {}`**
+
+MDN：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch
 
 如果我们要**分开处理  promise 对象成功态、失败态**，那么我们就要用到它。
 
@@ -719,8 +756,6 @@ main(); // 000
 
 
 ## 1.9 Promise 的注意事项
-
-
 
 **1、不推荐在 resolve() 或 reject() 后再写代码**
 

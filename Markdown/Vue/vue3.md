@@ -331,7 +331,7 @@ HTML 中还是当作对象读取
 
 作用：setup 中定义的变量定义为响应式变量（**数据为复杂类型：对象、数组**）
 
-![image-20230211224700258](D:\文档\学习文件\GitWebProjects\Markdown\Vue\mark-img\image-20230211224700258.png)
+<img src=mark-img/image-20230211224700258.png  align=center />
 
 
 
@@ -1127,7 +1127,7 @@ function addCar() {
 
 ## 4.5 provide/inject
 
-
+官方文档：https://cn.vuejs.org/api/composition-api-dependency-injection.html
 
 - 作用：实现<strong style="color:#DD5145">祖组件与其后代组件间</strong>通信
 
@@ -1817,7 +1817,7 @@ const props = defineProps<{
 
 
 
-#### 7.2.4.3 props 双向绑定
+#### 7.2.4.3 v-model实现双向绑定
 
 当我们想把父组件传过来的参数变成双向绑定时，**即可读也可写**
 
@@ -1870,9 +1870,9 @@ function toggle() {
 
 ### 7.2.5 defineExpose
 
-子组件导出的参数，父组件可通过 ref 属性获取到
+官方文档：https://cn.vuejs.org/api/sfc-script-setup.html#defineexpose
 
-
+setup 语法糖独有，子组件导出的参数，父组件可通过 ref 属性获取到
 
 子组件
 
@@ -1919,7 +1919,7 @@ const helloClick = () => {
 
 ### 7.2.6 $attrs 与 Attributes 继承
 
-官方文档：https://cn.vuejs.org/guide/components/attrs.html#attribute-inheritance
+Attributes 定义：https://cn.vuejs.org/guide/components/attrs.html#attribute-inheritance
 
 
 
@@ -2019,11 +2019,11 @@ console.log(attrs)
 
 
 
-### 7.2.7 v-model+defineProps
+### 7.2.7 v-model实现嵌套的双向绑定
 
 当父组件要控制 el 组件的显示与隐藏时，以下是步骤和方法：
 
-继承了上面 `props 双向绑定  ` 这个知识点，还多了一个步骤
+继承了上面 `v-model实现双向绑定  ` 这个知识点，还需要定义一个中间变量！
 
 
 
@@ -2091,8 +2091,6 @@ watch(() => dialogVisibleIn.value, (newValue) => {
     </el-dialog>
 </template>
 ```
-
-
 
 
 
@@ -2390,6 +2388,12 @@ TypeScript 中文网：https://www.tslang.cn/docs/home.html
 
 
 
+**@types 的规范**
+
+`@types` 用来统一管理第三方库的声明文件。当我们在用 typescript 进行开发时，会遇到很多类型定义的问题。比如说当我们 npm install 完一个包，却发现 import 的时候 TS 报错，说找不到这个包。其原因是这个包内不含类型声明，所以 TS 并不能识别这个模块。这个时候我们可以去通过 `npm install @types/pagename` 来下载这个包的声明文件，从而解决 TS 的报错
+
+
+
 **忽略 TS 校验**
 
 `  // @ts-ignore`：单行
@@ -2515,11 +2519,13 @@ loggingIdentity(5) // 报错 5不具有 length
 
 
 
-
-
 **Vue3 中 TS 的类型声明总结**
 
-- props 参数中声明类型
+https://cn.vuejs.org/guide/typescript/composition-api.html
+
+
+
+- **props 参数中声明类型**
 
 ```ts
 // 必须用大写的 String Boolean 来 new 一个type变量
@@ -2541,7 +2547,7 @@ let props = defineProps({
 
 - **PropType 的使用**
 
-用于在用运行时 props 声明时给一个 prop 标注更复杂的类型定义。
+用于Vue3 的 props 声明时给一个 prop 标注更复杂的类型定义。
 
 ```ts
 import type { PropType } from 'vue'
@@ -2569,19 +2575,9 @@ let props = defineProps({
 
 
 
-- 简单的 ref
-
-```ts
-let num = ref<number>(0)
-let numArr = ref<Book[]>([])
-let numObj = ref<Book>()
-```
 
 
-
-
-
-## 7.8 vue3 插槽使用方法
+## 7.8 Vue3 插槽使用方法
 
 让父组件可以向子组件指定位置插入html结构，也是一种组件间通信的方式，适用于 <strong style="color:red">父组件 ===> 子组件</strong> 。
 
@@ -2873,6 +2869,139 @@ emits: ['update:title'],
     
 this.$emit('update:title', value)
 ```
+
+
+
+## 7.10 KeepAlive内置标签的使用
+
+官方文档：https://cn.vuejs.org/guide/built-ins/keep-alive.html
+
+
+
+vue2 中的使用
+
+```vue
+// 针对普通组件直接嵌套即可
+
+// 针对动态组件 内部存在可以对组件名进行字符串匹配的api
+<keep-alive>
+  <component :is="view"></component>
+</keep-alive>
+
+
+// 针对路由组件
+<keep-alive>
+    <!-- 需要缓存的视图组件 --> 
+    <router-view v-if="$route.meta.keepAlive"></router-view>
+</keep-alive>
+```
+
+
+
+vue3中对路由组件使用有所变化
+
+```vue
+<router-view v-slot="{ Component }" v-if="route.meta.keepAlive">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+</router-view>
+```
+
+https://router.vuejs.org/zh/guide/migration/#router-view-%E3%80%81-keep-alive-%E5%92%8C-transition
+
+
+
+
+
+## 7.11 单文件组件 CSS 功能
+
+Vue3 官方文档：https://cn.vuejs.org/api/sfc-css-features.html
+
+Vue2 官方文档（已废弃）：https://vue-loader-v14.vuejs.org/zh-cn/features/scoped-css.html
+
+参考视频：https://www.bilibili.com/video/BV1gM4y1N7AX/?spm_id_from=333.788
+
+
+
+**添加 scoped 使得在单页面项目中可以使组件之间互不污染，实现模块化**
+
+实现原理：编译时默认会在每个选择器后面添加一个 **组件唯一标识的属性选择器**
+
+```vue
+<template>
+    <div class="text">
+        <input type="text">
+    </div>
+</template>
+
+<style scoped>
+.text {
+    width: 100px;
+    height: 100px;
+}
+
+.text input {
+    background-color: black;
+}
+</style>
+```
+
+![image-20230503114727640](mark-img/image-20230503114727640.png)
+
+![image-20230503114741389](mark-img/image-20230503114741389.png)
+
+
+
+
+
+**样式穿透实现方法**：即取消对选择器的默认添加样式
+
+添加 `::v-deep` 或者 `:deep(input)` 来实现，CSS、LESS、SASS 均可使用
+
+```css
+.text :deep(input) {
+    background-color: black;
+}
+
+.text ::v-deep input {
+    background-color: black;
+}
+```
+
+```scss
+.text {
+    width: 100px;
+    height: 100px;
+
+    :deep(input) {
+        background-color: black;
+    }
+}
+```
+
+![image-20230503115334710](mark-img/image-20230503115334710.png)
+
+
+
+**实现样式穿透的选择器，其子选择器也会实现样式穿透**
+
+```scss
+:deep(.aaa) {
+    width: 100px;
+    height: 100px;
+    background-color: black;
+
+    .bbb {
+        width: 50px;
+        height: 50px;
+    }
+}
+```
+
+![image-20230503115748257](mark-img/image-20230503115748257.png)
+
+
 
 
 

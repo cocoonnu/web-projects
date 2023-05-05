@@ -1,7 +1,4 @@
 ## 第一章 HTML CSS
-
-
-
 ### 1.1 CSS 常用样式记录
 
 - **calc() 函数**
@@ -35,6 +32,7 @@ width: fit-content
 background: linear-gradient(90deg, rgba(223, 229, 230, 0) 0%,
 rgba(223, 229, 230, 1) 100%);
 ```
+
 
 
 
@@ -289,14 +287,18 @@ input::placeholder {
 div {
     position: absolute;
     top: 50%;
-    transform: translate(-50%,-50%);
     left: 50%;
+    transform: translate(-50%,-50%);
 }
 ```
 
 
 
 #### 1.7.3 Flex/Grid 布局技巧
+
+Flex：https://vue3js.cn/interview/css/flexbox.html
+
+Grid：https://vue3js.cn/interview/css/grid.html
 
 ```css
 /* flex实现居中 */
@@ -324,7 +326,7 @@ div {
 
 
 
-#### 1.7.4 CSS 文字属性
+#### 1.7.4 CSS 文字属性使用
 
 ```scss
 // 引入字体
@@ -350,6 +352,20 @@ vertical-align
 text-align
 ```
 
+```less
+// 设置单行文本省略号
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+
+// 设置单行文本省略号
+// 一定要垂直布局
+width: 400px;
+-webkit-line-clamp: 2;
+overflow: hidden;
+text-overflow: ellipsis;
+```
+
 
 
 
@@ -358,8 +374,6 @@ text-align
 
 
 ## 第二章 JavaScript
-
-
 
 ### 2.1 ES6 使用笔记
 
@@ -496,7 +510,7 @@ https://vue3js.cn/interview/JavaScript/array_api.html
 
 容易搞混的几个api
 
-`arr.splice`：arr.splice(下标，个数，替换的值)
+`arr.splice`：arr.splice(下标，个数，替换的值)，替换个数和删除个数可以不一致
 
 `arr.slice`：截取下标为 a ，到下标为 b（不包括 b）的区间（字符串也适用）
 
@@ -519,6 +533,8 @@ let a= [].concat(1,2,3,[4,5],[6,7])
 5、arr.reverse()：用来将一个数组中的全部项顺序置反
 
 6、arr.indexOf(value)：数组存在value则返回下标 不存在返回
+
+7、arr.join(',')：数组转字符串
 ```
 
 
@@ -643,8 +659,6 @@ for (let key of arr) {}
 - 如果`compareFunction(a,b)`小于0，那么`a`排`b`前面
 - 如果`compareFunction(a,b)`大于0，那么`a`排`b`后面
 - 如果`compareFunction(a,b)`等于0，那么`a,b`的相对位置不变
-
-
 
 ```js
 // 默认排序从小到大
@@ -827,17 +841,43 @@ if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest
 
 
 
+#### 2.5.4 事件捕获和事件冒泡
+
+**事件流：有三个阶段**
+
+- 事件捕获阶段：一种从上往下的传播方式，由DOM中最高层的父节点然后逐渐向下传播到触发节点
+
+- 处于目标阶段
+
+- 事件冒泡阶段：一种从下往上的传播方式，由触发节点然后逐渐向上传播到DOM中最高层的父节点
 
 
-### 2.6 事件冒泡和事件委托
 
-- 由于事件捕获、事件冒泡会导致多个对象产生监听 
-- e.target 返回真正触发事件的对象 和 this 可能不一样！！
-- 事件委托通常需要结合使用 e.target 属性
+**事件模型可以分为三种**
+
+- 原始事件模型：同一个类型的事件只能绑定一次、只支持冒泡，不支持捕获、btn.onclick = fun
+- 标准事件模型：1、使用addEventListener进行监听
+- 标准事件模型：2、第三个参数决定该元素的事件在捕获还是冒泡中执行，可绑定多个事件
+- 标准事件模型：3、事件捕获先执行，再目标元素事件，再事件冒泡
+- https://github.com/febobo/web-interview/issues/64
 
 
 
+**addEventListener 使用方法**
 
+https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener
+
+> 如果设置第三个参数为useCapture，则默认为false，事件冒泡执行。为true，事件捕获执
+
+
+
+vue 里面的事件监听：
+
+- 默认为事件冒泡执行：`@click="doThis"`
+- 设置为事件捕获执行：`@click.capture="doThis"`
+- 阻止该元素触发事件冒泡：`@click.stop="doThis"`
+
+https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 
 
@@ -845,19 +885,32 @@ if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest
 
 
 
-### 3.1 Typora 图片设置
+### 3.1 Typora 配置记录
 
-1、去偏好设置中设置图片指定路径：`./mark-img`
+- [x] **图像配置**
 
-2、粘贴图片后改一下图片 url，确保 github 可以识别：
+去偏好设置中设置图片指定路径：`./mark-img`，另外把下面的框全部勾选上即可
 
-原图片地址：`D:\文档\学习文件\GitWebProjects\Markdown\Vue\mark-img\image-20230118225827872.png`
+```
+![图片描述](本地图片地址，最好用相对路径！)
+[图片描述](网络图片地址)
+```
 
-改为：`mark-img/image-20230118225827872.png`     注意是这个： `/` 
+
+
+- [x] **图片位置调整**
+
+```html
+<!-- 直接使用html标签即可 而且可以不用加引号！ -->
+<img src=mark-img/image-20230211224700258.png  align=center />
+```
 
 
 
-3、图片位置调整：https://blog.csdn.net/K346K346/article/details/108162853
+- [x] **Latex 语法**
+
+参考文档：https://juejin.cn/post/6844903605720317959
+
 
 
 
@@ -901,23 +954,57 @@ ctrl + b: 空了
 
 ### 3.3 VScode 插件介绍
 
-1、pritter-Code formatter - 代码格式化
+- pritter-Code formatter - 代码格式化
 
-https://blog.csdn.net/qq_45981075/article/details/114551233
-
-
-
-2、Vue Language Features (Volar) - Vue3 代码支持
+参考文档：https://blog.csdn.net/qq_45981075/article/details/114551233
 
 
 
-3、Vetur - Vue2 代码支持
+- Vue Language Features (Volar) - Vue3 代码支持
+
+
+
+- Vetur - Vue2 代码支持
+
+1、LiveServer（实时更新网页
+2、REST Client（客户端请求
+3、GitLens（git查看修改
+4、CSS Peek（查css代码
+5、Quokka.js（提醒js代码错误
+6、CodeSnap（代码截图
+7、Auto Rename Tag（自动修改前后标签
+8、Snippets（缩写
+9、Bracket Pair Colorizer（括号颜色
+10、indent-rainbow（缩进颜色
+11、vscode-icons（更好识别的图标
+12、Prettier（自动整理代码格式
+13、Color Highlight（颜色提醒
+14、Dracula Official（主题
+
+
+
+\1. One Dark Pro - 个人觉得是最好看的主题
+\2. Code Spell Checker - 单词拼写检查，有时看到拼错的单词会非常难受，强迫症推荐
+\3. DotENV - .env环境变量文件语法高亮
+\4. ESLint + Stylelint - 统一代码风格
+\5. SVG - svg 图片预览
+\6. Power Mode - 炫酷的键入动效
+\7. Tabnine - AI 代码自动补全，个人觉得比copilot好用，它不会打断你的代码思路
+\8. Trailing Spaces - 行末空格高亮，貌似新版vscode内置了
 
 
 
 ### 3.4 VScode 设置记录
 
-- 在 vs code 中关闭对 js、ts 文件校验：`搜索 validata 点击 TypeScript`
+- 在 VScode 中关闭对 js、ts 文件校验：搜索 validata 点击 TypeScript
+
+
+
+- Volar 关闭箭头函数和CSS的reference：搜索一下即可
+
+
+
+- 关闭 VScode Git 功能： 设置中搜索 `git:Enabled`
 
 
 

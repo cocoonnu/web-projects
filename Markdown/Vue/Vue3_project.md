@@ -206,11 +206,11 @@ eslint 官网：https://zh-hans.eslint.org/docs/latest/
 
 
 
-### 7、sass 的使用方法
+### 7、Sass 的使用方法
 
-sass 帮助我们集中式管理 css 样式
+Sass 帮助我们集中式管理 CSS 样式，但是 Sass 文件的后缀最好用 Scss。Scss 其实是 Sass 的新标准，它更好的适配了 CSS 的书写规范！！中文文档：https://www.sass.hk/docs/
 
-下载依赖：`npm i sass -D`  注意是 SASS ！！！
+下载依赖：`npm i sass -D` 
 
 
 
@@ -289,13 +289,9 @@ css: {
 
 
 
-### 8、对 axios 进行 ts 封装
+### 8、对 Axios 进行 TS 封装
 
-axios 官网：https://axios-http.com/zh/
-
-
-
-首先确定请求域名，详细请看 vite 配置代理那一节
+axios 官网：https://axios-http.com/zh/，如果是 TS 封装，最好下载 `npm i @types/axios`
 
 
 
@@ -350,7 +346,6 @@ class Http {
             return Promise.reject(err)
         })
     }
-
 
     // 封装 get/post 请求函数
     public httpRequestGet<T>(url: string, params: AxiosRequestConfig): Promise<T> {

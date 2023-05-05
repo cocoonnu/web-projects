@@ -263,7 +263,7 @@ devServer: {
 
 在 src 文件夹下新建 api 文件夹，新建 `requests.js` 来二次封装 axios
 
- requests.js：（固定模板）
+ requests.js：
 
 ```js
 // 对axios进行二次封装！让requests代替axios
@@ -277,12 +277,14 @@ const requests = axios.create({
     
     //请求不能超过5S
     timeout: 5000,
-
+    
+    // 请求头
+	// headers: {'X-Custom-Header': 'foobar'}
 });
 
 //请求拦截器----在项目中发请求前执行的函数
 requests.interceptors.request.use(function(config) {
-    // config 为一个 AJAX 对象，内含请求头等数据
+    // config 为请求的 AJAX 对象，内含请求头等数据
 
     return config;
 })
@@ -329,11 +331,9 @@ export default requests;
 index.js：
 
 ```js
-// 统一接口管理：封装所有请求函数
+// 如果请求发送成功，那么请求函数返回一个 promise 对象！！分为成功态和失败态
 
-// 1、如果请求发送成功，那么请求函数返回一个 promise 对象！！分为成功态和失败态
-
-// 2、如果请求发送失败，则返回一个 AxiosError 对象。
+// 如果请求发送失败，则返回一个 AxiosError 对象。
 
 import requests from "./requests";
 
@@ -343,7 +343,7 @@ export const reqgetCategoryList = function() {
     return requests.get(`/product/getBaseCategoryList`); // 本地端口号可以不写
 }
 
-// 带 data 参数的请求函数
+// 带 data 参数的 POST 请求函数
 export const reqgetSearchData = function(value) {
     return requests({
         method: 'POST',
@@ -352,12 +352,17 @@ export const reqgetSearchData = function(value) {
     })
 } 
 
-// 带内置参数的请求函数
+// 带内置参数的 GET 请求函数方式一
 export const reqCheckCart = function(skuId,isChecked) {
     return requests({
         method: 'GET',
         url: `/cart/checkCart/${skuId}/${isChecked}`,
     })
+} 
+
+// 带内置参数的 GET 请求函数方式二
+export const reqCheckCart = function(params) {
+    return requests.get(url, { para })
 } 
 ```
 
