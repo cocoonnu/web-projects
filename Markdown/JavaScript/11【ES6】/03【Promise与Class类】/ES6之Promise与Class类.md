@@ -669,6 +669,8 @@ MDN：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statemen
 
 由此可得，async 函数中的代码并不是异步执行的。而是必须等 await 语句执行完成，才会执行下一条语句！
 
+**那么可以理解为 await 后面的语句就是 then 回调函数，这些代码会加入微任务队列中**
+
 
 
 **async**

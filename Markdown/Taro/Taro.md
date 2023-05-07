@@ -99,7 +99,7 @@ Eslint 官网：https://zh-hans.eslint.org/docs/latest/
 
 Eslint 详细使用介绍：https://juejin.cn/post/6974223481181306888#heading-0
 
-```
+```bash
 npm i eslint -D
 npx eslint --init
 ```
@@ -139,7 +139,7 @@ npx eslint --init
 
 
 
-- 指定解析器：https://zh-hans.eslint.org/docs/latest/use/configure/plugins
+- 指定解析器（一般都用默认的）：https://zh-hans.eslint.org/docs/latest/use/configure/plugins
 
 ```
 npm i -D @babel/eslint-parser@7.15.0
@@ -565,7 +565,7 @@ let scrollTop = ref<number>(-1)
 
 当滚动时发现 `scrollTop` 并不会变化，所以并不会双向绑定
 
-但是后期如果改变 `scrollTop` 的值，那么滚动条会跟着变化
+但是后期如果改变 `scrollTop` 的值，那么滚动条会跟着变化，改完之后再变回 -1 即可
 
 ```ts
 onMounted(function() {
@@ -573,6 +573,7 @@ onMounted(function() {
     // 监听事件 点击顶部日历栏时回到顶部
     Taro.eventCenter.on('toTopFlightInfo', () => {
         scrollTop.value = 0
+        setTimeout(() => { scrollTop.value = -1 }, 1000)
     })
 
 })

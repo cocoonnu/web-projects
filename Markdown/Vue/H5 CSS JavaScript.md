@@ -996,7 +996,7 @@ ctrl + b: 空了
 
 ### 3.4 VScode 设置记录
 
-- 在 VScode 中关闭对 js、ts 文件校验：搜索 validata 点击 TypeScript
+- 在 VScode 中关闭对 js、ts 文件校验：搜索 validate 点击 TypeScript
 
 
 

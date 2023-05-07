@@ -136,6 +136,10 @@ app.use(ElementPlus)
 
 - 加载模块
 
+官方文档：https://element-plus.gitee.io/zh-CN/component/loading.html
+
+使用的是全局加载功能，会占满整个屏幕
+
 ```ts
 import { ElLoading } from 'element-plus'
 
@@ -455,7 +459,7 @@ const value = ref(new Date())
 
 下载依赖：`npm install vue-i18n@next`
 
-
+官方文档：https://kazupon.github.io/vue-i18n/zh/
 
 **在 src 下新建 `language `文件夹**
 
@@ -1719,6 +1723,8 @@ async function submitForm(formEl: FormInstance | undefined) {
 
 Vite + Vue 3+ TS + SSR 的基本原理、构建步骤、目录结构，实现步骤就是先将页面的静态文件在 HTML 中进行展示，随后再渲染 vue 构建好的页面。即**先服务端渲染再客户端渲染**
 
+基本参考 Vite SSR 提供的指南：https://cn.vitejs.dev/guide/ssr.html
+
 ![img](mark-img/b2a78f4a65741e16ae6f0e1725c40abe.png)
 
 - 目录结构
@@ -2202,7 +2208,15 @@ const computedMsg: any = computed({
 
 这次改造方案的目的是让服务端获取到 vuex 里的动态数据，使得在**服务端渲染的时候把动态数据也渲染出来**
 
-服务端获取到 vuex 里的动态数据之后，再同步到 客户端的 vuex 中。
+服务端获取到 vuex 里的动态数据之后，再同步到 客户端的 vuex 中。路由组件里的 `asyncData` 用来更新 Vuex 里的数据，以便服务端获取。 
+
+解释一下为什么服务端渲染的时候也可以把动态数据也渲染出来：
+
+- 服务端渲染的时候调用了 `asyncData` 函数，更新了 Vuex 数据
+- 有了 Vuex 数据，不管是直接在 `template` 使用 store
+- 还是使用了 compute 简化，都可以直接将数据渲染出来了！！
+
+
 
 下面是报错解决：
 
@@ -2214,9 +2228,13 @@ const computedMsg: any = computed({
 
 
 
+主要参考 Vue 的 SSR 数据预取方案：https://v2.ssr.vuejs.org/zh/guide/data.html#%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E6%95%B0%E6%8D%AE%E9%A2%84%E5%8F%96-server-data-fetching
+
+> 其中某些 API 已经废弃，所以重构了一下
 
 
-#### 7.1 改造 entry-server.ts
+
+#### 7.1 服务端数据预取
 
 - 首先匹配路由组件（**无法匹配路由组件中的子组件！！！**）
 
@@ -2262,11 +2280,57 @@ export async function render(url: string) {
 
 
 
-#### 7.2 实现 Vuex 数据同步
+#### 7.2 客户端数据预取
 
-服务端获取到 vuex 里的动态数据之后，再同步到 客户端的 vuex 中
+我们发现必须页面刷新才能使服务端获取到 vuex 里的动态数据。这一章讲解如何在路由跳转时服务端也能实现 vuex 数据预取，因此需要实现路由组件**在不刷新的路由跳转下**也能执行 asyncData 函数，以便更新 Vuex 的数据
+
+同时这套逻辑还可以实现防止客户端数据二次预取
+
+```ts
+router.isReady().then(function() {
+    
+    // 实现路由组件在不刷新的路由跳转下也能执行asyncData函数
+    router.beforeResolve((to, from, next) => {
+        const toComponents = router.resolve(to).matched.flatMap(record =>
+            Object.values(record.components)
+        )
+        const fromComponents = router.resolve(from).matched.flatMap(record =>
+            Object.values(record.components)
+        )
+
+        // 获取跳转前后不重复的组件
+        const actived = toComponents.filter((c, i) => {
+            return fromComponents[i] !== c
+        })
 
 
+        if (!actived.length) {
+            return next()
+        }
+
+        Promise.all(actived.map(function (Component) {
+            if (Component.asyncData) {
+
+                return Component.asyncData({ store, route: router.currentRoute })
+                // return Component.asyncData({ store, route: to })
+            }
+        })).then(function () {
+
+            // 结束loading
+            next()
+        })
+
+    })
+
+    app.mount('#app')
+})
+```
+
+
+
+
+
+#### 7.3 将 Vuex 数据嵌入到 HTML 中
 
 - **index.html**
 
@@ -2295,13 +2359,12 @@ if ((window as any).__INITIAL_STATE__) {
 
 
 
-#### 7.3 改造 server.js
+#### 7.4 改造 server.js
 
 获取服务端入口文件导出的 vuex 的数据 `state` ，并和 html 文档一实现替换效果
 
 ```ts
-// 4. 渲染应用的 HTML。这假设 entry-server.js 导出的 `render`
-//    函数调用了适当的 SSR 框架 API。
+// 4. 渲染应用的 HTML。这假设 entry-server.js 导出的 `render` 函数调用了适当的 SSR 框架 API。
 const { appHtml, state } = await render(url)
 
 
@@ -2312,7 +2375,7 @@ const html = template.replace(`<!--ssr-outlet-->`, appHtml)
 
 
 
-#### 7.4 asyncData 函数的实现
+#### 7.5 asyncData 函数的实现
 
 `asyncData` 函数会在路由组件服务端渲染的时候被调用
 
@@ -2451,65 +2514,11 @@ import ClientOnly from '@duannx/vue-client-only'
 
 
 
-### 9、路由跳转时 vuex 数据预取
+### 9、路由数据同步到 vuex 的方法
 
-当第二次改造完成后，我们发现必须页面刷新才能使服务端获取到 vuex 里的动态数据。这一章讲解如何在**路由跳转时服务端也能实现 vuex 数据预取**
+使用： `vuex-router-sync`，这个插件作用是将当前路由数据 route 同步到 vuex 中
 
-
-
-**entry-client.ts**
-
-只需要添加一个 `router.beforeResolve` **实现每次进入路由前调用 `asyncData` 函数预取数据即可**
-
-```ts
-router.beforeEach(async function () {
-	...
-
-    router.beforeResolve((to, from, next) => {
-        const toComponents = router.resolve(to).matched.flatMap(record =>
-            Object.values(record.components)
-        )
-        const fromComponents = router.resolve(from).matched.flatMap(record =>
-            Object.values(record.components)
-        )
-
-        const actived = toComponents.filter((c, i) => {
-            return fromComponents[i] !== c
-        })
-
-        if (!actived.length) {
-            return next()
-        }
-
-        // 可以添加loading（不过会和其他请求冲突，所以算了）
-
-        Promise.all(actived.map(function(Component) {
-            if (Component.asyncData) {
-
-                // 这里的参数必须和服务端渲染的中的一致！！
-                return Component.asyncData({ store, route: router.currentRoute })
-            }
-        })).then(function() {
-
-            // 结束loading
-            next()
-        })
-    })
-
-}) 
-```
-
-> router.currentRoute内部的value 和 router.currentRoute.value 不一样，大bug！
-
-
-
-插件介绍： `vuex-router-sync`
-
-这个插件作用是将当前路由数据 route 同步到 vuex 中
-
-下载：`npm i vuex-router-sync `  需要低版本的 nodejs
-
-`nvm use 12.20.0`
+下载：`npm i vuex-router-sync ` ，需要低版本的 nodejs，`nvm use 12.20.0`
 
 安装完之后，启动服务又报了一个错
 
@@ -3344,9 +3353,7 @@ obj.value.name = 'cocoon'
 
 ### 8、路由 mate 元信息处理
 
-这一节就是对我们的标题进行优化！
-
-- 首先进入路由中给每个路由填写基本的 mate 信息
+首先进入路由中给每个路由填写基本的 mate 信息
 
 ```ts
 let title = 'Airbnb爱彼迎 - 全球民宿_公寓_短租_住宿_预订平台'
@@ -3392,7 +3399,7 @@ const routes = [
 
 
 
-- 然后在 index.html 里面填写占位
+然后在 index.html 里面填写占位
 
 ```html
 <title></title>
@@ -3402,7 +3409,7 @@ const routes = [
 
 
 
-- 服务端渲染标题：进入 `server.js`
+**服务端进行 meta 包装**：进入 `server.js`
 
 ```ts
 // 获取路由中的元信息（服务端渲染时改变标题）            
@@ -3421,9 +3428,9 @@ const html = template.replace(`<!--ssr-outlet-->`, appHtml)
 
 
 
+**客户端进行 meta 包装**：进入 `entry-client.ts`
 
-
-- **客户端渲染标题（重点）**：进入 `entry-client.ts`
+实现在不刷新的路由跳转下也能匹配 mate 信息
 
 ```ts
 // 新增一个路由后置守卫
