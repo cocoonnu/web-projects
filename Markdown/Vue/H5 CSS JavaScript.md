@@ -789,21 +789,35 @@ BOM  常用操作：https://vue3js.cn/interview/JavaScript/BOM.html
 
 #### 2.5.1 Event 高度宽度属性
 
-e 就是鼠标对象 MouseEvent：`show(e) {}`，下面是一些属性
+MouseEvent MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/MouseEvent
 
-1、`e.target`：触发绑定事件的对象，可以为本体，也可以为子盒子
-
-
-
-2、`e.clientX`：鼠标在**页面上可视区域的位置**，从浏览器可视区域左上角开始，即是以浏览器滑动条此刻的滑动到的位置为参考点，随滑动条移而变化
+Event MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/Event
 
 
 
-3、`e.pageX`：鼠标在**页面上的位置**，从页面左上角开始，即是以页面为参考点，不随滑动条移动而变化
+`e` 就是鼠标对象 `MouseEvent`，它继承了 `Event` 事件对象，下面是它的常见属性
+
+- `e.target`：触发绑定事件的对象，可以为本体，也可以为子盒子
 
 
 
-4、`e.offsetX`：鼠标在 `e.target` **盒子里的位置**，如果该盒子有边框，则可能出现负值
+- `e.clientX`：鼠标在**页面上可视区域的位置**，从浏览器可视区域左上角开始，即是以浏览器滑动条此刻的滑动到的位置为参考点，随滑动条移而变化
+
+
+
+- `e.pageX`：鼠标在**页面上的位置**，从页面左上角开始，即是以页面为参考点，不随滑动条移动而变化
+
+
+
+- `e.offsetX`：鼠标在 `e.target` **盒子里的位置**，如果该盒子有边框，则可能出现负值
+
+
+
+- `e.stopPropagation`：阻止事件冒泡
+
+
+
+- `e.preventDefault`：组件事件默认行为
 
 
 
