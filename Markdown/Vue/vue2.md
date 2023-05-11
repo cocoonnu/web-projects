@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 1、Vue 基础知识和原理
 
 ## 1.1 初识 Vue
 
@@ -271,12 +271,6 @@ console.log(descriptor)
 */
 ```
 
-> 打印结果
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/09b4bf67bb7843388fecd7da1572901f.png)
-
-
-
 
 
 **2、Object.defineProperty(obj, prop, descriptor)**
@@ -425,18 +419,10 @@ const vm = new Vue({
 
 
 
-3、图解
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/8ccad88c5e40497587dadb3db07e1821.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5qC86Zu354uQ5oCd,size_20,color_FFFFFF,t_70,g_se,x_16)
-
-
-
 
 
 
 ## 1.7 事件处理
-
-
 
 ### 1.7.1 事件的基本使用
 
@@ -526,7 +512,7 @@ const vm = new Vue({
 
 **如果传参里面不写 $event ，函数里面照样可以用 e 作为参数**
 
-```
+```js
 @blur="handleBlur(todo,$event)"
 ```
 

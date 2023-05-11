@@ -921,7 +921,7 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 
 
-- [x] **Latex 语法**
+- [x] **Latex 数学公式语法**
 
 参考文档：https://juejin.cn/post/6844903605720317959
 
@@ -980,24 +980,11 @@ ctrl + b: 空了
 
 - Vetur - Vue2 代码支持
 
-1、LiveServer（实时更新网页
-2、REST Client（客户端请求
-3、GitLens（git查看修改
-4、CSS Peek（查css代码
-5、Quokka.js（提醒js代码错误
-6、CodeSnap（代码截图
-7、Auto Rename Tag（自动修改前后标签
-8、Snippets（缩写
-9、Bracket Pair Colorizer（括号颜色
-10、indent-rainbow（缩进颜色
-11、vscode-icons（更好识别的图标
-12、Prettier（自动整理代码格式
+
+
 13、Color Highlight（颜色提醒
 14、Dracula Official（主题
 
-
-
-\1. One Dark Pro - 个人觉得是最好看的主题
 \2. Code Spell Checker - 单词拼写检查，有时看到拼错的单词会非常难受，强迫症推荐
 \3. DotENV - .env环境变量文件语法高亮
 \4. ESLint + Stylelint - 统一代码风格
@@ -1024,10 +1011,10 @@ ctrl + b: 空了
 
 ### 3.5 VScode 配置代码片段
 
-快捷键：Ctrl + Shift + P 打开搜索，搜索 snippets 选择配置用户代码片段
+- 快捷键：Ctrl + Shift + P 打开搜索，搜索 snippets 选择配置用户代码片段
 
-在下面选择 vue.json 配置vue的代码片段，进入网站：https://snippet-generator.app/
+- 在下面选择 vue.json 配置 vue 的代码片段
 
-配置然后粘贴即可
+- 进入网站：https://snippet-generator.app/，配置然后粘贴即可
 
 参考：https://blog.csdn.net/sinat_36359516/article/details/128042359
