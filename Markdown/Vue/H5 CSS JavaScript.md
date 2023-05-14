@@ -40,19 +40,63 @@ rgba(223, 229, 230, 1) 100%);
 
 ### 1.2 CSS 选择器详解
 
-- **伪类选择器**
+
+
+**带 type 的匹配选择器**
+
+- `first-of-type`、`last-of-type`、`nth-of-type(n)`：选择第一个、最后一个、第 n 个
+
+- 理解：先筛选同级父元素下的所有 `p` 标签（仅限兄弟元素），再匹配第 n 个 `p` 标签
+- 并且还会逐层把兄弟元素作为父元素，再进行上面的匹配流程
+- `nth-last-of-type(n)`：从末尾开始计数，第 n 个
 
 ```css
-.test:first-of-type、first-child 选中类名为test并且为父元素的第一个元素，若不满足条件则无法选中
-
-
-.test:last-of-type、last-child 选中类名为test并且为父元素的最后一个元素，若不满足条件则无法选中
-
-
-.test:nth-child(n) 选中类名为test并且为在父元素指定位置n的一个元素，若不满足该条件则无法选中
-
-.test:nth-last-of-type(n) 选中类名为test并且为在父元素指定位置n的一个元素（从末尾开始计数）若不满足该条件则无法选中
+p:nth-of-type(2) {
+	color: red
+}
 ```
+
+```html
+<div>
+    <p>1</p>
+    <p>2</p>
+</div>
+<h1>3</h1>
+<p>4</p>
+<p>5</p>
+```
+
+> 2 和 5 会亮
+
+
+
+**带 child 的匹配选择器**
+
+- `first-child`、`last-child`、`nth-child(n)`：选择第一个、最后一个、第 n 个
+- 理解：先选择同级父元素下的第 n 个元素（任何兄弟元素），再看下该该元素是不是 `p` 标签，如果是则匹配
+- 如果不是，再逐层把兄弟元素作为父元素，再进行上面的匹配流程
+
+```css
+p:nth-child(2) {
+	color: red
+}
+```
+
+```html
+<div>
+    <p>1</p>
+    <p>2</p>
+</div>
+<h1>3</h1>
+<p>4</p>
+<p>5</p>
+```
+
+> 只有 2 会亮，因为 5 被认为是第 4 个元素
+
+
+
+**其他伪类选择器**
 
 ```css
 :link 选择未被访问的链接
@@ -69,17 +113,24 @@ rgba(223, 229, 230, 1) 100%);
 
 
 
-- **属性选择器**
+**属性选择器**
 
-```csss
+```css
 [attribute*=value]：选择attribute属性值包含value的所有元素
 [attribute^=value]：选择attribute属性开头为value的所有元素
 [attribute$=value]：选择attribute属性结尾为value的所有元素
 ```
 
+```css
+/* 选择p标签中id为包含div的所有元素 */
+p[id*=div] {
+    color: red;
+}
+```
 
 
-- **:not(selector)**
+
+**:not(selector)**
 
 选择与 `<selector>` 选择器不匹配的所有元素，下面是例子
 
@@ -377,6 +428,31 @@ text-overflow: ellipsis;
 
 ### 2.1 ES6 使用笔记
 
+**展开运算符**
+
+使用展开运算符进行对数组和对象的复制或者合并，**返回一个新的对象或数组，新地址和原地址不相等**
+
+```js
+// 数组
+const arr = [1,2,3]
+console.log([...arr] === arr);	// false
+```
+
+```js
+// 对象
+const apple = {
+    color: '红色',
+    shape: '球形',
+    taste: '甜'
+};
+console.log({...apple});			// { color: '红色', shape: '球形', taste: '甜' }
+console.log({...apple} === apple);	// false
+```
+
+
+
+**更多复杂类型**
+
 Set：https://juejin.cn/post/7107449385264349191
 
 Map：https://juejin.cn/post/7106898275290054692
@@ -398,7 +474,7 @@ throw new Error('参数不是一个可迭代对象')
 
 
 
-原型和原型链：
+**原型和原型链**
 
 - 对于 ES6 复杂类型，实例里面都有一个 `__proto__` 属性执行构造函数的 `prototype`
 - 构造函数的 `prototype` 里面有多个原型方法，不同复杂类型对应不同方法
@@ -446,10 +522,19 @@ MDN 官方文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Refer
 
 - **Object.assign**
 
-用来合并对象。如果存在同名属性则o1被o2覆盖，返回o1对象  浅拷贝
+用来合并对象。如果存在同名属性则o1被o2覆盖，**返回o1对象**  浅拷贝
 
 ```js
-Object.assign(obj1, obj2)
+const target = { a: 1, b: 2 };
+const source = { b: 4, c: 5 };
+
+const returnedTarget = Object.assign(target, source);
+
+console.log(target);
+// Expected output: Object { a: 1, b: 4, c: 5 }
+
+console.log(returnedTarget === target);
+// Expected output: true
 ```
 
 
@@ -885,7 +970,7 @@ https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener
 
 
 
-vue 里面的事件监听：
+Vue 里面的事件监听：
 
 - 默认为事件冒泡执行：`@click="doThis"`
 - 设置为事件捕获执行：`@click.capture="doThis"`

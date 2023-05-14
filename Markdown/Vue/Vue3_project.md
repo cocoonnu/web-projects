@@ -570,6 +570,8 @@ function changeLan(lan: string) {
 
 推荐文档：https://blog.csdn.net/imagine_tion/article/details/115000245
 
+推荐文档：https://blog.csdn.net/p1967914901/article/details/127123254
+
 
 
 **基本步骤：1、创建数据库连接 2、创建 objectStore 3、创建一些索引 4、通过事务来进行数据库操作**

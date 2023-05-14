@@ -145,6 +145,7 @@ function App() {
 
       {/* 条件渲染标签/组件 */}
       {flag ? <span>this is span</span> : null}
+      {flag && <span>this is span</span> }
     </div>
   )
 }
@@ -172,7 +173,6 @@ const classObj = {
 const flag = true
 
 function App() {
-
     return (
         <div className="App">
 
@@ -208,6 +208,10 @@ function App() {
     )
 }
 ```
+
+也可以使用 Fragment，类似于 Vue 里面的 Fragment，可以接收一个 key 属性
+
+参考文档：https://boboy.blog.csdn.net/article/details/104943812
 
 
 
@@ -369,6 +373,14 @@ show = (e) => {
 
 
 
+**事件里面的回调函数最好写成如下格式，不要简写图方便！**
+
+```jsx
+<Button onClick={ () => fun() }>按钮</Button>
+```
+
+
+
 **成员函数不使用箭头函数的后果：没有自己的 this 指向**，有两个方式修正
 
 ```jsx
@@ -403,7 +415,17 @@ class Test extends Component {
 
 ### 1.4.3 实现数据双向绑定 
 
-手动绑定状态和绑定事件
+这里介绍一下受控组件和非受控组件，参考文档：https://juejin.cn/post/6858276396968951822
+
+
+
+受控组件：
+
+在HTML的表单元素中，它们通常自己维护一套`state`，并随着用户的输入自己进行`UI`上的更新，这种行为是不被我们程序所管控的。而如果将`React`里的`state`属性和表单元素的值建立依赖关系，再通过`onChange`事件与`setState()`结合更新`state`属性，就能达到控制用户输入过程中表单发生的操作。被`React`以这种方式控制取值的表单输入元素就叫做**受控组件**
+
+
+
+- input 受控组件
 
 ```jsx
 class Test extends Component {
@@ -433,7 +455,13 @@ class Test extends Component {
 }
 ```
 
+- 其他受控组件使用可以去看文档，比如多选select、单选select、textarea等
 
+
+
+非受控组件
+
+我们仅仅是想要获取某个表单元素的值，而不关心它是如何改变的。因此可以用获取`DOM`元素信息的方式来获取表单元素的值呢？也就是使用`ref`。
 
 
 
@@ -675,7 +703,7 @@ class Test extends Component {
 
 
 
-## 1.6 React API 使用
+## 1.6 React API 使用介绍
 
 ### 1.6.1 createRef
 
@@ -683,13 +711,13 @@ React 使用 Ref 属性的使用方法：https://blog.csdn.net/weixin_44827418/a
 
 - 当 ref 属性用于 HTML 元素时，使用 `createRef` 创建的 ref 接收底层 DOM 元素作为其 current 属性
 - 当 ref 属性用于自定义类组件时，ref 对象接收组件的挂载实例作为其 current 属性
-- 你不能在函数组件上使用 ref 属性，因为他们没有实例
+- **`creatRef` 不能用于获取函数组件的 ref 属性，因为函数组件没有实例**
 
-> 但是某些时候，我们可能想要获取函数式组件中的某个DOM元素，这个时候我们可以通过 React.forwardRef 后面学习 hooks 中如何使用 ref
+> 但是某些时候，我们可能想要获取函数式组件中的某个DOM元素，这个时候我们可以通过 React.forwardRef 后面会用到
 
 
 
-**获取普通 HTML 元素的 DOM**
+**获取普通 HTML 元素的 DOM 案例**
 
 ```jsx
 import React, { Component, createRef } from 'react'
@@ -714,7 +742,15 @@ class Test extends Component {
 
 
 
-### 1.6.2 Props.children
+**`createRef` 与 `useRef` 的不同点**
+
+- useRef 是 Hooks 的一种，一般用于函数组件，而 createRef 一般用于类组件
+- 由 useRef 创建的 ref 对象在组件的**整个生命周期内都不会改变，即组件更新不变**
+- 由 createRef 创建的 ref 对象，**组件每更新一次，ref 对象就会被重新创建**
+
+
+
+### 1.6.2 childrenProps
 
 父组件使用子组件时，在子组件内部写的节点或数据会被封装到子组件 `props` 属性的`children` 当中
 
@@ -760,6 +796,192 @@ class Child extends React.Component {
 
 
 
+### 1.6.3 randerProps
+
+实现类似 Vue 中的作用域插槽，实现父子数据通信，父组件利用子组件的数据渲染元素
+
+- 父组件定义一个 rander 函数作为 props 参数传递给子组件
+-  rander 函数返回元素节点，并接收数据参数
+
+```jsx
+import React, { memo, useState } from 'react'
+
+const App = memo(() => {
+    
+    return (<div>
+                
+        <TestA rander={(name) => (
+            <h1>{ name }</h1>
+        )} />
+                
+    </div>)
+})
+
+function TestA(props) {
+    const [name] = useState('cocoon')
+
+    return (<div>
+        { 'name:' }
+        {/* 预留插槽位 */}
+        { props.rander(name) }
+    </div>)
+}
+
+export default App
+```
+
+
+
+
+
+
+
+### 1.6.4 PureComponent
+
+在使用类组件式，会继承于React的Component组件，该组件存在两个问题：
+
+- 只要执行 setState()，即使状态数据没有变化，组件也会重新渲染（render）
+- 若当前组件重新 render，即使子组件并未发生任何变化，也会重新渲染
+
+
+
+这两个问题导致组件经常被渲染，导致效率低下，**因此想要让其当组件的 `props` 或 `state` 数据发生变化时才重新渲染**。导致此问题的原因在于 Component 中的 shouldComponentUpdate 总是返回 true，因此要让其有选择性的进行返回，有两种方法可以做到
+
+
+
+**方式一：重写每个组件的 `shouldComponentUpdate(nextProps, nextState)` 方法**
+
+该方法接收未来的 props和 state，将其与目前的 state/props 进行比较，若发生改变才返回 true，否则为 false
+
+但是这个方法必须手动判断每一个更改的属性，不方便！
+
+```jsx
+import React, { Component } from 'react'
+
+export default class Test extends Component {
+    state = {
+        name: '小明',
+        age: 10
+    }
+    show = () => {
+        this.setState({ name: '小明', age: 11 })
+    }
+    
+    shouldComponentUpdate(nextProps, nextState) {
+        return !(nextState.name === this.state.name && nextState.age === this.state.age)
+    }
+    render() {
+        console.log('是否被渲染')
+        const { name, age } = this.state
+        return (
+            <div>
+                <h2>这是学生信息</h2>
+                <h3>姓名：{name}</h3>
+                <h3>年龄：{age}</h3>
+                <button onClick={this.show}>显示学生年龄</button>
+            </div>
+        )
+    }
+}
+```
+
+
+
+**方式二：使用 PureComponent 替换 Component**
+
+PureComponent 重写了shouldComponentUpdate 方法，保证组件只有在 state 或者 props 变化的时候返回true。**使用次方法的缺点：使用了浅比较**
+
+```jsx
+import React, { PureComponent } from 'react'
+
+export default class Test extends PureComponent {
+    state = {
+        name: '小明',
+        age: 10
+    }
+    show = () => {
+        this.setState({ name: '小明', age: 10 })
+    }
+    render() {
+        console.log('是否被渲染'); // state中age未改变，所以此行不会被输出
+        const { name, age } = this.state
+        return (
+            <div>
+                <h2>这是学生信息</h2>
+                <h3>姓名：{name}</h3>
+                <h3>年龄：{age}</h3>
+                <button onClick={this.show}>显示学生年龄</button>
+            </div>
+        )
+    }
+}
+```
+
+
+
+**浅比较的定义如下：**
+
+如果 `this.state` 和里面的引用类型属性的引用没有变化，则 `PureComponent` 的浅比较无法监测到
+
+
+- **正确修改方式：使用展开运算符**
+
+```jsx
+// 测试代码
+import React, { PureComponent } from 'react'
+
+export default class Test extends PureComponent {
+    state = {
+        name: '小明',
+        arr: [1,2,3],
+        obj: {car: 'cc'}
+    }
+
+    show = () => {
+        // 普通属性
+        this.setState({ name: 'czy' })
+
+        // 引用类型属性
+        const { obj, arr } = this.state
+        this.setState({ obj: {...obj, bug: 'fff'} })
+        this.setState({ arr: [...arr, 4, 5] })
+    }
+
+    render() {
+        console.log(this.state.obj)
+        return (
+            <div>
+                <div>{ this.state.name }</div>
+                <div>{ this.state.arr }</div>
+                <button onClick={this.show}>添加</button>
+            </div>
+        )
+    }
+}
+```
+
+
+
+- **错误方式：使用 `push`、`Object.assgin` 等方法**
+
+```jsx
+const newState = this.state
+newState.name = 'czy'
+this.setState(newState)
+
+const { obj, arr } = this.state
+Object.assign(obj, { bug: 'fff' })
+arr.push(4, 5)
+this.setState({ obj })
+this.setState({ arr })
+```
+
+> 以上方法三个属性都无法改变！！但是在 `Component` 下全都可以实现改变！！
+
+
+
+
+
 ## 1.7 React 生命周期记录
 
 组件的生命周期是指组件从被创建到挂载到页面中运行起来，再到组件不用时卸载的过程，注意，只有类组件才有生命周期（类组件 实例化  函数组件 不需要实例化）
@@ -767,6 +989,8 @@ class Child extends React.Component {
 React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
 
 ![image-20230511195805658](mark-img/image-20230511195805658.png)
+
+推荐文档：https://blog.csdn.net/p1967914901/article/details/123939017
 
 
 
@@ -864,3 +1088,518 @@ module.exports = {
 ### 1.8.3 配置 ESlint/Prettier
 
  https://blog.csdn.net/guxin_duyin/article/details/127048203
+
+
+
+# 第二章 认识 React Hooks
+
+Hook 是 React 16.8 的新增特性，它可以让我们在不编写class的情况下, 使用state以及其他的React特性
+
+类组件存在的问题：
+
+- 组件复用状态很难
+- 难以理解的class，所以需要花很多的精力去学习 this
+- 复杂组件变得难以理解等
+
+Hooks 可以让我们在不编写 class 的情况下, 使用 state 以及其他的 React 特性(意味着不学习class关键字和this指向依然可以编写 React )，我们可以由此延伸出非常多的用法，来让我们前面所提到的问题得到解决
+
+
+
+## 2.1 响应式数据与监听
+
+### 2.1.1 useState 状态响应
+
+通过 `useState` 这个 hooks 可以实现响应式数据，具体使用如下
+
+- `useState` 函数可以执行多次，每次执行互相独立，每调用一次为函数组件提供一个状态
+- 只能出现在函数组件中，不能再类组件中使用
+- 不能嵌套在 if、for 或其它子函数中，只能在顶层语句中使用
+
+```jsx
+import { useState } from 'react'
+
+function Test() {
+    // 获取数据和修改数据函数
+    const [cnt, setCnt] = useState(0)
+
+    return (
+        <div>{cnt} <button onClick={() => { setCnt(cnt + 1) } }>click</button></div>
+    )
+}
+```
+
+
+
+`useState` 内接收一个函数作为参数，该函数的返回值作为状态对象的初始值
+
+```jsx
+const [name, setName] = useState(() => {
+    const name = 'cocoon'
+    return name + 'czy'
+})
+```
+
+
+
+有时间看一下：[使用 useState 需要注意的 5 个问题](https://blog.csdn.net/p1967914901/article/details/127334263)
+
+
+
+### 2.1.2 useEffect 状态监听
+
+通常 `useEffect` 函数的作用就是为函数组件提供副作用处理的，常见的副作用：localstorage 操作、手动修改dom、数据请求 ajax 发送等，理解如下
+
+- `useEffect` 第一个参数要求我们传入一个回调函数，执行时机有三种情况
+- 第二个参数要求存入一个数组，数组里面为回调函数的**依赖项**
+- 回调函数内部可以返回一个函数，该函数在组件销毁时执行，用于清除副作用 
+- **一个函数组件中可以使用多个Effect Hook，解决类组件中生命周期经常将很多的逻辑放在一起的问题**
+- 参考文档：https://lanan.blog.csdn.net/article/details/126840653
+
+
+
+**初始化和重新渲染执行**
+
+当第二个参数不填时，回调函数会在初始化和组件重新渲染的时候执行，会影响性能
+
+```jsx
+useEffect(() => {
+    console.log("监听的代码逻辑")
+})
+```
+
+
+
+**只在初始化渲染执行**
+
+第二个参数传入一个空数组，在 React 执行完更新 DOM 操作之后，就会执行回调函数。可以等效于 `componentDidMount` 和`componentWillUnmount` 这两个生命周期函数！
+
+```jsx
+// 传入空数组表示不受任何数据依赖
+useEffect(() => {
+    // 这个回调函数相当于componentDidMount
+    console.log("监听的代码逻辑")
+
+    // 这个回调函数的返回值函数相当于componentWillUnmount
+    return () => {
+        console.log("取消的监听代码逻辑")
+    }
+}, [])
+```
+
+
+
+**状态监听执行**
+
+初始化执行一次，当依赖项（监听的状态数据）更新后，也会执行回调函数
+
+```jsx
+import { useState, useEffect } from 'react'
+
+function Test() {
+    const [cnt, setCnt] = useState(0)
+	
+    // 状态监听执行
+    useEffect(() => {
+        console.log(cnt)
+    }, [cnt])
+
+    return (
+        <div>{cnt} <button onClick={() => { setCnt(cnt + 1) } }>click</button></div>
+    )
+}
+```
+
+
+
+
+
+### 2.1.3 自定义 React hook
+
+有了两个 API，我们可以将响应式数据文件单独抽离出去，形成一个单独的 hook 文件
+
+
+
+- 获取 DOM 距离顶部高度的 hook
+
+```js
+import { useState } from 'react'
+
+export function useWindowScroll() {
+    const [scrollTop, setScrollTop] = useState(0)
+
+    window.addEventListener('scroll', () => {
+        setScrollTop(document.documentElement.scrollTop)
+    })
+
+    return [scrollTop, setScrollTop]
+}
+```
+
+```jsx
+const [scrollTop] = useWindowScroll()
+(<div> { scrollTop } </div>)
+```
+
+
+
+- 封装一个 LocalStorage 的 hook
+
+```js
+import { useState, useEffect } from 'react'
+
+export function useLocalStorage(key, defalutValue) {
+    const [data, setData] = useState(defalutValue)
+    
+    useEffect(() => {
+        localStorage.setItem(key, data)
+    }, [data])
+
+    return [data, setData]
+}
+```
+
+```jsx
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+
+function Test() {
+    const [name, setName] = useLocalStorage('name', 'cocoon')
+    const [age, setAge] = useLocalStorage('age', 12)
+
+    setTimeout(() => {
+        setName('czy')
+        setAge(21)
+    },1000)
+
+    return (
+        <div>{ name } { age }</div>
+    )
+}
+```
+
+
+
+## 2.2 Ref Hooks 介绍
+
+### 2.2.1 useRef
+
+和前面学的 `createRef` 类似，**返回一个 ref 对象，返回的 ref 对象在组件的整个生命周期保持不变**
+
+- 用来获取 DOM 元素, 操作 DOM，获取类组件实例，依然不能获取函数组件的实例
+- 还可以用来保存一个数据，这个对象在整个生命周期中可以保存不变，即组件更新也不会改变
+
+```jsx
+export default function App() {
+    const testRef = useRef(null)
+
+    useEffect(() => {
+        console.log(testRef)
+    }, [])
+
+    return (
+        <div className="app">
+            <Test ref={ testRef } />
+        </div>
+    )
+}
+```
+
+
+
+**`createRef` 与 `useRef` 的不同点**
+
+- useRef 是 Hooks 的一种，一般用于函数组件，而 createRef 一般用于类组件
+- 由 useRef 创建的 ref 对象在组件的**整个生命周期内都不会改变，即组件更新不变**
+- 由 createRef 创建的 ref 对象，**组件每更新一次，ref 对象就会被重新创建**
+
+参考文档：https://blog.csdn.net/m0_71485750/article/details/126859793
+
+
+
+### 2.2.2 forwardRef
+
+这个 hook 本质上是解决父组件需要操作函数组件上的 DOM 元素的问题。
+
+- 通过 `forwardRef` 直接创建一个函数组件，使得该函数组件可以接收一个 ref 参数
+- 函数组件将接收到的 ref 参数绑定到内部的 DOM 元素身上即可！
+- 随后父组件就可以使用到函数组件上的 DOM 元素了
+
+```jsx
+import { useEffect, useRef, forwardRef } from 'react'
+
+const Test = forwardRef((props, divRef) => {
+    return (
+        <div ref={ divRef }>
+            <input type="text" />
+        </div>
+    )
+})
+
+export default function App() {
+    const divRef = useRef(null)
+
+    useEffect(() => {
+        console.log(divRef)
+    }, [])
+
+    return (
+        <div className="app">
+            <Test ref={ divRef } />
+        </div>
+    )
+}
+```
+
+> DOM 元素封装在 divRef.current 属性上
+
+
+
+### 2.2.3 useImperativeHandle
+
+上面的 forwardRef 的做法本身没有什么问题，但是我们是将子组件的 DOM 直接暴露给了父组件。直接暴露给父组件带来的问题是某些情况的不可控，父组件可以拿到 DOM 后进行任意的操作，我们可以在通过 `useRef`、`forwardRef`、`useImperativeHandle` 搭配使用
+
+- 第一个参数传入一个函数组件接收到的 ref 参数
+- 第二个参数传入一个回调函数，要求该回调函数返回一个对象, 该对象会绑定到 ref 的 current 属性中
+- 返回的对象函数组件自定义，通常封装一些对自身 DOM 元素操作的方法
+
+
+
+```jsx
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
+
+const Test = forwardRef((props, ref) => {
+    useImperativeHandle(ref, () => {
+        return {
+            name: 'czy',
+            say() {
+                console.log(this.name)
+            }
+        }
+    })
+
+    return (<div className='test'>
+    </div>)
+})
+
+export default function App() {
+
+    const divRef = useRef(null)
+
+    useEffect(() => {
+        console.log(divRef)
+        divRef.current.say()
+    }, [])
+
+    return (
+        <div className='app'>
+            <Test ref={ divRef } />
+        </div>
+    )
+}
+```
+
+`divRef.current` 得到的就是 `useImperativeHandle` 中的函数返回的那个对象
+
+![image-20230514152450336](mark-img/image-20230514152450336.png)
+
+
+
+
+
+## 2.3 性能优化 Hooks
+
+### 2.3.1 useCallback
+
+> 前言：定义一个计数器, 我们点击按钮时, counter 数据会发生变化, App 函数组件就会重新渲染, 意味着increment 函数就会被重新定义一次, 每点击一次按钮, increment 函数就会重新被定义。虽然每次定义increment 函数, 垃圾回收机制会将上一次定义的 increment 函数回收, 但是这种不必要的重复定义是会影响性能的
+
+`useCallback` 会返回一个 `memoized`（有记忆的） 的**回调函数**。作用就是在依赖不变的情况下，多次定义的时候，返回的回调函数是相同的。
+
+- 参数一：传入一个回调函数, 如果依赖发生改变会定义一个新的该回调函数使用, 如果依赖没有发生改变, 依然使用原来的回调函数
+
+- 参数二：用于控制依赖的, 第二个参数要求传入一个数组, 数组中可以传入依赖, 传空数组表示没有依赖
+- 参考文档：https://lanan.blog.csdn.net/article/details/126856799
+
+
+
+**优化方案一：函数不会重新定义**
+
+```jsx
+import React, { memo, useState, useCallback } from 'react'
+
+const App = memo(() => {
+    const [counter, setCounter] = useState(10)
+
+    const increment = useCallback(() => {
+        setCounter(counter + 1)
+    }, [counter])
+
+    return (
+        <div>
+            <h2>{counter}</h2>
+            <button onClick={() => increment()}>+1</button>
+        </div>
+    )
+})
+```
+
+
+
+**优化方案二：父组件修改其他状态数据的时候，子组件不会进行无用的渲染**
+
+通常使用 useCallback 的目的是在向子组件传递函数时, 将要传递的函数进行优化再传递给子组件, 避免父组件修改其他状态数据的时候，子组件进行无用的多次重复渲染
+
+```jsx
+import React, { memo, useState, useCallback } from 'react'
+
+const Test = memo((props) => {
+    console.log("Test组件被重新渲染")
+    return (
+        <div>
+            <button onClick={props.increment}>Test+1</button>
+        </div>
+    )
+})
+
+const App = memo(() => {
+    const [counter, setCounter] = useState(10)
+    const [message, setMessage] = useState("哈哈哈哈")
+
+    // 使用useCallback依赖于counter
+    const increment = useCallback(() => {
+        setCounter(counter + 1)
+    }, [counter])
+
+    return (
+        <div>
+            <h2>{counter}</h2>
+            <button onClick={increment}>+1</button>
+            <h2>{message}</h2>
+            <button onClick={() => setMessage("呵呵呵呵")}>修改message</button>
+            <Test increment={increment} />
+        </div>
+    )
+})
+
+export default App
+
+```
+
+
+
+**优化方案三：父组件修改自身所有的状态数据（包括 props 参数）的时候，子组件都不会进行重复渲染**
+
+`useCallback` + `useRef` 优化方案模板代码
+
+```jsx
+import React, { memo, useState, useCallback, useRef } from 'react'
+
+const Test = memo((props) => {
+    console.log("Test组件被重新渲染")
+    return (
+        <div>
+            <button onClick={props.increment}>Test+1</button>
+        </div>
+    )
+})
+
+const App = memo(() => {
+    const [counter, setCounter] = useState(10)
+    const [message, setMessage] = useState("哈哈哈哈")
+
+    // 组件进行多次渲染, 返回的是同一个ref对象
+    const counterRef = useRef()
+    // 将最新的counter保存到ref对象current属性中
+    counterRef.current = counter
+
+    const increment = useCallback(() => {
+        // 在修改数据时, 引用保存到ref对象current属性的最新的值
+        setCounter(counterRef.current + 1)
+    }, [])
+
+    return (
+        <div>
+            <h2>{counter}</h2>
+            <button onClick={increment}>+1</button>
+            <Test increment={increment} />
+            <h2>{message}</h2>
+            <button onClick={() => setMessage("呵呵呵呵")}>修改message</button>
+        </div>
+    )
+})
+
+export default App
+```
+
+
+
+
+
+### 2.3.2 useMemo
+
+useMemo 返回的也是一个有记忆的值，在依赖不变的情况下，多次定义的时候，返回的值是相同的
+
+- 参数一：传入一个回调函数，具有返回值
+
+- 参数二：传入一个数组，表示依赖，什么都不依赖传入空数组。如果不传则 useMemo 无法起作用，无意义
+
+```jsx
+import React, { memo, useMemo, useState } from 'react'
+
+const App = memo(() => {
+    const [counter, setCounter] = useState(10)
+    const [str] = useState('czy')
+
+    let result = useMemo(() => {
+        console.log('我被执行')
+        return str + 'cocoon'
+    }, [str])
+
+    return (
+        <div>
+            <h2>计算结果: {result}</h2>
+
+            <h2>当前计数: {counter}</h2>
+            <button onClick={() => setCounter(counter + 1)}>+1</button>
+        </div>
+    )
+})
+
+export default App
+```
+
+
+
+**useMemo 与 useCallback 的区别**
+
+- useMemo 拿到的传入回调函数的返回值，useCallback 拿到的传入的回调函数本身
+- 简单来说 useMemo 是对函数的返回值做优化，useCallback 是对函数做优化
+
+
+
+### 2.3.3 React.memo
+
+适用函数组件，**React.memo 仅检查 props 变更**，默认情况下其只会对 props 中的复杂对象做浅比较，如果你想要控制对比过程，那么请将自定义的比较函数通过第二个参数传入来实现
+
+```jsx
+import React from 'react';
+
+function Child({seconds}){
+    console.log('I am rendering');
+    return (
+        <div>I am update every {seconds} seconds</div>
+    )
+};
+
+function areEqual(prevProps, nextProps) {
+    if(prevProps.seconds===nextProps.seconds){
+        return true
+    }else {
+        return false
+    }
+
+}
+export default React.memo(Child,areEqual)
+```
+
+
+
+如果 props 有函数传递就比较麻烦了，如果那么函数没有开启 `useCallback` 那么父组件重新渲染，那么函数也重新编译，React.memo 会认为 props 发生变化，因此子组件会重新渲染！ 
