@@ -419,6 +419,24 @@ text-overflow: ellipsis;
 
 
 
+### 1.8 HTML 静态资源路径
+
+React 脚手架中使用 `%PUBLIC_URL%` 则固定从服务器根路径 `http://localhost:3000` 的文件夹下获取资源
+
+```html
+<link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+```
+
+> 和 `href="/logo192.png"` 效果是一样
+
+
+
+使用 `./` 则从当前服务器路径 `http://localhost:3000/home` 的文件夹下获取资源
+
+```html
+<link rel="apple-touch-icon" href="./logo192.png" />
+```
+
 
 
 

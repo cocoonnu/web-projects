@@ -1,4 +1,4 @@
-### 调试方法
+###  调试方法
 
 进入调试：
 
@@ -867,3 +867,209 @@ endmodule
 ![image-20230427153619920](mark-img/image-20230427153619920.png)
 
 ![image-20230427153714894](mark-img/image-20230427153714894.png)
+
+
+
+
+
+### 数字密码锁
+
+```verilog
+module password_lock(clk,in,set,pause,value1,value2,store,bee,status,temp_set,ook);
+
+input clk,set,in,pause;
+output reg status = 0;
+output reg bee = 0;
+output reg temp_set = 0;
+output reg ook = 0;
+
+output reg[3:0] value1;
+output reg[3:0] value2;
+output reg[3:0] store;
+
+reg en = 1;
+reg[2:0] i = 0;
+reg[2:0] j = 0;
+reg[2:0] k = 0;
+
+reg[2:0] count1 = 0;
+reg[2:0] count2 = 0;
+reg[2:0] count3 = 0;
+reg[3:0] keynum = 4'b0101;
+
+
+always @(posedge clk)
+begin
+  if (set == 1)
+  fork
+    temp_set <= 1;
+    value1 <= 4'bxxxx;
+    value2 <= 4'bxxxx;
+    store <= 4'bxxxx;
+    i <= 0;
+    j <= 0;
+    k <= 0;
+    ook <= 0;
+    count1 <= 0;
+    count2 <= 0;
+    count3 <= 0;
+  join
+  
+  if (pause == 1) bee <= 0;
+end
+
+always @(posedge clk)
+begin
+  if (temp_set == 0)
+  begin
+    
+    case({en,in})
+      2'b11:
+      begin
+        value1[i] <= 1'b1;
+        i <= i + 1;
+        count1 <= count1 + 1;   
+      end
+
+      2'b10:
+      begin
+        value1[i] <= 1'b0;
+        i <= i + 1;
+        count1 <= count1 + 1;   
+      end
+    endcase
+        
+  end
+end
+
+always @(posedge clk)
+begin
+  if (count1 == 4)
+  begin
+    
+    if (value1 == keynum) status <= 1;
+    else bee <= 1;
+    
+    i <= 0;
+    count1 <= 0;
+    value1 <= 4'bxxxx; 
+    
+  end
+end
+
+always @(posedge clk)
+begin
+  if (temp_set == 1 && ook == 0)
+  begin
+    
+    case({en,in})
+      2'b11:
+      begin
+        value2[j] <= 1'b1;
+        j <= j + 1;
+        count2 <= count2 + 1;   
+      end
+
+      2'b10:
+      begin
+        value2[j] <= 1'b0;
+        j <= j + 1;
+        count2 <= count2 + 1;   
+      end
+    endcase
+        
+  end
+end
+
+always @(posedge clk)
+begin
+  if (count2 == 4)
+  begin
+    
+    if (value2 == keynum) ook <= 1;
+    
+    j <= 0;
+    count2 <= 0;
+    value2 <= 4'bxxxx; 
+    
+  end
+end
+
+always @(posedge clk)
+begin
+  if (ook == 1)
+  begin
+    
+    case({en,in})
+      2'b11:
+      begin
+        store[k] <= 1'b1;
+        k <= k + 1;
+        count3 <= count3 + 1;   
+      end
+
+      2'b10:
+      begin
+        store[k] <= 1'b0;
+        k <= k + 1;
+        count3 <= count3 + 1;   
+      end
+    endcase
+        
+  end
+end
+
+always @(posedge clk)
+begin
+  if (count3 == 4)
+  begin
+   
+    keynum <= store;
+    temp_set <= 0;
+    ook <= 0;
+    k <= 0;
+    count3 <= 0; 
+    
+  end
+end
+
+endmodule
+```
+
+```verilog
+module lock_pass; // 开锁
+  
+reg clk,set,pause,in;
+wire bee,status,ook,temp_set;
+wire[3:0] value1,value2;
+wire[3:0] store;
+
+always
+	#10 clk = ~clk;
+
+initial
+fork
+  clk = 0;
+  in = 1'bx;
+  set = 0;
+  pause = 0;
+join
+
+initial
+begin
+  #123 in = 1'b1; #23 in = 1'bx;
+  #45 in = 1'b0; #23 in = 1'bx;
+  #45 in = 1'b1; #23 in = 1'bx;
+  #45 in = 1'b0; #23 in = 1'bx;
+end
+
+password_lock u0(.clk(clk),.in(in),.set(set),.pause(pause),.value1(value1),.value2(value2),.store(store),.bee(bee),.status(status),.temp_set(temp_set),.ook(ook));
+
+endmodule
+```
+
+```verilog
+```
+
+
+
