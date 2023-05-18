@@ -438,6 +438,8 @@ cnpm -v
 
 ## 3.4 修改包的版本
 
+**npm 方式**
+
 先将 `node_modules`、`package-lock.json` 删除
 
 ```bash
@@ -448,6 +450,14 @@ rm -rf package-lock.json
 再修改 `package.json` 中包的版本，最后在 `npm i`
 
 > 最好不要不要直接卸载依赖！！会莫名其妙出现很多错误！！！
+
+
+
+**yarn 方式**
+
+```bash
+$ yarn add [package]@[version]
+```
 
 
 

@@ -28,13 +28,13 @@ $ npx create-react-app react-test
 
 
 
-- **新建 `jsconfig.json` 使得 Vscode 对 JS 代码进行优化**
+- **新建 `jsconfig.json` 使得 VScode 对项目的 JS 代码进行优化**
 
 ```js
 {
     "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
+        "target": "es3",
+        "module": "esnext",
         "baseUrl": "./",
         "moduleResolution": "node",
         "paths": {
@@ -52,6 +52,10 @@ $ npx create-react-app react-test
     }
 }
 ```
+
+> 通常 target 选项会报错，根据提示选择项目对应的版本
+>
+> 参考：https://juejin.cn/post/7079769333471117343
 
 
 
@@ -262,13 +266,15 @@ export default App
 
 ## 1.4 响应式和事件绑定
 
-这里是 React18 之前的响应式实现方式，React18 之后使用函数组件，下面的 API 基本废弃
+这里是 React18 之前的响应式实现方式，React18 之后使用函数组件，下面的 API 被 Hooks 替换了
 
 
 
 ### 1.4.1 实现响应式数据
 
-记住 React 是禁止直接操作 `state` 的！我们一般通过 `setState` 这个 API 进行状态修改
+初始化数据定义在类组件实例的 `state` 属性上
+
+React 是禁止直接操作 `state` 的！我们一般通过 `setState` 这个 API 进行状态修改
 
 - `setState` 方法是从 `Component` 中继承过来的，所以可以直接 `this.setState`
 - `setState` 方法传入的该对象会和 `this.state` 的对象进行一个合并, **相同的属性会进行覆盖**
@@ -750,7 +756,31 @@ class Test extends Component {
 
 
 
-### 1.6.2 childrenProps
+### 1.6.2 lazyLoad
+
+代码分割能够创建多个包并在运行时动态加载，它能够帮助我们**懒加载**当前用户所需要的内容，能够显著地提高应用性能。尽管并没有减少应用整体的代码体积，但可以避免加载用户永远不需要的代码，并在初始加载的时候减少所需加载的代码量
+
+- `React.Lazy() `可以通过**代码分割**延迟加载组件，它能让我们像渲染常规组件一样动态引入组件
+- `Suspense` 是一个延迟函数所**必须**的组件，通常用来包裹住延迟加载组件
+- 参考文档：https://blog.csdn.net/m0_46612221/article/details/127396089
+
+
+
+两个 API 搭配使用实现路由组件懒加载的效果
+
+```jsx
+const Home = lazy(() => import('./views/Home'))
+
+(<Suspense fallback={(<div>loading</div>)}>
+    <Route path="/home" component={Home} />
+</Suspense>)
+```
+
+
+
+
+
+### 1.6.3 childrenProps
 
 父组件使用子组件时，在子组件内部写的节点或数据会被封装到子组件 `props` 属性的`children` 当中
 
@@ -796,7 +826,7 @@ class Child extends React.Component {
 
 
 
-### 1.6.3 randerProps
+### 1.6.4 randerProps
 
 实现类似 Vue 中的作用域插槽，实现父子数据通信，父组件利用子组件的数据渲染元素
 
@@ -836,7 +866,7 @@ export default App
 
 
 
-### 1.6.4 PureComponent
+### 1.6.5 PureComponent
 
 在使用类组件式，会继承于React的Component组件，该组件存在两个问题：
 
@@ -984,13 +1014,15 @@ this.setState({ arr })
 
 ## 1.7 React 生命周期记录
 
-组件的生命周期是指组件从被创建到挂载到页面中运行起来，再到组件不用时卸载的过程，注意，只有类组件才有生命周期（类组件 实例化  函数组件 不需要实例化）
+组件的生命周期是指组件从被创建到挂载到页面中运行起来，再到组件不用时卸载的过程，**注意，只有类组件才有生命周期（类组件 实例化  函数组件 不需要实例化）**
+
+
+
+### 1.7.1 常用的生命周期
 
 React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
 
 ![image-20230511195805658](mark-img/image-20230511195805658.png)
-
-推荐文档：https://blog.csdn.net/p1967914901/article/details/123939017
 
 
 
@@ -1018,6 +1050,54 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 | 钩子函数             | 触发时机                 | 作用                               |
 | -------------------- | ------------------------ | ---------------------------------- |
 | componentWillUnmount | 组件卸载（从页面中消失） | 执行清理工作（比如：清理定时器等） |
+
+
+
+### 1.7.2 生命周期详细讲解
+
+参考文档：https://blog.csdn.net/p1967914901/article/details/123939017
+
+视频：https://www.bilibili.com/video/BV1wy4y1D7JT
+
+
+
+**React 16.4 之前的生命周期：**
+
+在组件第一次挂载时会经历：
+
+```
+`constructor` -> `componentWillMount` -> `render` -> `componentDidMount`
+```
+
+组件更新时会经历：
+
+```
+`componentWillReceiveProps` -> `shouldComponentUpdate` -> `componentWillUpdate` -> `render` -> `componentDidUpdate`
+```
+
+组件卸载时执行：`componentWillUnmount`
+
+
+
+**React 16.4 之后的生命周期：**
+
+如图所示，我们可以看到，在组件第一次挂载时会经历：
+
+```
+`constructor` -> `getDerivedStateFromProps` -> `render` -> `componentDidMount
+```
+
+组件更新时会经历：
+
+```
+`getDerivedStateFromProps` -> `shouldComponentUpdate` -> `render` -> `getSnapshotBeforeUpdate` -> `componentDidUpdate`
+```
+
+组件卸载时执行：`componentWillUnmount`
+
+
+
+从以上生命周期的对比，我们不难看出，React废弃 `componentWillMount` `componentWillReceiveProps` `componentWillUpdate` 三个钩子函数，文档中分别介绍各个生命周期函数
 
 
 
@@ -1093,13 +1173,14 @@ module.exports = {
 
 # 第二章 认识 React Hooks
 
-Hook 是 React 16.8 的新增特性，它可以让我们在不编写class的情况下, 使用state以及其他的React特性
+Hook 是 React 16.8 的新增特性，它可以让我们在不编写 class 的情况下, 使用 state 以及其他的 React 特性
 
 类组件存在的问题：
 
 - 组件复用状态很难
-- 难以理解的class，所以需要花很多的精力去学习 this
+- 难以理解的 class，所以需要花很多的精力去学习 this
 - 复杂组件变得难以理解等
+- **函数组件废弃 state 和生命周期函数**，利用其他 Hooks 代替实现
 
 Hooks 可以让我们在不编写 class 的情况下, 使用 state 以及其他的 React 特性(意味着不学习class关键字和this指向依然可以编写 React )，我们可以由此延伸出非常多的用法，来让我们前面所提到的问题得到解决
 
@@ -1603,3 +1684,29 @@ export default React.memo(Child,areEqual)
 
 
 如果 props 有函数传递就比较麻烦了，如果那么函数没有开启 `useCallback` 那么父组件重新渲染，那么函数也重新编译，React.memo 会认为 props 发生变化，因此子组件会重新渲染！ 
+
+
+
+#  第三章 React 进阶知识点
+
+推荐文档专栏：https://blog.csdn.net/p1967914901/category_10164640.html
+
+
+
+## 3.1 React 高阶组件
+
+https://blog.csdn.net/weixin_44682587/article/details/121649536
+
+
+
+## 3.2 React 实现路由守卫
+
+V5：https://blog.csdn.net/zhangqling/article/details/127451166
+
+V6：https://blog.csdn.net/m0_69838795/article/details/129557342
+
+
+
+## 3.3 useEffect 中使用异步
+
+https://blog.csdn.net/p1967914901/article/details/127581065

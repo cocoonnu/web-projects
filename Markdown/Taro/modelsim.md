@@ -874,6 +874,8 @@ endmodule
 
 ### 数字密码锁
 
+二进制密码锁
+
 ```verilog
 module password_lock(clk,in,set,pause,value1,value2,store,bee,status,temp_set,ook);
 
@@ -1036,6 +1038,10 @@ end
 endmodule
 ```
 
+
+
+开锁测试文件
+
 ```verilog
 module lock_pass; // 开锁
   
@@ -1068,7 +1074,91 @@ password_lock u0(.clk(clk),.in(in),.set(set),.pause(pause),.value1(value1),.valu
 endmodule
 ```
 
+
+
+开锁失败测试文件
+
 ```verilog
+module lock_error;
+  
+reg clk,set,pause,in;
+wire bee,status,ook,temp_set;
+wire[3:0] value1,value2;
+wire[3:0] store;
+
+always
+	#10 clk = ~clk;
+
+initial
+fork
+  clk = 0;
+  in = 1'bx;
+  set = 0;
+  pause = 0;
+join
+
+initial
+begin
+  #123 in = 1'b1; #23 in = 1'bx;
+  #45 in = 1'b1; #23 in = 1'bx;
+  #45 in = 1'b0; #23 in = 1'bx;
+  #45 in = 1'b0; #23 in = 1'bx;
+  
+  #123 pause = 1;
+  #23 pause = 0;
+end
+
+password_lock u0(.clk(clk),.in(in),.set(set),.pause(pause),.value1(value1),.value2(value2),.store(store),.bee(bee),.status(status),.temp_set(temp_set),.ook(ook));
+
+endmodule
+```
+
+
+
+修改密码测试文件
+
+```verilog
+module lock_change;
+  
+reg clk,set,pause,in;
+wire bee,status,ook,temp_set;
+wire[3:0] value1,value2;
+wire[3:0] store;
+
+always
+	#10 clk = ~clk;
+
+initial
+fork
+  clk = 0;
+  in = 1'bx;
+  set = 0;
+  pause = 0;
+join
+
+initial
+begin
+  #123 set = 1; #21 set = 0;
+  
+  #123 in = 1'b1; #21 in = 1'bx;
+  #45 in = 1'b0; #21 in = 1'bx;
+  #45 in = 1'b1; #21 in = 1'bx;
+  #45 in = 1'b0; #21 in = 1'bx;
+  
+  #123 in = 1'b0; #21 in = 1'bx;
+  #45 in = 1'b1; #21 in = 1'bx;
+  #45 in = 1'b0; #21 in = 1'bx;
+  #45 in = 1'b1; #21 in = 1'bx;
+ 
+  #123 in = 1'b0; #21 in = 1'bx;
+  #45 in = 1'b1; #21 in = 1'bx;
+  #45 in = 1'b0; #21 in = 1'bx;
+  #45 in = 1'b1; #21 in = 1'bx;  
+end
+
+password_lock u0(.clk(clk),.in(in),.set(set),.pause(pause),.value1(value1),.value2(value2),.store(store),.bee(bee),.status(status),.temp_set(temp_set),.ook(ook));
+
+endmodule
 ```
 
 
