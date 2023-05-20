@@ -391,6 +391,10 @@ package-lock.json 是在运行 `npm install` 时生成的一个文件，用于�
 
 ## 3.3 切换下载镜像源
 
+npm 中国镜像站：http://www.npmmirror.com/
+
+
+
 - 手动设置
 
 ```bash
@@ -425,11 +429,13 @@ nrm use taobao
 
 - 利用 cnpm 命令
 
-```
+```bash
 // 全局安装
-npm install -g cnpm --registry=https://registry.npm.taobao.org
+$ npm install -g cnpm --registry=https://registry.npm.taobao.org
 
-cnpm -v
+$ npm install -g cnpm --registry=https://registry.npmmirror.com
+
+$cnpm -v
 ```
 
 
