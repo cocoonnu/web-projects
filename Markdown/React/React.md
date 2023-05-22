@@ -113,7 +113,7 @@ JSX 就是 Javascript 和 XML 结合的一种格式。React 发明了 JSX，可�
 
 - 可以理解为插入的是 JS 表达式
 
-- 当插入的变量是Number、String、Array、节点等类型时，可以直接插入显示，其他类型插入会报错
+- 当插入的变量是Number、String、Array、节点等类型时，可以直接插入显示，**其他类型插入会报错**
 
 - 还支持函数、函数调用、 三元表达式、运算表达式
 
@@ -125,9 +125,20 @@ const name = '柴柴'
 
 > 注意是表达式，所以不能写语句
 
+```jsx
+// 如果想直接显示对象类型可以这样写
+<p>{ JSON.stringify(user) }</p> 
+
+// 数组类型
+<h1>{ countArr }</h1> // 会变成字符串
+<h1>{JSON.stringify(countArr) }</h1>
+```
+
 
 
 **列表渲染**
+
+使用 map 将返回一个数组，每次循环返回的项会放入数组中。JSX 渲染数组时会将每一项逐个渲染出来
 
 ```jsx
 <div className="App">
@@ -357,6 +368,10 @@ clickBtn() {
 ```
 
 
+
+注意 state 是不可变数据，引用类型遵循不可变数据原则：不去修改 state 的值，而是传入一个新的值
+
+因此解决方式有：PureComponent 组件的浅比较、immer 的使用
 
 
 
@@ -1109,6 +1124,8 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 
 ## 1.8 Craco 配置开发环境
 
+craco，一个对 create-react-app 进行自定义配置的社区解决方案
+
 使用`create-react-app` 创建的项目默认是无法修改其内部的`webpack`配置的，不像 `vue-cli `那样可以通过一个配置文件修改。 虽然有一个`eject` 命令可以是将配置完全暴露出来，但这是一个不可逆的操作，同时也会失去`CRA` 带来的便利和后续升级。
 
 如果想要无 `eject` 重写 `CRA` 配置，目前成熟的是下面这几种方式
@@ -1121,6 +1138,8 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 
 更多项目配置可以查看掘金文档（待完成）：https://juejin.cn/post/6871148364919111688
 
+Craco Github：https://github.com/dilanx/craco
+
 
 
 ### 1.8.1 配置项目根路径
@@ -1128,7 +1147,7 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 首先安装 Craco
 
 ```bash
-$ npm i @carco/craco -D
+$ npm i -D @craco/craco
 $ npm i @craco/craco@alpha -D // 最新版React兼容 
 ```
 
@@ -1155,11 +1174,23 @@ module.exports = {
   "start": "craco start",
   "build": "craco build",
   "test": "craco test",
-  "eject": "react-scripts eject"
+  "eject": "react-scripts eject",
 },
 ```
 
-还要配置 `jsconfig.json`，VScode 支持根路径引用，但是如果没配置好 `jsconfig.json`，部分报错将无法识别！！目前没有找到解决办法
+还要配置 `jsconfig.json`、`tsconfig.json`，VScode 支持根路径引用
+
+```json
+"compilerOptions": {
+    ......
+    "baseUrl": "./",
+    "paths": {
+        "@/*": [
+            "src/*"
+        ]
+    },    
+}
+```
 
 
 
@@ -1238,11 +1269,196 @@ const [name, setName] = useState(() => {
 
 
 
-有时间看一下：[使用 useState 需要注意的 5 个问题](https://blog.csdn.net/p1967914901/article/details/127334263)
+
+
+[使用 useState 需要注意的 5 个问题](https://blog.csdn.net/p1967914901/article/details/127334263)
+
+- **没有使用可选链，例如：`user.names.firstName`，如果丢失了任何链接的对象或属性，就会出现问题**
+
+```jsx
+// js中可以使用可选的链接操作符（?.）
+<p>User: {user?.names?.firstName}</p>
+```
 
 
 
-### 2.1.2 useEffect 状态监听
+- **setState 尽量使用函数形式，函数的返回值作为最新的 state。普通形式容易进行数据合并**
+
+```jsx
+const click = () => {
+    setCount(count + 1)
+    setCount(count + 1)
+}
+```
+
+> 实际上只会加1，因为是异步更新的，当时 count 一直是原来的值，这就导致了数据合并
+
+
+
+```js
+const click = () => {
+    setCount(count => count + 1)
+    setCount(count => count + 1)
+}
+```
+
+> 成功实现加2，虽然函数也是异步更新的，但是函数无法进行合并
+
+
+
+- **避免只修改对象或数组的属性而不修改引用本身**
+
+遵循不可变数据原则：不去修改 state 的值，而是传入一个新的值
+
+```js
+// 修改复杂类型统一使用这种个格式！
+const click = () => {
+    setCountArr(countArr => ([...countArr, 4,5,6]))
+
+    setUser(user => ({ ...user, name: 'cocoon' }))
+    setUser({ ...user, name: 'cocoon' })
+}
+```
+
+> 记得外层加大括号！
+
+
+
+- **管理表单中的多个输入字段时，只用一个 useState 维护！**
+
+```jsx
+import { useState, useEffect } from "react";
+
+export default function App() {
+    const [user, setUser] = useState({
+        firstName: "",
+        lastName: "",
+        age: "",
+    });
+
+    // 更新特定的输入字段
+    const handleChange = (e) =>
+        setUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }))
+
+    // 渲染 UI
+    return (
+        <div className='App'>
+            <form>
+                <input type='text' onChange={handleChange} name='firstName'  />
+                <input type='text' onChange={handleChange} name='lastName'  />
+                <input type='number' onChange={handleChange} name='age'  />
+            </form>
+        </div>
+    );
+}
+```
+
+
+
+
+
+### 2.1.2 immer 的使用方法
+
+由于 React 的 this.setState、useState 遵循不可变数据原则：不去修改 state 的值，而是传入一个新的值，使得我们操作一个引用类型时不敢去使用它的原生 API 了，如数组的 `push` 等。
+
+```js
+// 之前修改引用类型的写法
+setUser(user => ({ ...user, name: 'cocoon' }))
+
+const { obj, arr } = this.state
+this.setState({ obj: {...obj, bug: 'fff'} })
+this.setState({ arr: [...arr, 4, 5] })
+```
+
+
+
+安装：
+
+```bash
+$ npm i immer --save
+```
+
+
+
+优化 useState
+
+```js
+import produce from 'immer'
+
+const [user, setUser] = useState({
+    name: '123',
+    age: 13
+})
+const [countArr, setCountArr] = useState([1,2,3])
+
+const click = () => {
+    setUser(produce(user => {
+        user.name = 'cocoon'
+    }))
+
+    setCountArr(produce(countArr => {
+        countArr.push(1,2,3)
+    }))
+}
+```
+
+> 原理是参数 user 实际是是一个 Proxy 代理对象
+
+
+
+优化 this.setState
+
+```js
+state = {
+    carts: [
+        { id: 1, name: 'aa', num: 1 },
+        { id: 2, name: 'bb', num: 2 }
+    ]
+}
+
+this.setState(produce(draft => {
+    draft.carts[index].num++
+}))
+```
+
+
+
+优化 Redux reducer
+
+```js
+import { createStore } from 'redux'
+import { produce } from 'immer'
+
+const initState = {
+  count: 100
+}
+
+// 之前的写法
+const reducer = (state = initState, { type, payload }) => {
+  if ('add' === type) {
+    return { ...state, count: state.count + payload }
+  }
+  return state
+}
+
+// immer写法：操作数据无需深复制，提升性能
+// 第二个参数就是代理对象
+const reducer = produce((draft, { type, payload }) => {
+    
+  if ('add' === type) draft.count += payload
+    
+}, initState)
+
+export default createStore(reducer)
+```
+
+
+
+参考文档：https://blog.csdn.net/m0_46672781/article/details/127327796
+
+
+
+### 2.1.3 useEffect 状态监听
 
 通常 `useEffect` 函数的作用就是为函数组件提供副作用处理的，常见的副作用：localstorage 操作、手动修改dom、数据请求 ajax 发送等，理解如下
 
@@ -1310,9 +1526,13 @@ function Test() {
 
 
 
-### 2.1.3 自定义 React hook
+### 2.1.4 自定义 React hook
 
 有了两个 API，我们可以将响应式数据文件单独抽离出去，形成一个单独的 hook 文件
+
+通常我们会使用第三方 hooks，以便节省我们的时间，这里推荐 ahooks，拿来即用即可！
+
+ahooks 官网：https://ahooks.gitee.io/zh-CN
 
 
 
@@ -1726,3 +1946,4 @@ V6：https://blog.csdn.net/m0_69838795/article/details/129557342
 ## 3.3 useEffect 中使用异步
 
 https://blog.csdn.net/p1967914901/article/details/127581065
+

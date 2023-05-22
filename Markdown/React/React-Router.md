@@ -435,6 +435,16 @@ export default withRouter(Demo)
 
   
 
+创建路由阶段依旧可以使用前面用到的在 index.js 里面的操作
+
+```jsx
+import { BrowserRouter as Router } from 'react-router-dom'
+
+root.render(<Router> <App/> </Router>)   
+```
+
+
+
 参考文档：https://blog.csdn.net/qq_45679015/article/details/123767993
 
 
@@ -664,7 +674,7 @@ function App() {
 
 ```js
 {
-    path: 'home',
+    path: '/home',
     element: <Home />,
     children: [
         {
@@ -675,10 +685,16 @@ function App() {
             path: 'news',
             element: <News />,
         },
+        // 重定向
         {
             path: '/home',
             element: <Navigate to='news' />,
-        }
+        }  
+        // 还可以直接默认渲染一个子组件
+        {
+            path: '/home',
+            element: <HomeChildren />,
+        }          
     ]
 }
 ```
@@ -877,3 +893,163 @@ console.log('useResolvedPath',useResolvedPath('/user?id=001&name=tom#qws'))
  //输出：{pathname: "/user", search: "?id=001&name=tom", hash: "#qws"}
 ```
 
+
+
+## 2.8 创建路由整体流程
+
+index.js
+
+```jsx
+import { BrowserRouter as Router } from 'react-router-dom'
+
+root.render(<Router> <App/> </Router>)   
+```
+
+
+
+router/index.jsx
+
+```jsx
+import React from 'react'
+import MainLayout from '@/layouts/MainLayout'
+import Home from '@/views/Home'
+import Login from '@/views/Login'
+import NotFound from '@/views/NotFound'
+
+export default [
+    {
+        path: '/',
+        element: <MainLayout />,
+
+        children: [
+            {
+                path: '/',
+                element: <Home />
+            },
+            {
+                path: 'login',
+                element: <Login />
+            },
+            {
+                path: '*',
+                element: <NotFound />
+            },            
+        ]
+    },
+]
+```
+
+
+
+App.jsx
+
+```jsx
+import React, { FC } from 'react'
+import { useRoutes } from 'react-router-dom'
+import routes from '@/router/index'
+
+const App: FC = () => {
+    const elements = useRoutes(routes)
+
+    return (
+        <div className='App'>
+            { elements }
+        </div>
+    )
+}
+
+export default App
+```
+
+
+
+MainLayout.jsx
+
+```jsx
+import React, { FC } from 'react'
+import { Outlet } from 'react-router-dom'
+
+
+const MainLayout: FC = () => {
+    return (
+        <div className='main-container'>
+            <h1>heater</h1>
+            
+            <Outlet />
+            
+            <h1>foot</h1>
+        </div>
+    )
+}
+
+export default MainLayout
+```
+
+
+
+## 2.9 createBrowserRouter
+
+最新版本还可以用这种方式创建路由器：
+
+- 使用 createBrowserRouter 这个方法可以直接创建一个路由器，与之对应的是 createHashRouter
+
+- 代替之前的 `BrowserRouter`、`HashRouter` 用标签创建路由器
+
+- 通过搭配 RouterProvider 组件进行路由的挂载，代替之前的 useRoutes 创建的 `{ element }`
+
+App.jsx
+
+```jsx
+import React, { FC } from 'react'
+import { RouterProvider } from 'react-router-dom'
+import router from './router'
+
+const App: FC = () => {
+
+    return (
+        <div className='App'>
+            <RouterProvider router={ router }></RouterProvider>
+        </div>
+    )
+}
+
+export default App
+```
+
+
+
+router/index.js
+
+```jsx
+import React from 'react'
+import { createBrowserRouter } from 'react-router-dom'
+
+import MainLayout from '@/layouts/MainLayout'
+import Home from '@/views/Home'
+import Login from '@/views/Login'
+import NotFound from '@/views/NotFound'
+
+export default createBrowserRouter([
+    {
+        path: '/',
+        element: <MainLayout />,
+
+        children: [
+            {
+                path: '/',
+                element: <Home />
+            },
+            {
+                path: 'login',
+                element: <Login />
+            },
+            {
+                path: '*',
+                element: <NotFound />
+            },
+        ]
+    },
+])
+```
+
+其他使用没有变化

@@ -172,9 +172,7 @@ module.exports = {
 
 首先介绍 Husky，它可以编写脚本使得在代码提交之前，自动对代码进行格式化、优化、lint 检查。
 
-通过搭配 lint-staged 实现每次提交仅对修改过的代码和未通过检查的文件进行检查。在提交的时候即可实现报错信息，且提交失败
-
-![image-20230520222253415](mark-img/image-20230520222253415.png)
+通过搭配 lint-staged 实现每次提交仅对修改过的代码和未通过检查的文件进行检查。
 
 
 
@@ -207,7 +205,7 @@ $ npm run prepare
 }
 ```
 
-添加 pre-commit 钩子，执行 `npm run lint-staged` 命令
+添加 pre-commit 钩子
 
 ```bash
 $ npx husky add .husky/pre-commit "npm run lint-staged" 
@@ -215,8 +213,188 @@ $ npx husky add .husky/pre-commit "npm run lint-staged"
 
 
 
+在提交的时候即可实现报错信息，且提交失败
+
+![image-20230520222253415](mark-img/image-20230520222253415.png)
+
+
+
 参考文档：https://blog.csdn.net/huangpb123/article/details/102690412
 
 Husky 入门教程：https://blog.csdn.net/HHoao/article/details/127833268
 
-参考文档里面还有对 commit 格式规范检查的工具的使用
+
+
+commitlint：对 commit 提交格式规范检查的工具，使用方式也在参考文档里面
+
+```
+单行规范：type(scope?): subject
+多行规范：type(scope?): subject 换行 body 换行 footer
+例如：chore: run tests on travis ci
+例如：fix(server): send cors headers
+```
+
+Github：https://github.com/conventional-changelog/commitlint
+
+
+
+## 1.4 TS 在项目中的适配
+
+这里会介绍一下项目中对于 TS 的一些适配情况。
+
+tsconfig 配置文件讲解：https://blog.csdn.net/cs23405/article/details/115750351
+
+
+
+## 1.5 组件命名与文件夹规范
+
+这是我在自己的项目里自定义的组件和文件夹命名规范，这里主要做下记录：
+
+- src/layouts：存放 layout 组件，用于页面整体布局，使用 `outlet` 的地方
+- src/components：存放公共普通组件
+- src/views：存放所有的路由组件
+
+- 有的时候一些公共的普通组件具有相同点的话，还会用一个文件夹进行包裹
+- 涉及组件的文件、文件夹都使用驼峰式命名
+
+
+
+**路由组件的规范**
+
+首先路由组件放在 `views` 文件夹中，然后创建一个以该路由组件名字命名的文件夹，里面有 `index.tsx`、`index.module.scss`
+
+如果路由组件中有嵌套路由组件，那么该嵌套路由组件也是一样创建一个以该路由组件名字命名的文件夹，里面有 `index.tsx`、`index.module.scss`
+
+
+
+**普通组件的规范**
+
+如果是公共的普通组件，那么放到 `components` 文件中，然后创建一个以该组件名字名字的文件夹，里面有 `index.tsx`、`index.module.scss`
+
+如果是普通组件的子组件，那么在当前文件夹下创建 `components` 文件夹，子组件以自己的命名命名在 `components` 文件夹下创建 `JSX` 文件，如果有样式文件，还是在 `components` 文件夹下创建
+
+如果是路由组件下的普通组件，那么在当前文件夹下创建 `components` 文件夹，子组件以自己的命名命名 `components` 文件夹下创建 `JSX` 文件，如果有样式文件，还是在 `components` 文件夹下创建
+
+
+
+# 第二章 项目逻辑功能实现
+
+## 2.1 CSS Module 的使用
+
+**CSS Module**
+
+我们一般是一个 jsx 文件对应一个 css 文件，但是如果直接这样引入的话，会造成直接引入整个文件，而不是按需加载，这样处理就极有可能对 css 造成全局污染或者冲突，从而就无法达到我们组件化的目的了
+
+```js
+import './index.css'
+```
+
+
+
+Creat React APP 创建的项目原生支持了 CSS Module，需要规范命名：`*.module.css`，下面是使用方法
+
+```jsx
+import styles from './App.module.css'
+
+(<div className={ styles.app }>
+    <p className={ styles.item }>12445</p>
+</div>)
+```
+
+```css
+.app {
+    color: red;
+
+}
+.item {
+    color: green;
+}    
+```
+
+Creat React APP 创建的项目也原生支持了 SASS Module，直接将后缀名换成 SCSS 即可
+
+![image-20230521160732154](mark-img/image-20230521160732154.png)
+
+
+
+
+
+**对 TS 的适配**
+
+- 参考文档：https://blog.csdn.net/cs23405/article/details/115752487
+
+- 创建 src/custom.d.ts 声明文件
+
+```js
+declare module "*.css" {
+    const css : {[key:string]:string};
+    export default css;
+}
+
+declare module "*.scss" {
+    const scss : {[key:string]:string};
+    export default scss;
+}
+```
+
+- 使用 TS 插件使得 VScode 在我们 style. 的时候出现提示
+
+```bash
+$ npm install typescript-plugin-css-modules --save-dev
+```
+
+```json
+// tsconfig.json
+"compilerOptions": {
+    ......
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+}
+```
+
+```json
+// setting.json
+{
+    ......
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true    
+}
+```
+
+
+
+**CSS in JSX**
+
+有两个推荐的库，可以实现在 jsx 中写 css，但是不推荐在 tsx 中使用因为又要声明一些类型防止报错！
+
+- https://github.com/vercel/styled-jsx
+- https://styled-components.com/
+
+
+
+## 2.2 项目路由页面介绍
+
+```markdown
+## 页面对应的路由
+
+- 首页 MainLayout `/`
+- 登录 `/login`
+- 注册 `/register`
+
+- 问卷管理 MainLayout ->ManageLayout `/manage`
+    - 我的问卷 `/manage/list`
+    - 星标问卷 `/manage/star`
+    - 回收站 `/manage/trash`
+    
+- 问卷详情 QuestionLayout `/question`
+    - 编辑问卷 `/question/edit/:id`
+    - 问卷统计 `/question/stat/:id`
+    
+- 404 `/*`
+
+## Layout 模板（使用 `outlet` 的地方）
+
+- MainLayout
+- ManageLayout
+- QuestionLayout
+```
+

@@ -1118,8 +1118,19 @@ ctrl + b: 空了
 
 - 快捷键：Ctrl + Shift + P 打开搜索，搜索 snippets 选择配置用户代码片段
 
-- 在下面选择 vue.json 配置 vue 的代码片段
 
-- 进入网站：https://snippet-generator.app/，配置然后粘贴即可
 
-参考：https://blog.csdn.net/sinat_36359516/article/details/128042359
+- 给当前项目单独配置，输入配置文件的名字如 `react` 回车，会在 .vscode 文件夹下指定生成 `react.code-snippets` 文件
+
+
+
+- 进入网站：https://snippet-generator.app，配置之后然后粘贴到哪个文件对象下即可
+
+
+
+- 一个配置文件可以使用多个代码片段。选择 vue.json 可以配置全局的代码片段
+
+
+
+
+
