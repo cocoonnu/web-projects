@@ -142,10 +142,15 @@ const name = '柴柴'
 
 ```jsx
 <div className="App">
-    {/* 列表渲染 */}
+    {/* 数组渲染 */}
     {list.map(item => (
         <div key={ item } onClick={ clickMe }>{ item }</div>
     ))}
+    
+    {/* 对象渲染 */}
+    {Object.entries(obj).map(([key, value], index) => {
+        return <li key={key}>{value}</li>
+    }) }     
 </div>
 ```
 
@@ -296,26 +301,33 @@ React 是禁止直接操作 `state` 的！我们一般通过 `setState` 这个 A
 - `setState` 方法是从 `Component` 中继承过来的，所以可以直接 `this.setState`
 - `setState` 方法传入的该对象会和 `this.state` 的对象进行一个合并, **相同的属性会进行覆盖**
 - **`setState` 的更新是异步的**，我们并不能在执行完 `setState` 之后立马拿到最新的 `state` 的结果
+- `setState` 执行机制：https://vue3js.cn/interview/React/setState.html
 
 
 
 **方式一：`setState` 直接传入一个对象**
 
 ```jsx
-class Test extends Component {
-    state = {
-        name: 'cocoon'
-    }
-    
-    clickBtn = () => {
-        this.setState({
-            name: this.state.name + 'czy'
-        })
+class Count extends Component {
+    state = { name: 'cocoon', obj: {age: 14, sex: 1}, arr: [1,2] } 
+
+    show = () => {
+        let { name, obj, arr } = this.state
+        name = 'czy'
+        obj.age = 332 // 引用类型直接修改且可以使用自身API
+        arr.push(3)
+        this.setState({name}) // 引用类型可以不用传入，简单类型必须传入 
     }
 
-    ...
-    <button onClick={ this.clickBtn }>clickBtn</button>
-	...
+    render() { 
+        return (
+            <div>
+                { JSON.stringify(this.state) }
+
+                <button onClick={ () => this.show() }>click</button>
+            </div>
+        )
+    }
 }
 ```
 
@@ -369,10 +381,6 @@ clickBtn() {
 
 
 
-注意 state 是不可变数据，引用类型遵循不可变数据原则：不去修改 state 的值，而是传入一个新的值
-
-因此解决方式有：PureComponent 组件的浅比较、immer 的使用
-
 
 
 ### 1.4.2 实现事件绑定
@@ -382,6 +390,7 @@ clickBtn() {
 - 首先要绑定事件时要指定 `this` 指向，事件参数默认接收 `e`
 - 普通成员函数建议使用箭头函数
 - 内置函数可以不适用箭头函数，里面的 this 已经被封装好了 
+- 事件绑定机制原理：https://blog.csdn.net/kelly0721/article/details/117259877
 
 ```jsx
 // 类里面定义成员函数
@@ -859,12 +868,10 @@ import React, { memo, useState } from 'react'
 
 const App = memo(() => {
     
-    return (<div>
-                
+    return (<div>               
         <TestA rander={(name) => (
             <h1>{ name }</h1>
-        )} />
-                
+        )} /> 
     </div>)
 })
 
@@ -880,8 +887,6 @@ function TestA(props) {
 
 export default App
 ```
-
-
 
 
 
@@ -972,10 +977,10 @@ export default class Test extends PureComponent {
 
 **浅比较的定义如下：**
 
-如果 `this.state` 和里面的引用类型属性的引用没有变化，则 `PureComponent` 的浅比较无法监测到
+如果 **`this.state`** 和**里面的引用类型属性**的引用没有变化，则 `PureComponent` 的浅比较无法监测到
 
 
-- **正确修改方式：使用展开运算符**
+- 正确修改方式：使用展开运算符进行**浅拷贝**
 
 ```jsx
 // 测试代码
@@ -1013,7 +1018,7 @@ export default class Test extends PureComponent {
 
 
 
-- **错误方式：使用 `push`、`Object.assgin` 等方法**
+- 错误方式：使用先使用解构再使用原生的 API `push`、`Object.assgin` 等方法
 
 ```jsx
 const newState = this.state
@@ -1027,7 +1032,7 @@ this.setState({ obj })
 this.setState({ arr })
 ```
 
-> 以上方法三个属性都无法改变！！但是在 `Component` 下全都可以实现改变！！
+> 以上方法三个属性都无法改变！！但是在 `Component` 下全都可以实现改变
 
 
 
@@ -1049,7 +1054,7 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 
 **挂载阶段**
 
-| 钩子 函数         | 触发时机                                            | 作用                                                  |
+| 钩子函数          | 触发时机                                            | 作用                                                  |
 | ----------------- | --------------------------------------------------- | ----------------------------------------------------- |
 | constructor       | 创建组件时，最先执行，初始化的时候只执行一次        | 初始化state、创建 Ref、使用 bind 解决 this 指向问题等 |
 | render            | 每次组件渲染都会触发                                | 渲染UI、不能在里面调用 setState                       |
@@ -1118,7 +1123,7 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 
 
 
-从以上生命周期的对比，我们不难看出，React废弃 `componentWillMount` `componentWillReceiveProps` `componentWillUpdate` 三个钩子函数，文档中分别介绍各个生命周期函数
+从以上生命周期的对比，我们不难看出，React 废弃 `componentWillMount` 、`componentWillReceiveProps` 、`componentWillUpdate` 三个钩子函数，文档中分别介绍了各个生命周期函数
 
 
 
@@ -1271,7 +1276,7 @@ const [name, setName] = useState(() => {
 
 
 
-[使用 useState 需要注意的 5 个问题](https://blog.csdn.net/p1967914901/article/details/127334263)
+**[注意：使用 useState 需要注意的 5 个问题](https://blog.csdn.net/p1967914901/article/details/127334263)**
 
 - **没有使用可选链，例如：`user.names.firstName`，如果丢失了任何链接的对象或属性，就会出现问题**
 
@@ -1306,21 +1311,34 @@ const click = () => {
 
 
 
-- **避免只修改对象或数组的属性而不修改引用本身**
+- **当 state 为引用数据类型时，必须修改引用本身**
 
-遵循不可变数据原则：不去修改 state 的值，而是传入一个新的值
+遵循不可变数据原则：不能直接修改 state 的值，而是传入一个新的值（理解为必须进行浅拷贝）
+
+通过模板字符串实现
 
 ```js
-// 修改复杂类型统一使用这种个格式！
-const click = () => {
-    setCountArr(countArr => ([...countArr, 4,5,6]))
 
-    setUser(user => ({ ...user, name: 'cocoon' }))
+const click = () => {
+    setCountArr([...countArr, 4,5,6])
     setUser({ ...user, name: 'cocoon' })
 }
 ```
 
-> 记得外层加大括号！
+通过 `concat`、`filter`、`assign` 实现
+
+```tsx
+// 数组的删除
+setCheckArr(checkArr.filter(city => {
+    if (city == cityName) return false
+    return true
+}))
+
+// 数组的添加
+setCheckArr(checkArr.concat(cityName))
+```
+
+
 
 
 
@@ -1359,10 +1377,12 @@ export default function App() {
 
 ### 2.1.2 immer 的使用方法
 
-由于 React 的 this.setState、useState 遵循不可变数据原则：不去修改 state 的值，而是传入一个新的值，使得我们操作一个引用类型时不敢去使用它的原生 API 了，如数组的 `push` 等。
+由于 React 的两种情况：**PureComponent 下的 this.setState**、**useState** 在修改引用类型数据时
+
+分别遵循浅比较和不可变数据原则（不能直接修改 state 的值，而是要传入一个新的值），使得我们操作一个引用类型时不敢去使用它的原生 API 了，如数组的 `push` 、对象的 `assgin`等
 
 ```js
-// 之前修改引用类型的写法
+// 之前修改引用类型的写法，必须返回一个新对象才能修改数据
 setUser(user => ({ ...user, name: 'cocoon' }))
 
 const { obj, arr } = this.state
@@ -1372,7 +1392,7 @@ this.setState({ arr: [...arr, 4, 5] })
 
 
 
-安装：
+如果我们借助 immer 这个库则能够高效的解决这个问题，先安装这个库
 
 ```bash
 $ npm i immer --save
@@ -1380,7 +1400,7 @@ $ npm i immer --save
 
 
 
-优化 useState
+**优化 useState**
 
 ```js
 import produce from 'immer'
@@ -1406,7 +1426,7 @@ const click = () => {
 
 
 
-优化 this.setState
+**优化 this.setState**
 
 ```js
 state = {
@@ -1423,7 +1443,7 @@ this.setState(produce(draft => {
 
 
 
-优化 Redux reducer
+**优化 Redux reducer**
 
 ```js
 import { createStore } from 'redux'

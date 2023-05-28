@@ -2149,7 +2149,7 @@ app.use(router)
 组件中使用
 
 ```ts
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router'
 const router = useRouter() // 全局 router
 const route = useRoute() // 当前路由 route
 ```

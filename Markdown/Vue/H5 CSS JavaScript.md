@@ -193,11 +193,20 @@ p[id*=div] {
 - **保持盒子内图片匹配**
 
 ```scss
+// 使用外层盒子
 .imgBx img {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
+
+// 直接使用img
+    img {
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        object-fit: contain;
+    }
 
 fill		// 默认，不保证保持原有的比例，内容拉伸填充整个内容容器
 contain		// 保持原有尺寸比例。内容被缩放
@@ -642,6 +651,20 @@ let a= [].concat(1,2,3,[4,5],[6,7])
 
 
 
+- arr.concat
+
+首先会创建一个当前数组的副本，然后再把它的参数添加到副本末尾，最后返回一个新数组，不会影响原始数组
+
+```js
+let colors = ["red", "green", "blue"];
+let colors2 = colors.concat("yellow", ["black", "brown"]);
+console.log(colors); // ["red", "green","blue"]
+console.log(colors2); // ["red", "green", "blue", "yellow", "black", "brown"]
+```
+
+
+
+
 - **arr.splice**
 
 arr.splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
@@ -741,7 +764,7 @@ let newArr = arr.flat(Infinity)
 
 - **for of 循环**
 
-for...of 遍历一个可迭代对象，如数组、字符串、Map/Set（无对象） 。针对一个迭代对象，所以获得 value
+for...of 遍历一个可迭代对象，如数组、字符串、Map/Set（无object） 。针对一个迭代对象，所以获得 value
 
 ```js
 for (let key of arr) {}
@@ -1129,6 +1152,10 @@ ctrl + b: 空了
 
 
 - 一个配置文件可以使用多个代码片段。选择 vue.json 可以配置全局的代码片段
+
+
+
+- 自主配置可以参考：https://zhuanlan.zhihu.com/p/475137755
 
 
 

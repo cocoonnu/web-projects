@@ -147,6 +147,8 @@ export default function reducer(state = 10, action) {
 }
 ```
 
+> 在 `redux `中的 `reducer `函数规定必须是**一个纯函数**，`reducer `中的`state `对象要求不能直接修改，可以通过扩展运算符把修改路径的对象都复制一遍，然后产生一个新的对象返回（浅拷贝）
+
 
 
 **创建 store/constants.js 文件：**将 type 的类型定义为常量（防止写错的情况）, 这些常量最好也防止一个单独的文件中

@@ -785,6 +785,12 @@ export default Test
 
 
 
+search 对象的一些 API
+
+![image-20230528161525128](mark-img/image-20230528161525128.png)
+
+
+
 ### 2.5.3 useLocation
 
 V5 里面传输 state 参数是这样的
@@ -823,14 +829,28 @@ V5 的路由组件通过 `this.props.history` 、普通组件通过 `withRouter`
 V6 不管是普通组件还是路由组件都通过 `useNavigate` 实现
 
 ```jsx
-function goTo() {
-    navigate('/about')
+import { useNavigate } from 'react-router-dom'
 
+function goTo() {
+    const navigate = useNavigate()
+    const age = 18
+    
+    // 传递params参数
+    navigate('/about/${age}')
+
+    // 传递search参数
+    nav({
+        pathname: '/login',
+        search: `keyword=${value}`       
+    })
+        
+    // 传递state参数
     navigate('/home/news', {
         replace: true,
         state: { name: 'cocoon' }
     })
 
+    // 前进后退
     navigate(1)
     navigate(-1)
 }
@@ -864,7 +884,7 @@ ReactDOM.render(
 
 - 返回值：`POP`、`PUSH`、`REPLACE`。
 
-- 备注：`POP`是指在浏览器中直接打开了这个路由组件（刷新页面）
+- 备注：`POP` 是指在浏览器中直接打开了这个路由组件（刷新页面）
 
 
 

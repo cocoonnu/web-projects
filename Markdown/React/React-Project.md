@@ -238,11 +238,81 @@ Github：https://github.com/conventional-changelog/commitlint
 
 
 
+
+
 ## 1.4 TS 在项目中的适配
 
 这里会介绍一下项目中对于 TS 的一些适配情况。
 
 tsconfig 配置文件讲解：https://blog.csdn.net/cs23405/article/details/115750351
+
+
+
+**React.FC 以及 Props 传参**
+
+React.FC 详细介绍：https://blog.csdn.net/qq_52421092/article/details/127628465，它主要起到一层函数组件规范的作用，如不能用 `setState`，取而代之的是 `useState()`、`useEffect` 等 Hook API
+
+下面介绍 Props 传参方式
+
+```tsx
+<CardOption _id={ _id } />
+```
+
+```tsx
+import React, { FC } from 'react'
+
+interface PropsType {
+    _id: string
+}
+
+const CardOption: FC<PropsType> = (props: PropsType) => {
+
+    return (
+    )
+}
+```
+
+
+
+**useState 的 TS 声明及使用**
+
+```tsx
+const [selectedIds, setSelectedIds] = useState<string[]>([])
+
+// 可强制声明类型避免报错
+setSelectedIds(value as string[])
+```
+
+
+
+**指定 event 的类型**
+
+使用 type 进行引入 `ChangeEvent<HTMLInputElement>`、`MouseEvent<HTMLButtonElement>`
+
+```tsx
+import React, { FC } from 'react'
+import type { ChangeEvent, MouseEvent } from 'react'
+
+const Login: FC = () => {
+    const inputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.value)
+    }
+
+    const btnClick = (event: MouseEvent<HTMLButtonElement>) => {
+        console.log(event.target)
+    }
+
+    return (
+        <div className='Login'>
+            <input type='text' defaultValue='sdad' onChange={inputChange}/>
+
+            <button onClick={btnClick}>click</button>
+        </div>
+    )
+}
+```
+
+
 
 
 
@@ -283,6 +353,8 @@ tsconfig 配置文件讲解：https://blog.csdn.net/cs23405/article/details/1157
 
 **CSS Module**
 
+**推荐文章：https://cloud.tencent.com/developer/article/1819624**
+
 我们一般是一个 jsx 文件对应一个 css 文件，但是如果直接这样引入的话，会造成直接引入整个文件，而不是按需加载，这样处理就极有可能对 css 造成全局污染或者冲突，从而就无法达到我们组件化的目的了
 
 ```js
@@ -291,27 +363,39 @@ import './index.css'
 
 
 
-Creat React APP 创建的项目原生支持了 CSS Module，需要规范命名：`*.module.css`，下面是使用方法
+Creat React APP 创建的项目原生支持了 CSS Module，**需要规范命名：`*.module.css`**，下面是使用方法
 
 ```jsx
 import styles from './App.module.css'
 
 (<div className={ styles.app }>
     <p className={ styles.item }>12445</p>
+    <p className={ styles['app-black'] }>12445</p>
 </div>)
 ```
 
-```css
+```scss
 .app {
     color: red;
-
+	
+    .app-black {
+        color: black;
+    }
 }
+
 .item {
     color: green;
-}    
+}   
+
+// 像其他的 CSS 文件一样直接使用类名（也就是普通的设置方法），而不是编译后的哈希字符串
+:global(.ant-image-mask) {
+    display: none;
+}
 ```
 
-Creat React APP 创建的项目也原生支持了 SASS Module，直接将后缀名换成 SCSS 即可
+> Creat React APP 创建的项目也原生支持了 SASS Module，直接将后缀名换成 SCSS 即可
+
+
 
 ![image-20230521160732154](mark-img/image-20230521160732154.png)
 
@@ -337,7 +421,7 @@ declare module "*.scss" {
 }
 ```
 
-- 使用 TS 插件使得 VScode 在我们 style. 的时候出现提示
+- **使用 TS 插件使得 VScode 在我们 style. 的时候出现提示**
 
 ```bash
 $ npm install typescript-plugin-css-modules --save-dev
@@ -376,11 +460,11 @@ $ npm install typescript-plugin-css-modules --save-dev
 ```markdown
 ## 页面对应的路由
 
-- 首页 MainLayout `/`
+- 首页 MainLayout -> home `/`
 - 登录 `/login`
 - 注册 `/register`
 
-- 问卷管理 MainLayout ->ManageLayout `/manage`
+- 问卷管理 MainLayout -> ManageLayout `/manage`
     - 我的问卷 `/manage/list`
     - 星标问卷 `/manage/star`
     - 回收站 `/manage/trash`
@@ -390,11 +474,289 @@ $ npm install typescript-plugin-css-modules --save-dev
     - 问卷统计 `/question/stat/:id`
     
 - 404 `/*`
+```
 
-## Layout 模板（使用 `outlet` 的地方）
+`MainLayout`：主页面入口
 
-- MainLayout
-- ManageLayout
-- QuestionLayout
+`ManageLayout`：问卷管理页面入口
+
+`QuestionLayout`：新建问卷页面入口
+
+
+
+
+
+## 2.3 组件编写问题记录
+
+### 2.3.1 React 使用图片相关组件
+
+组件库：https://ant-design.antgroup.com/components/image-cn
+
+```jsx
+<img src={require('@/assets/images/react.png')} />
+
+// antd 图片组件支持预览功能
+<Image src={require('@/assets/images/react.png')} />
+```
+
+```css
+img {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    object-fit: contain;
+}
+
+:global(.ant-image-mask) {
+    display: none;
+}
+```
+
+
+
+### 2.3.2 解决 100vw 出现滚动条
+
+首先我们想让一个容器充满整个浏览器视口，并设置一个最小宽度
+
+```scss
+.container {
+    width: 100vw;
+    min-width: 1200px;
+}
+```
+
+然后你会发现，当达到一定高度的时候，浏览器出现了纵向滚动条！紧接着横向滚动条也出现了！那是因为 100 vw 也包括了纵向滚动条的宽度
+
+解决办法是**直接将 body 设置为充满整个浏览器视口（不包括纵向滚动条）**
+
+```scss
+body {
+    width: 100%;
+}
+
+// 继承body的宽度即可
+.container {
+    width: 100%;
+    min-width: 1200px;
+}
+```
+
+> 补充：未指定宽度时，子元素会自动继承父元素的宽度
+
+
+
+### 2.3.3 解决 textarea 换行问题
+
+```tsx
+// 定义一个文本域受控组件
+import React, { FC, useState } from 'react'
+import type { ChangeEvent } from 'react'
+
+const Login: FC = () => {
+
+    const textChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        setText(event.target.value)
+    }
+
+    const [text, setText] = useState('')
+
+    return (
+            <textarea onChange={textChange}></textarea>
+            <div>{ text }</div> // 普通渲染会发现无法显示换行
+
+    )
+}
+```
+
+```tsx
+// 使用这个属性可以成功显示换行
+<div dangerouslySetInnerHTML={{ __html: text.replaceAll('\n', '<br>')}}></div>
+```
+
+
+
+### 2.3.4 搜索框组件设计理念
+
+我们设计搜索框和分页器的时候，要遵循组件解耦原则，既不能修改列表组件里面的内容！于是我们可以通过修改组件之间存在的共同的东西 - 页面 URL，来实现组件间的交互。
+
+**那么搜索框组件的唯一功能就是点击搜索后，将页面 URL 添加 search 参数**，另外这里还实现了受控组件
+
+```tsx
+import React, { FC, useState, useEffect } from 'react'
+import type { ChangeEvent } from 'react'
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom'
+import { LIST_SEARCH_KEY } from '@/constant'
+import { Input } from 'antd'
+const { Search } = Input
+
+const ListSearch: FC = () => {
+    const nav = useNavigate()
+    const { pathname } = useLocation()
+    const [searchParams] = useSearchParams() 
+    const [searchValue, setSearchValue] = useState('')
+
+    // 监测页面url的search参数
+    useEffect(() => {
+        setSearchValue(searchParams.get(LIST_SEARCH_KEY))
+    }, [searchParams])
+
+    // 搜索时改变页面url传入search参数
+    const onSearch = () => {
+        nav({
+            pathname,
+            search: `${LIST_SEARCH_KEY}=${searchValue}`       
+        })
+    }
+    
+    // 双向数据绑定
+    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(event.target.value)
+    }
+
+    return (
+        <Search
+            onSearch={onSearch}
+            onChange={onChange}
+            value={searchValue}
+            style={{ width: 280 }}
+            placeholder='请输入问卷标题...'
+        />
+    )
+}
+
+export default ListSearch
+```
+
+
+
+
+
+## 2.4 Antd 组件库的使用
+
+**定制主题和设置全局语言**
+
+一般基于 `ConfigProvider` 这个组件上进行设置，这里只是简单设置
+
+全局主题变量：https://ant-design.antgroup.com/docs/react/customize-theme-cn#theme
+
+```tsx
+import { ConfigProvider } from 'antd'
+import zhCN from 'antd/locale/zh_CN'
+
+const antdTheme = {
+    token: {
+        borderRadius: 3, // 设置圆角
+    }
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+root.render(
+    <ConfigProvider locale={zhCN} theme={antdTheme}>
+        <App />
+    </ConfigProvider>
+)
+```
+
+
+
+
+
+**Modal 对话框的便捷使用**
+
+https://ant-design.antgroup.com/components/modal-cn
+
+```tsx
+import React from 'react';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { Button, Modal } from 'antd';
+
+const { confirm } = Modal;
+
+const showConfirm = () => {
+  confirm({
+    title: 'Do you Want to delete these items?',
+    icon: <ExclamationCircleFilled />,
+    content: 'Some descriptions',
+    onOk() {
+      console.log('OK');
+    },
+    onCancel() {
+      console.log('Cancel');
+    },
+  });
+};
+
+const App: React.FC = () => (
+    <Button onClick={showConfirm}>Confirm</Button>
+);
+
+export default App;
+```
+
+
+
+**Table 表格组件的使用**
+
+https://ant-design.antgroup.com/components/table-cn
+
+```tsx
+// 首先定义列名，一个对象对应一列
+const tableColumns = [
+    {
+        title: '标题',
+        dataIndex: 'title',
+    },
+    {
+        title: '是否发布',
+        dataIndex: 'isPublished',
+        
+        // 自定义渲染
+        render: (isPublished: boolean) => {
+            return isPublished ? <Tag color='processing'>已发布</Tag> : <Tag>未发布</Tag>
+        },
+    },
+    {
+        title: '答卷',
+        dataIndex: 'answerCount',
+    },
+    {
+        title: '创建时间',
+        dataIndex: 'createdAt',
+    },
+]
+```
+
+```jsx
+// 数据
+const [questionList] = useState([
+    {
+        _id: 'q1',
+        title: '问卷1',
+        isPublished: false,
+        isStar: false,
+        answerCount: 5,
+        createdAt: '3月10日 13:23'
+    },
+    {
+        _id: 'q2',
+        title: '问卷2',
+        isPublished: true,
+        isStar: false,
+        answerCount: 5,
+        createdAt: '3月10日 13:23'
+    },
+])
+```
+
+```tsx
+// 渲染
+<Table
+    rowKey='_id' // 设置唯一key
+    pagination={false}
+    columns={tableColumns}
+    dataSource={questionList}
+    style={{ width: '100%' }}
+    rowSelection={{ onChange: onSelectedChange }}
+/>
 ```
 

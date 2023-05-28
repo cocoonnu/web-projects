@@ -657,7 +657,7 @@ app.listen(8000,function() {
 
 ## 4.4 全局变量
 
-https://github.com/febobo/web-interview/issues/154
+说说 Node. js 有哪些全局对象：https://github.com/febobo/web-interview/issues/154
 
 
 
