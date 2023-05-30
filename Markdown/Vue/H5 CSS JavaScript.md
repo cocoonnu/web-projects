@@ -651,7 +651,7 @@ let a= [].concat(1,2,3,[4,5],[6,7])
 
 
 
-- arr.concat
+- **arr.concat**
 
 首先会创建一个当前数组的副本，然后再把它的参数添加到副本末尾，最后返回一个新数组，不会影响原始数组
 
@@ -684,7 +684,7 @@ arr.splice(index, 1)
 
 - **arr.some**
 
-some() 方法会依次执行数组的每个元素：
+some() 方法会依次遍历数组的每个元素：
 
 如果有一个元素满足条件，则表达式返回 true , 剩余的元素不会再执行检测
 
@@ -966,8 +966,6 @@ https://vue3js.cn/interview/JavaScript/visible.html
 
 #### 2.5.3 BOM API 使用记录
 
-
-
 - **scrollIntoView**
 
 MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/Element/scrollIntoView
@@ -980,6 +978,8 @@ const two = document.getElementById('two')
 // block：垂直方向对齐方式    inline：水平方向对齐方式
 if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
 ```
+
+
 
 
 

@@ -633,7 +633,7 @@ export default ListSearch
 
 ## 2.4 Antd 组件库的使用
 
-**定制主题和设置全局语言**
+### 2.4.1 定制主题和全局语言
 
 一般基于 `ConfigProvider` 这个组件上进行设置，这里只是简单设置
 
@@ -661,7 +661,7 @@ root.render(
 
 
 
-**Modal 对话框的便捷使用**
+### 2.4.2 Modal 对话框的使用
 
 https://ant-design.antgroup.com/components/modal-cn
 
@@ -695,7 +695,7 @@ export default App;
 
 
 
-**Table 表格组件的使用**
+### 2.4.3 Table 表格组件的使用
 
 https://ant-design.antgroup.com/components/table-cn
 
@@ -760,3 +760,192 @@ const [questionList] = useState([
 />
 ```
 
+
+
+### 2.4.4 Form 表单的详细使用
+
+#### 2.4.4.1 基础 Form 表单模板
+
+`Form` 组件：最外层必须用 Form 包裹，内部属性如下：
+
+- https://ant-design.antgroup.com/components/form-cn#form
+- `labelCol`：设置每一个 Form.Item `label` 标签占总宽度的百分比 8/8+16
+- `wrapperCol`：设置每一个 Form.Item 里面的内容（通常为输入框）占总宽度的百分比 
+- `onFinish`：当点击 submit 按钮时，表单提交成功的回调函数
+
+
+
+`From.Item` 组件，表单的每一项必须用它包裹，内部属性如下：
+
+- https://ant-design.antgroup.com/components/form-cn#formitem
+
+- `rules`：表单项的规则，后面会讲怎么用
+
+- `Input`：输入框组件，有以下选择：`input`、` Input.Password`、` Input.Search`、` Input.TextArea`
+
+- `valuePropName`：指定表单项值的属性（默认将表单项的 **value 属性**映射到了表单内部）
+
+- `wrapperCol`：表单项自定义占总宽度的百分比 ，offset 为在此基础上**向右移动**的百分比距离
+
+  
+
+```tsx
+<Form
+    name='login'
+    labelCol={{ span: 8 }}
+    wrapperCol={{ span: 16 }}
+    style={{ width: 400 }}
+    onFinish={onFinish}
+>   
+    <Form.Item
+        label='用户名'
+        name='username'
+    >
+        <Input />
+    </Form.Item>
+
+    <Form.Item
+        label='密码'
+        name='password'
+    >
+        <Input.Password />
+    </Form.Item>
+
+    <Form.Item name='remember' valuePropName='checked' 
+        wrapperCol={{ offset: 8, span: 16 }}
+    >
+        <Checkbox>记住我</Checkbox>
+    </Form.Item>
+
+    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+        <Button type='primary' htmlType='submit'>
+            登录
+        </Button>
+    </Form.Item>
+</Form>
+```
+
+
+
+#### 2.4.4.2 指定 Form.Item 规则
+
+可新建 `formRules.ts` 文件导出每个表单项所用到的规则，以下规则的类型和使用方式：
+
+https://ant-design.antgroup.com/components/form-cn#rule
+
+```ts
+import { Rule } from 'antd/es/form'
+
+export const usernameRulse: Rule[] = [
+    { required: true, message: '用户名不能为空！' },
+    
+    { type: 'string', min: 5, max: 13, message: '用户名长度必须在5-13之间' },
+    
+    { pattern: /^\w+$/, message: '用户名只能是字母数字下划线' },
+]
+```
+
+> 一个对象对应一条规则！！
+
+
+
+自定义校验规则，通过设置 `validator(rules, value)` 函数，然后返回 promise
+
+```ts
+export const confirmPasswordRules: Rule[] = [
+    {
+        // 这里规定必须输入123，否则报错
+        validator(rules, value) {
+            if (value == '123') {
+                return Promise.resolve()
+            } else {
+                return Promise.reject(new Error('123'))
+            }
+        }
+    }
+]
+```
+
+```ts
+// 来一个更高级的
+export const confirmPasswordRules: Rule[] = [
+ 
+    // 这里使用一个函数来返回一条规则，函数参数接收formRef表单实例
+    (formRef) => ({
+        validator(rules, value) {
+            if (!value || formRef.getFieldValue('password') === value) {
+                return Promise.resolve()
+            } else {
+                return Promise.reject(new Error('两次密码不一致'))
+            }
+        }
+    }),
+]
+```
+
+
+
+组件中对表单项使用规则
+
+```tsx
+import { usernameRulse, passwordRules, confirmPasswordRules } from './hooks/formRules'
+
+<Form.Item
+    label='用户名'
+    name='username'
+    rules={usernameRulse}
+>
+```
+
+
+
+
+
+#### 2.4.4.3 获取 Form 表单实例
+
+**函数式组件**
+
+```tsx
+const [formRef] = Form.useForm()
+
+<Form
+    form={formRef}
+>   
+```
+
+
+
+**类组件**
+
+```tsx
+import type { FormInstance } from 'antd/es/form'
+const formRef = React.useRef<FormInstance>(null)
+
+<Form
+  ref={formRef}
+>
+      
+forRef.current | null
+```
+
+
+
+**Form 表单实例暴露的 API 如下：**https://ant-design.antgroup.com/components/form-cn#forminstance
+
+- `validateFields`：进行表单校验
+
+```ts
+const btnClick = () => {
+    formRef.validateFields().then((values) => {
+        console.log(values)
+    }).catch((err) => {
+        console.log(err)
+    })
+}
+```
+
+> formRef.validateFields(['username']) 可指定对 username 属性进行校验
+
+
+
+其他的自己看文档。。。
