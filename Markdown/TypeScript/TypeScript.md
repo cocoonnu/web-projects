@@ -256,11 +256,9 @@ TypeScript 简介
 
 - include
 
-定义希望被编译文件所在的目录，默认值：`["**/*"]` 即所有 TS 文件 
+指定某些目录或文件被编译，默认值：`["**/*"]` 即所有 TS 文件 
 
 `**`：表示所有目录，`*`：表示所有文件
-
-
 
 ```js
 // 所有src目录和tests目录下的文件都会被编译
@@ -272,7 +270,9 @@ TypeScript 简介
 
 - exclude
 
-定义需要排除在外的目录，默认值：`["node_modules", "bower_components", "jspm_packages"]`
+**指定某些目录或文件不被编译（并不能阻止 VScode 检查）**
+
+默认值：`["node_modules", "bower_components", "jspm_packages"]`
 
 ```js
 // src下hello目录下的文件都不会被编译

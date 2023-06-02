@@ -1,5 +1,42 @@
 # 第一章 项目初始化配置
 
+使用脚手架 `create-react-app` 启动一个项目，默认情况下**脚手架搭建的项目配置文件都是隐藏的**
+
+因此使用 Craco 来对 `create-react-app` 进行自定义配置，主要要用于对 Webpack 的另外配置
+
+新建 `craco.config.js` ，内部导出的模块中可以配置 Webpack 的一些选项
+
+```js
+const path = require('path')
+const reslove = pathname => path.resolve(__dirname, pathname)
+
+module.exports = {
+    webpack: {
+        alias: {
+            '@': reslove('src'),
+        }
+    },
+
+    devServer: {
+        port: 8000,
+        proxy: {
+            '/api': 'http://localhost:3001',
+        },
+    },    
+}
+```
+
+修改完 `craco.config.js` 必须要重启项目！！有点麻烦了
+
+
+
+- Craco 官网：https://github.com/dilanx/craco
+- Webpack 官网：https://www.webpackjs.com/
+
+- `create-react-app` 中文文档：https://create-react-app.bootcss.com/
+
+
+
 ## 1.1 ESlint 的详细使用方法
 
 ESLint 是一个可配置的 JavaScript 检查器（实际上可以检查 JS、TS、JSX、TSX、VUE 等主流文件格式）。它可以帮助你发现并修复 JavaScript 代码中的问题。问题可以指潜在的运行时漏洞、未使用最佳实践、风格问题等
@@ -12,6 +49,17 @@ ESLint 是一个可配置的 JavaScript 检查器（实际上可以检查 JS、T
 - parser：指定一个代码解析器的引擎，让它去检测代码是不是正规合法的，一般情况下使用默认的
 - rules：我们自定义的规则，它的优先级是最高的，需要遵循自定义规则规范
 - env：指定脚本允许运行的环境，通常 node、browser、es6 全都开启
+
+
+
+配置 .eslintignore 忽略特定的文件和目录，其中的每一行都是一个 glob 模式
+
+```
+# Ignore build files
+build
+server
+node_modules
+```
 
 
 
@@ -344,6 +392,8 @@ const Login: FC = () => {
 如果是普通组件的子组件，那么在当前文件夹下创建 `components` 文件夹，子组件以自己的命名命名在 `components` 文件夹下创建 `JSX` 文件，如果有样式文件，还是在 `components` 文件夹下创建
 
 如果是路由组件下的普通组件，那么在当前文件夹下创建 `components` 文件夹，子组件以自己的命名命名 `components` 文件夹下创建 `JSX` 文件，如果有样式文件，还是在 `components` 文件夹下创建
+
+
 
 
 
@@ -930,7 +980,9 @@ forRef.current | null
 
 
 
-**Form 表单实例暴露的 API 如下：**https://ant-design.antgroup.com/components/form-cn#forminstance
+**Form 表单实例**
+
+实例封装的 API 如下：https://ant-design.antgroup.com/components/form-cn#forminstance
 
 - `validateFields`：进行表单校验
 
@@ -944,8 +996,447 @@ const btnClick = () => {
 }
 ```
 
-> formRef.validateFields(['username']) 可指定对 username 属性进行校验
+> `formRef.validateFields(['username'])` 可指定只对 username 属性进行校验
 
 
 
-其他的自己看文档。。。
+
+
+#  第三章 项目服务端与跨域代理
+
+在我们没有后端接口的时候我们难免需要自己搭建一个 Mock 接口，实现与后端的同步开发。当后端的工作完成之后，再把 Mock 接口替换成真实接口。这样便可以大大提升效率！
+
+并且，当我们开发小项目或者个人全栈开发时，搭建 Mock 接口是必须掌握的技能。下面是它三种实现方式：
+
+-  **直接使用 Mockjs 搭建：**只适合获取随机的数据，不设计与数据库交互， 只适用于开发环境
+- **使用 Nodejs 搭建 Web 服务器：**通过 Express、Koa 等框架手动实现服务端接口，还可以搭配数据库使用
+
+- **使用第三方 Mock 服务：**[一些前端 Mock 工具](https://cloud.tencent.com/developer/article/1980086)，可以自行搜索其他网站，一键生成 Mock 接口
+
+
+
+前端项目在开发模式下发送请求的时候通过使用打包工具（Webpack、Vite 等）提供的中间件来实现反向代理从而实现跨域，**发送请求时如果不加上 ip 地址，则默认为本地地址。**另外通常会使用 Axios 来发送请求。
+
+
+
+## 3.1 直接使用 Mockjs 搭建
+
+前面其实已经学习过 Mockjs 这个库了，这里再总结一下使用方法
+
+- 使用其内部的 API 可以产生随机的数提供我们使用
+- 可以启动 Mockjs 服务来实现请求拦截的效果，不过只适用于开发环境
+- 安装：`npm i mockjs -D  @types/mockjs`
+- Mock.mock 启动拦截：https://github.com/nuysoft/Mock/wiki/Mock.mock()
+- Mock.Random 产生随机数：https://github.com/nuysoft/Mock/wiki/Mock.Random
+
+
+
+使用案例：新建 `mock/index.js`
+
+```ts
+import Mock from 'mockjs'
+const Random = Mock.Random
+import banner from './data/banner.json'
+interface DataList {
+    date: string,
+    name: string,
+    address: string
+}
+
+// 生成随机数数组
+const dataList: DataList[] = []
+for (let i = 0; i < 100; i++) {
+    const template = {
+        date: Random.date(), // 生成一个随机日期,可加参数定义日期格式
+        name: Random.name(), // 生成姓名
+        address: Random.province() // 生成地址
+    }
+    dataList.push(template)
+}
+
+// get 请求
+Mock.mock('/mock/banner',{
+    'code': '200',
+    'message': '获取成功',    
+    data: banner,    
+})
+
+// post 请求
+Mock.mock('/mock/list', 'post', (params: any) => {
+    let info = JSON.parse(params.body)
+    let [index, size, total] = [info.current, info.pageSize, dataList.length]
+    let len = total / size
+    let totalPages = len - parseInt(String(len)) > 0 ? parseInt(String(len)) + 1 : len
+    let newDataList = dataList.slice(index * size, (index + 1) * size)
+
+    return {
+        'code': '200',
+        'message': '获取成功',
+        'data': {
+            'current': index,
+            'pageSize': size,
+            'rows': newDataList,
+            'total': total,
+            'totalPages': totalPages
+        }
+    }
+})
+```
+
+- 启动服务：直接在入口文件中引入 `mock/index.js`
+- 发送请求：mock 地址为 `http://localhost:3001/mock/list`
+
+
+
+
+
+## 3.2 Koa 搭建服务端接口
+
+这里简单使用 Koa + Koa-route 进行服务端接口的搭建。。。
+
+- 安装：`npm i koa-router koa -D  `
+
+- `router.get(url, function(ctx))`：生成一个 `get` 请求，通过 `ctx.body` 设置响应体
+- `app.use(router.routes())`：启动  Koa-route 中间件
+- Koa 官网：http://www.koajs.com.cn/
+- Koa-route：https://github.com/ZijianHe/koa-router
+
+
+
+**server/index.js**
+
+```js
+const Koa = require('koa')
+const Router = require('koa-router')
+const { resolve } = require('path')
+const routerOption = require('./router')
+
+const app = new Koa()
+const router = new Router()
+
+routerOption.forEach(route => {
+    const { url, method, response } = route
+
+    router[method](url, async ctx => {
+        ctx.body = await asyncGetRes(response, ctx)
+    })
+})
+
+// 设置1s的延迟效果
+const asyncGetRes = async (fn, ...args) => {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(fn(...args)), 1200)
+    })
+}
+
+app.use(router.routes())
+app.listen(3001)
+console.log('http://localhost:3001 服务接口已启动')
+```
+
+> nodemon server/index.js 启动服务
+
+
+
+**配置单个 route: router/routes/question.js**
+
+```js
+const Mock = require('mockjs')
+const Random = Mock.Random
+
+module.exports = [
+    // 创建问卷
+    {
+        url: '/api/question',
+        method: 'post',
+        response(ctx) {
+            return {
+                errno: 0,
+                data: {
+                    id: Random.id()
+                  	ctx
+                }
+            }
+        }
+    },
+]
+```
+
+> 接口地址：`http://localhost:3001/api/question`
+
+
+
+
+
+## 3.3 服务端接口架构分析
+
+写接口之前要对 API 进行设计，使用 Restful API 返回统一的格式。这里主要指定接口的 `method`、`path` 和 `response` 返回的数据格式，下面是一些例子
+
+```markdown
+### 获取用户信息
+
+- method `get`
+- path `/api/user/info`
+- response `{ errno: 0, data: {...} }` 或 `{ errno: 10001, msg: 'xxx' }`
+
+### 注册
+
+- method `post`
+- path `/api/user/register`
+- request body `{ username, password, nickname }`
+- response `{ errno: 0 }`
+```
+
+
+
+
+
+## 3.4 反向代理跨域的实现
+
+一般都是通过 proxy 选项来进行对不同域名跨域的配置，下面以 Webpack 为例来说明（Vite 操作基本一致）
+
+- 另外 proxy 选项里面还有一些其他属性，这里就不做介绍了
+- Webpack 修改配置之后项目必须重启之后才能生效
+
+- Webpack：https://www.webpackjs.com/configuration/dev-server/#devserverproxy
+
+- Vite：https://cn.vitejs.dev/config/server-options.html#server-proxy
+
+
+
+**配置基本的反向代理**
+
+设置所有请求接口地址中带有 `api` 字段的地址都反向代理到本地端口上实现跨域，让浏览器以为发送的是前面那个没有跨域的接口地址，实际上发送的是后面那个真实的接口地址
+
+`http://localhost:8000/api/list` => `http://localhost:3000/api/list`
+
+```js
+module.exports = {
+    ......
+    devServer: {
+        port: 8000,
+        proxy: {
+            '/api': 'http://localhost:3000',
+        },        
+    },    
+}
+```
+
+
+
+**实现路径重写的效果**
+
+设置所有请求接口地址中带有 `api` 字段的地址都反向代理到本地端口上实现跨域，同时把 `api` 字段抹去
+
+`http://localhost:8000/api/list` => `http://localhost:3000/list`
+
+**如此可以实现利用多个不同字段来区分并配置多个跨域接口**
+
+```js
+module.exports = {
+	......
+    devServer: {
+        port: 8000,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3000',
+                pathRewrite: { '^/api': '' },
+            },            
+        },
+    },    
+}
+```
+
+
+
+**多个字段配置同一个跨域接口**
+
+`http://localhost:8000/api/list` => `http://localhost:3000/api/list`
+
+`http://localhost:8000/auth/list` => `http://localhost:3000/auth/list`
+
+```js
+module.exports = {
+	......
+    devServer: {
+        port: 8000,
+        proxy: [
+            {
+                context: ['/auth', '/api'],
+                target: 'http://localhost:3001',
+            },
+        ],        
+    },    
+}
+```
+
+
+
+
+
+## 3.5 Axios 的详细使用
+
+Axios 适用于浏览器环境和 Nodejs 环境，可以直接使用 Axios 发送请求，也可以先创建一个 Axios 实例，对每个请求做出请求响应拦截和设置公共属性
+
+- 每次请求的结果为一个 Promise 对象
+- 响应结果里面的 JSON 数据会被自动转换
+- 可实现取消请求、超时处理，客户端支持防御[XSRF](http://en.wikipedia.org/wiki/Cross-site_request_forgery)
+- 无需手动写 TS，TypeScript 类型推断会自动完成
+- Aixos API：https://axios-http.com/zh/docs/api_intro
+
+
+
+### 3.5.1 Axios 的使用案例
+
+直接安装：`npm install axios`
+
+**axios.get:** https://axios-http.com/zh/docs/example
+
+```js
+axios.get('/user?ID=12345')
+.then(function (response) {
+    // 处理成功情况
+    console.log(response);
+})
+.catch(function (error) {
+    // 处理错误情况
+    console.log(error);
+})
+.finally(function () {
+    // 总是会执行
+});
+
+axios.get('/user', {
+    params: {
+        ID: 12345
+    },
+    header: {
+        ...
+    }
+})
+
+// 支持async/await用法
+async function getUser() {
+    try {
+        const response = await axios.get('/user?ID=12345');
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+}
+```
+
+
+
+**axios.post:** https://axios-http.com/zh/docs/post_example
+
+```js
+const {data} = await axios.post('https://httpbin.org/post', {
+    firstName: 'Fred',
+    lastName: 'Flintstone',
+    orders: [1, 2, 3]
+  }, {
+    
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
+})
+
+// 支持将 HTML From 转化为 JSON，请求体为一个 HTML From
+const {data} = await axios.post('/user', document.querySelector('#my-form'), {
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+```
+
+
+
+**支持并发请求**
+
+```js
+function getUserAccount() {
+  return axios.get('/user/12345');
+}
+
+function getUserPermissions() {
+  return axios.get('/user/12345/permissions');
+}
+
+const [acct, perm] = await Promise.all([getUserAccount(), getUserPermissions()]);
+```
+
+
+
+### 3.5.2 Axios 的实例封装
+
+- 使用实例通常搭配拦截器使用，并设置一些发送请求的默认值
+- 创建一个 Axios 实例：https://axios-http.com/zh/docs/instance
+- 这里有介绍拦截器的阶段：https://axios-http.com/zh/docs/interceptors
+
+```js
+import axios, { AxiosResponse } from 'axios'
+
+const axiosInstance = axios.create({
+    // 设置一些发送请求的默认值: headers baseURL
+    timeout: 5000,
+    // baseURL: 'server/'
+})
+
+// 请求拦截器
+axiosInstance.interceptors.request.use(function(config) {
+    return config
+})
+
+// 响应拦截器
+axiosInstance.interceptors.response.use(function(response: AxiosResponse) {
+    // 将响应体内容作为结果
+    const res = response.data || {}
+
+    // 函数默认要求返回response: AxiosResponse，这里直接返回结果的data属性
+    return res.data
+}, error => {
+    console.log('响应状态码不为2xx，请检查请求地址是否出错')
+    return Promise.reject(error)
+})
+
+export default axiosInstance
+```
+
+
+
+
+
+**特别介绍一下 baseURL**
+
+设置之后可以对每个由该 Axios 实例发出的请求添加一个头字段，可以搭配代理里面的路径重写一起使用！
+
+```js
+baseURL: 'server/'
+'http://localhost:8000/api/list' => 'http://localhost:8000/server/api/list'
+```
+
+
+
+同时配置代理跨域路径重写和 baseURL
+
+```js
+'/server': {
+    target: 'http://localhost:3000',
+    pathRewrite: { '^/server': '' },
+},            
+
+baseURL: 'server/'
+```
+
+实现发送请求时：`axiosInstance.get('api/list') ` 得到地址默认添加 server 字段实现代理，然后又清除
+
+`http://localhost:8000/server/api/list` => `http://localhost:3000/api/list`
+
+
+
+
+
+## 3.6 前端处理异步请求
+

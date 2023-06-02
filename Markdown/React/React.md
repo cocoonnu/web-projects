@@ -1129,15 +1129,15 @@ React 万能参考图：https://projects.wojtekmaj.pl/react-lifecycle-methods-di
 
 ## 1.8 Craco 配置开发环境
 
-craco，一个对 create-react-app 进行自定义配置的社区解决方案
+craco，一个对 create-react-app 进行自定义配置的社区解决方案，从而来代理 Webpack 的配置
 
-使用`create-react-app` 创建的项目默认是无法修改其内部的`webpack`配置的，不像 `vue-cli `那样可以通过一个配置文件修改。 虽然有一个`eject` 命令可以是将配置完全暴露出来，但这是一个不可逆的操作，同时也会失去`CRA` 带来的便利和后续升级。
+使用 `create-react-app` 创建的项目默认是无法修改其内部的 `webpack` 配置的，不像 `vue-cli ` 那样可以通过一个配置文件修改。 虽然有一个 `eject` 命令可以是将配置完全暴露出来，但这是一个不可逆的操作，同时也会失去`CRA` 带来的便利和后续升级。
 
 如果想要无 `eject` 重写 `CRA` 配置，目前成熟的是下面这几种方式
 
 - 通过 CRA 官方支持的 `--scripts-version` 参数，创建项目时使用自己重写过的 `react-scripts` 包
 - 使用 `react-app-rewired` + `customize-cra` 组合覆盖配置
-- 使用 `craco` 覆盖配置
+- **使用 `craco` 覆盖配置**
 
 
 

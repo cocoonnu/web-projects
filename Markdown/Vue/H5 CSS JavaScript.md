@@ -1161,3 +1161,42 @@ ctrl + b: 空了
 
 
 
+### 3.6 修改浏览器缓存地址
+
+删除这几个文件夹
+
+```
+C:\Users\LENOVO\AppData\Local\Microsoft\Edge\User Data\Default\Cache
+C:\Users\LENOVO\AppData\Local\Microsoft\Edge\User Data\Default\Code Cache
+
+C:\Users\LENOVO\AppData\Local\Google\Chrome\User Data\Default\Cache
+C:\Users\LENOVO\AppData\Local\Google\Chrome\User Data\Default\Code Cache
+```
+
+
+
+新建 D 盘
+
+```
+D:\Browser_cache\chrome
+D:\Browser_cache\edge
+```
+
+
+
+进入 CMD 输入
+
+```
+mklink /d "C:\Users\LENOVO\AppData\Local\Microsoft\Edge\User Data\Default\Cache" "D:\Browser_cache\edge"
+
+mklink /d "C:\Users\LENOVO\AppData\Local\Microsoft\Edge\User Data\Default\Code Cache" "D:\Browser_cache\edge"
+```
+
+```
+mklink /d "C:\Users\LENOVO\AppData\Local\Google\Chrome\User Data\Default\Cache" "D:\Browser_cache\chrome"
+
+mklink /d "C:\Users\LENOVO\AppData\Local\Google\Chrome\User Data\Default\Code Cache" "D:\Browser_cache\chrome"
+```
+
+
+
