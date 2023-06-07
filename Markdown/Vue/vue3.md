@@ -2451,6 +2451,11 @@ let chars: StringArray = ['a', 'b']
 // 普通类型
 type str = string
 
+type ResDataType = {
+    list: Array<any>
+    total: number
+}
+
 // 函数类型
 type Add = (x: number, y: number) => number
 
@@ -2476,6 +2481,25 @@ let add: Add = function(a, b) {
 ```
 
 
+
+Partial 将类型中所有选项变为可选
+
+Required 将类型中所有选项变为必选
+
+```ts
+type ContactType = {
+  name: string // 姓名
+  phone: string // 手机号
+  email: string // 邮箱
+}
+
+Partial<ContactType> 等效于
+ContactType{
+  name?: string; // 姓名
+  phone?: string; // 手机号
+  email?: string; // 邮箱
+}
+```
 
 
 

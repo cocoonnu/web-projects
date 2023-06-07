@@ -569,6 +569,14 @@ JWT 工作流程
 
 在服务器中利用 JWT 将一个对象（一般是用户数据对象）   生成一个 `Token` 字符串，在服务器和客户端之间传输。`Token` 字符串通过 `localStrorage` （或其他存储方式）储存在客户端中。在下次发送请求时携带该字符串一起发送至服务器。服务器再通过 JWT 解析字符串获取用户数据对象，从而进行身份认证
 
+```js
+// 设置 TOKEN 请求头 JWT 固定格式
+const token = localStorage.getItem('TOKEN') || ''
+config.headers['Authorization'] = `Bearer ${token}`
+```
+
+
+
 
 
 ### 2.2.1 JWT的组成

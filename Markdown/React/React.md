@@ -1287,6 +1287,8 @@ const [name, setName] = useState(() => {
 
 
 
+
+
 - **setState 尽量使用函数形式，函数的返回值作为最新的 state。普通形式容易进行数据合并**
 
 ```jsx
@@ -1308,6 +1310,8 @@ const click = () => {
 ```
 
 > 成功实现加2，虽然函数也是异步更新的，但是函数无法进行合并
+
+
 
 
 
@@ -1403,7 +1407,7 @@ $ npm i immer --save
 **优化 useState**
 
 ```js
-import produce from 'immer'
+import { produce } from 'immer'
 
 const [user, setUser] = useState({
     name: '123',
@@ -1737,6 +1741,97 @@ export default function App() {
 `divRef.current` 得到的就是 `useImperativeHandle` 中的函数返回的那个对象
 
 ![image-20230514152450336](mark-img/image-20230514152450336.png)
+
+
+
+
+
+### 2.2.4 useContext
+
+这个  hook 可以实现**响应式数据或普通数据**跨层级传递，类似于之前的 Context 嵌套传递，使用起来更加简单
+
+参考文档：https://blog.csdn.net/weixin_43606158/article/details/100750602
+
+
+
+**根组件**
+
+```tsx
+// 创建一个 Context 对象
+import React, { useContext } from "react"
+
+const TestContext= React.createContext({
+    // 这里可以设置默认的 value 对象
+    name: 'cocoon'
+})
+
+function App() {
+  return (
+	<TestContext.Provider 
+		value={{
+			username: 'czy',
+		}}
+	>
+		......
+	<TestContext.Provider/>
+  )
+}
+```
+
+
+
+**嵌套组件**
+
+```tsx
+import React, { useContext } from "react
+import { TestContext } from './App'
+
+const Navbar = () => {
+  // 获取导出的 value 对象
+  const { username } = useContext(TestContext)
+    
+  return (
+    <div className="navbar">
+      <p>{username}</p>
+    </div>
+  )
+}
+```
+
+
+
+### 2.2.5 useReducer
+
+`useReducer` 是 `useState` 的替代方案，通常用于处理修改逻辑更复杂的数据。和 Redux 中的 reducer 很类似！
+
+参考文档：https://blog.csdn.net/Jas3000/article/details/124168218
+
+```jsx
+// 简单使用useReducer实现计数器
+const initialState = {count: 0};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'increment':
+      return {count: state.count + 1};
+    case 'decrement':
+      return {count: state.count - 1};
+    default:
+      throw new Error();
+  }
+};
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({type: 'decrement'})}>-</button>
+      <button onClick={() => dispatch({type: 'increment'})}>+</button>
+    </>
+  );
+}
+```
 
 
 

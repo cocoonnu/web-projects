@@ -759,14 +759,13 @@ useSearchParams：获取 search 参数
 
 - 通过 `search.get('id')` 获取属性值
 - 属性值可以区分数字和字符串类型
-- `setSearch` 可以用来更新 `search` 数据
 
 ```jsx
 import React from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 function Test() {
-    const [search, setSearch] = useSearchParams()
+    const [search] = useSearchParams()
     const id = search.get('id')
     const name = search.get('name')
 
@@ -783,11 +782,43 @@ function Test() {
 export default Test
 ```
 
-
-
 search 对象的一些 API
 
 ![image-20230528161525128](mark-img/image-20230528161525128.png)
+
+
+
+**搭配 useNavigate 实现跳转时改变路由 search 参数**
+
+```js
+// 直接设置参数
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom'
+
+const nav = useNavigate()
+const { pathname } = useLocation()
+const [searchParams] = useSearchParams() 
+
+const onSearch = () => {
+    nav({
+        pathname,
+        search: `keyword=123`
+    })
+}
+```
+
+```js
+// 添加参数，参数已经存在时会自动更新
+const onSearch = () => {
+    searchParams.set(keyword, 123)
+    
+    nav({
+        pathname,
+        search: searchParams.toString() // 所有参数自动转化为 `keyword=123&name=coco`
+    })
+}
+```
+
+
 
 
 

@@ -506,6 +506,8 @@ console.log(1);
 
 参考文档：https://blog.csdn.net/m0_68324632/article/details/126459643
 
+注意下面讲得三个 API 可以实现**多个异步函数并行触发**，通过放入一个数组中得到不同的状态，**得到结果的总时长为最大的一个异步函数的延时**
+
 
 
 - **Promise.all**
@@ -751,6 +753,22 @@ async function main() {
 }
 
 main(); // 000
+```
+
+
+
+**for await (const item of 迭代器)**
+
+可以实现**多个异步函数按顺序触发**，得到结果的总时长为所有异步函数延时的累加
+
+```ts
+async () => {
+    let resArr = []
+    for await (const _id of selectedIds) {
+        let res = await updateQuestionApi(_id, { isDelete: false })
+        resArr.push(res)
+    }    
+}
 ```
 
 

@@ -627,9 +627,9 @@ const Login: FC = () => {
 
 ### 2.3.4 搜索框组件设计理念
 
-我们设计搜索框和分页器的时候，要遵循组件解耦原则，既不能修改列表组件里面的内容！于是我们可以通过修改组件之间存在的共同的东西 - 页面 URL，来实现组件间的交互。
+我们设计搜索框和分页器的时候，要遵循组件解耦原则，既不能修改列表组件里面的内容！于是我们可以通过修改组件之间存在的共同的东西 - 页面 URL，来实现组件间的交互。另外这里还实现了受控组件。
 
-**那么搜索框组件的唯一功能就是点击搜索后，将页面 URL 添加 search 参数**，另外这里还实现了受控组件
+**那么搜索框组件的唯一功能就是点击搜索后，将页面 URL 添加 search 参数并页面跳转**
 
 ```tsx
 import React, { FC, useState, useEffect } from 'react'
@@ -675,6 +675,57 @@ const ListSearch: FC = () => {
 }
 
 export default ListSearch
+```
+
+
+
+### 2.3.5 分页器组件设计理念
+
+和搜索框一样，作用就是点击分页时改变 URL 中的 page、pageSize 属性，**并实现页面跳转。**
+
+我们先将该组件变成一个受控组件，当发生 onChange 事件的时候修改 URL，监听 URL 更新组件受控属性
+
+Pagination 分页器：https://ant-design.antgroup.com/components/pagination-cn
+
+```tsx
+type PropsType = {
+    total: number // 数据总数由父组件传递
+}
+
+const ListPagination: FC<PropsType> = (props: PropsType) => {
+    const nav = useNavigate()
+    const { pathname } = useLocation()
+    const [searchParams] = useSearchParams()
+	// 受控属性
+    const [current, setCurrent] = useState(1)
+    const [pageSize, setPageSize] = useState(LIST_PAGE_SIZE)
+
+    // 监听URL
+    useEffect(() => {
+        setCurrent(parseInt(searchParams.get(LIST_PAGE_KEY)) || 1)
+        setPageSize(parseInt(searchParams.get(LIST_PAGE_SIZE_KEY)) || LIST_PAGE_SIZE)
+    }, [searchParams])
+
+    // 触发分页事件，修改URL search参数
+    const onChange: PaginationProps['onChange'] = (page, pageSize) => {
+        searchParams.set(LIST_PAGE_KEY, page.toString())
+        searchParams.set(LIST_PAGE_SIZE_KEY, pageSize.toString())
+
+        nav({
+            pathname,
+            search: searchParams.toString()
+        })
+    }
+
+    return (
+        <Pagination 
+            current={current} 
+            total={props.total} 
+            onChange={onChange} 
+            pageSize={pageSize} 
+        />
+    )
+}
 ```
 
 
@@ -1002,14 +1053,142 @@ const btnClick = () => {
 
 
 
+## 2.5 ahooks 的使用记录
+
+### 2.5.1 useRequest 处理异步函数
+
+**useRequest(service, option)**
+
+- service 为一个异步函数，option 为一个配置对象
+- 自动模式下该 Hook 会在组件初始化时执行
+- 该 Hook 返回 data、loading、error、refresh 等
+- 使用文档：https://ahooks.gitee.io/zh-CN/hooks/use-request/index
+
+```js
+// service 函数的类型1
+function getData() {
+    return new Promise(function(resolve, reject) {
+        if () resolve(res)
+        if () reject(err)
+    })
+}
+
+// service 函数的类型2
+export async function createQuestionApi(): Promise<ResDataType> {
+    const url = '/api/question'
+    const res = await axiosInstance.post(url) as ResType
+    if (res.errno === 0) return res.data as ResDataType
+    return Promise.reject({} as ResDataType)
+}
+```
+
+
+
+**service 函数接收参数必须写成回调函数**
+
+```ts
+const { loading, data } = useRequest(() => getQuestionPageListApi(SearchOption), {
+    refreshDeps: [searchParams]
+})
+```
+
+
+
+**在组件初始化时，会自动执行该异步函数**
+
+```js
+const { data, error, loading } = useRequest(service)
+```
+
+> data 会从 undefined 变成异步函数成功态的返回结果，error 为失败态返回结果
+
+
+
+**通过设置 refreshDeps 配置实现监听效果，即依赖项改变则异步函数触发一次**
+
+```ts
+const { loading, data } = useRequest(getQuestionPageListApi, {
+    refreshDeps: [searchParams]
+})
+```
+
+
+
+**手动触发模式，通过调用暴露的 run 同步函数触发**
+
+```js
+const { loading, run: createQuestion  } = useRequest(createQuestionApi, {
+    manual: true,
+
+    // 处理成功的回调（promise 为成功态）
+    onSuccess: (data) => {
+        nav('/question')
+        message.success('新建问卷成功')
+    },
+})
+```
+
+
+
+
+
+## 2.6 Hooks 导出数据与维护
+
+当我们使用 Hooks 导入的数据时，**该数据有三大特点：是响应式的、单项数据流只读、初始值可能为空**
+
+我们还可以从里面**解构赋值，其数据也具有三大特点！**
+
+```ts
+const { data: questionData, loading } = useLoadQueList({ isDeleted: true })
+const { list: questionList = [] } = questionData || { list: [] }
+```
+
+
+
+另外我们可以在我们组件中**使用 useState 维护内部的数据。**如果以 Hooks 导出的数据作为初始值，则需要设置 useEffect 来监听依赖的数据，另外还可以在其他地方手动修改内部维护的数据
+
+```ts
+const [questionListState, setQuestionListState] = useState(questionList)
+
+// 自动根据依赖更新
+useEffect(() => {
+    setQuestionListState(questionList)
+}, [questionList])
+```
+
+
+
+这里收集一下 setState 的常用方式
+
+- **过滤数组：直接用 filter**
+
+```ts
+setQuestionListState(questionListState.filter(item => {
+    if (selectedIds.includes(item._id)) return false
+    return true
+}))   
+```
+
+
+
+- **数组添加元素：直接用 concat**
+
+```ts
+setQuestionList(questionList.concat(data1, data2))
+```
+
+
+
+
+
 #  第三章 项目服务端与跨域代理
 
-在我们没有后端接口的时候我们难免需要自己搭建一个 Mock 接口，实现与后端的同步开发。当后端的工作完成之后，再把 Mock 接口替换成真实接口。这样便可以大大提升效率！
+在我们没有后端接口的时候我们难免需要自己搭建一个 Mock 接口，实现与后端的同步开发。当后端的工作完成之后，再把 Mock 接口替换成真实接口。这样便可以大大提升效率！**（全栈开发时服务端可不能用 Mock！）**
 
-并且，当我们开发小项目或者个人全栈开发时，搭建 Mock 接口是必须掌握的技能。下面是它三种实现方式：
+因此，搭建 Mock 接口是必须掌握的技能。下面是它三种实现方式：
 
--  **直接使用 Mockjs 搭建：**只适合获取随机的数据，不设计与数据库交互， 只适用于开发环境
-- **使用 Nodejs 搭建 Web 服务器：**通过 Express、Koa 等框架手动实现服务端接口，还可以搭配数据库使用
+-  **直接使用 Mockjs 搭建：**可获取随机的数据，直接在前端项目中启动， 只适用于开发环境
+- **使用 Nodejs 搭建 Web 服务器：**通过 Express、Koa 等框架手动实现服务端 Mock 接口，
 
 - **使用第三方 Mock 服务：**[一些前端 Mock 工具](https://cloud.tencent.com/developer/article/1980086)，可以自行搜索其他网站，一键生成 Mock 接口
 
@@ -1092,7 +1271,7 @@ Mock.mock('/mock/list', 'post', (params: any) => {
 
 ## 3.2 Koa 搭建服务端接口
 
-这里简单使用 Koa + Koa-route 进行服务端接口的搭建。。。
+这里简单使用 Koa + Koa-route 进行服务端 Mock 接口的搭建。。。
 
 - 安装：`npm i koa-router koa -D  `
 
@@ -1166,11 +1345,17 @@ module.exports = [
 
 
 
+获取 GET 请求中的 params 参数：通过 ctx.query 获取，**且所有数据均为字符串类型**
+
+
+
 
 
 ## 3.3 服务端接口架构分析
 
-写接口之前要对 API 进行设计，使用 Restful API 返回统一的格式。这里主要指定接口的 `method`、`path` 和 `response` 返回的数据格式，下面是一些例子
+我还是觉得我这个个人项目如果只写 Mock 接口的话真的有点像过家家一样。。。关键是我这个项目如果要实现后端所有的真实接口工作量又会加大！没办法作为前端的我只能硬着头皮写 Mock 接口了！
+
+前端和后端写接口之前要对 API 进行设计，使用 Restful API 返回统一的格式。这里主要指定接口的 `method`、`path` 和 `response` 返回的响应体数据的格式，下面是一些例子
 
 ```markdown
 ### 获取用户信息
@@ -1376,12 +1561,12 @@ const [acct, perm] = await Promise.all([getUserAccount(), getUserPermissions()])
 - 这里有介绍拦截器的阶段：https://axios-http.com/zh/docs/interceptors
 
 ```js
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
+import { message } from 'antd'
 
 const axiosInstance = axios.create({
     // 设置一些发送请求的默认值: headers baseURL
     timeout: 5000,
-    // baseURL: 'server/'
 })
 
 // 请求拦截器
@@ -1390,21 +1575,29 @@ axiosInstance.interceptors.request.use(function(config) {
 })
 
 // 响应拦截器
-axiosInstance.interceptors.response.use(function(response: AxiosResponse) {
-    // 将响应体内容作为结果
-    const res = response.data || {}
+axiosInstance.interceptors.response.use(function(response) {
 
-    // 函数默认要求返回response: AxiosResponse，这里直接返回结果的data属性
-    return res.data
+    // 统一输出错误提示
+    const res: any = response.data || {}
+    if (res.errno !== 0) {
+        if (res.msg) message.error(res.msg)
+    }
+
+    // 直接返回响应体内容
+    return res
+
 }, error => {
+    // 开发模式下打印
+    console.log(error) 
     console.log('响应状态码不为2xx，请检查请求地址是否出错')
-    return Promise.reject(error)
+
+    // 统一输出错误提示
+    message.error('请求失败，请稍后重试')
+    return error
 })
 
 export default axiosInstance
 ```
-
-
 
 
 
@@ -1438,5 +1631,144 @@ baseURL: 'server/'
 
 
 
-## 3.6 前端处理异步请求
+## 3.6 前端处理异步请求流程
+
+- 经过封装之后，前端业务中不需要处理请求失败的情况（但需要处理请求成功的情况，如输出成功提示）
+
+- Axios 实例中统一输出了错误提示。如果请求失败（响应码不为 2xx 或者 res.errno 不等于 0）得到的结果统一为一个空对象的 Promise 失败态！如果请求成功则获得 res.data 对象
+- 替换成真实接口时，修改代理域名和接口 API 调用函数中的 URL 即可
+
+- Mock 接口或真实接口响应体内容规范如下，**注意 data 里面的属性名也必须要一致！**
+
+```js
+{
+    errno: 0,
+    data: {
+        id: Random.id()
+        list: [...]
+    }
+}
+{
+    errno: 404,
+    msg: '新建问卷失败'
+}
+```
+
+
+
+**首先设置跨域代理**
+
+```js
+devServer: {
+    port: 8000,
+    proxy: {
+        '/api': 'http://localhost:3001',
+    },        
+},    
+```
+
+
+
+**然后封装 Axios 实例**
+
+- 响应成功时根据响应头内容的 `errno` 属性输出错误提示，否则直接返回响应头内容 
+
+- 响应失败时（响应状态码不为2xx），打印错误，输出错误提示，返回 AxiosError 对象
+
+```ts
+import axios from 'axios'
+import { message } from 'antd'
+
+const axiosInstance = axios.create({
+    // 设置一些发送请求的默认值: headers baseURL
+    timeout: 5000,
+})
+
+// 请求拦截器
+axiosInstance.interceptors.request.use(function(config) {
+    return config
+})
+
+// 响应拦截器
+axiosInstance.interceptors.response.use(function(response) {
+
+    // 统一输出错误提示
+    const res: any = response.data || {}
+    if (res.errno !== 0) {
+        if (res.msg) message.error(res.msg)
+    }
+
+    // 直接返回响应体内容
+    return res
+
+}, error => {
+    // 开发模式下打印
+    console.log(error) 
+    console.log('响应状态码不为2xx，请检查请求地址是否出错')
+
+    // 统一输出错误提示
+    message.error('请求失败，请稍后重试')
+    return error
+})
+
+export default axiosInstance
+```
+
+
+
+**统一规范接口 API 调用函数**
+
+- 新建文件夹 services，根据接口 API 的不同类型划分模块，如有关问卷的 API 就放在 question.js 中
+- 调用 `axiosInstance`方法之后接收 **ResType的响应体内容** 或者 **AxiosError对象**
+- **统一规范接口 API 调用函数返回 响应体内容的 data 属性 或者 一个空对象的 Promise 失败态**
+- 接口 API 调用函数为 async 函数，调用获取结果依然需要获取
+
+```ts
+import axiosInstance from '@/utils/axiosInstance'
+type ResType = {
+    errno: number,
+    data?: ResDataType,
+    msg?: string
+}
+
+type ResDataType = {
+    [key: string]: any
+}
+
+// 新建问卷
+export async function createQuestionApi(): Promise<ResDataType> {
+    const url = '/api/question'
+    const res = await axiosInstance.post(url) as ResType
+    if (res.errno === 0) return res.data as ResDataType
+    return Promise.reject({} as ResDataType)
+}
+
+// 获取某页问卷列表
+export async function getQuestionPageListApi(): Promise<ResDataType> {
+    const url = '/api/question'
+    const res = await axiosInstance.get(url) as ResType
+    if (res.errno === 0) return res.data as ResDataType
+    return Promise.reject({} as ResDataType)
+}
+```
+
+
+
+**前端业务中使用接口 API 调用函数**
+
+- data 可以得到响应体内容的 data 属性 或者 空对象
+
+- 这里只是简单使用，通过 async/await
+- 更强大的使用可以去看 ahooks 的 useRequest，专门用来处理异步函数的解决方案
+
+```ts
+useEffect(() => {
+    async function getQuestionPageList() {
+        const data = await getQuestionPageListApi()
+        console.log(data)
+    }
+
+    getQuestionPageList()
+}, [])
+```
 

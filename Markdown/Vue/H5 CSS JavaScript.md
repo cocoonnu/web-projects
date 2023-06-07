@@ -727,7 +727,7 @@ arr.fonEach((item,index,arr) => {})
 
 - **arr.map**
 
-遍历操作数组，返回一个新数组
+遍历操作数组，将每次返回的结果作为一个新数组返回
 
 当数组为简单类型时，不会该变原数组，当为引用类型时，则会改变原数组！！
 
@@ -742,6 +742,8 @@ map 使用方法：https://blog.csdn.net/Anna0115/article/details/103696124
 - **arr.filter**
 
 遍历筛选数组，回调函数返回布尔类型，返回一个满足条件的新数组
+
+当数组为简单类型时，不会该变原数组，当为引用类型时，则会改变原数组！！
 
 ```js
 var newArr = arr.filter(function(item,index,arr) {
