@@ -1163,3 +1163,221 @@ endmodule
 
 
 
+
+
+### 复习题
+
+第三题
+
+```verilog
+//模10计数器的Verilog HDL设计
+module count10(clk, clr, out);
+ 
+input clk, clr;
+output[3:0] dout;
+reg [3:0] dout;
+ 
+always@(posedge clk or negedge clr)
+begin
+    if(!clr)
+		out <= 4'b0000;        //系统复位，计数器清零
+	else
+        if(out == 4'b1001)     //计数值达到9时，计数器清零
+			out <= 4'b0000;
+		else
+			out <= out + 1'b1; //否则，计数器加1 
+end
+endmodule
+```
+
+```verilog
+//模10计数器的测试文件
+`timescale 1ns/1ps
+module count10_tb;
+ 
+reg clk, clr;
+wire[3:0] out;
+ 
+always
+begin
+	#1 clk = ~clk;
+end
+ 
+initial
+begin
+	clk = 1'b0;
+	clr = 1'b1;
+
+    #2 clr = 1'b0;
+	#2 clr = 1'b1;
+	
+end
+ 
+count10 u1(.clk(clk), .clr(clr), .out(dout));
+ 
+endmodule
+```
+
+
+
+第八题
+
+```verilog
+module fre_div204 #(parameter NUM=20)(input clk,reset,output wire cout);
+  
+reg[4:0] m;
+reg cout;
+    
+always @(posedge clk)
+begin
+  
+  if (!reset)
+  begin
+    m <= 0;
+    cout <= 0;
+  end
+  
+  else 
+  begin
+    if (m == NUM - 1) m <= 0;
+    else m <= m +1;
+    
+    if (m < 8) cout <= 1;
+    else cout <= 0;    
+  end
+  
+end
+
+endmodule
+```
+
+```verilog
+module fre_div257 #(parameter NUM=25)(input clk,reset,output wire cout);
+  
+reg[4:0] m,n;
+reg cout1,cout2;
+assign cout = cout1 | cout2;
+
+always @(posedge clk)
+begin
+  
+  if (!reset)
+  begin
+    m <= 0;
+    cout1 <= 0;
+  end
+  
+  else 
+  begin
+    if (m == NUM - 1) m <= 0;
+    else m <= m +1;
+    
+    if (m < 17) cout1 <= 1;
+    else cout1 <= 0;    
+  end
+  
+end
+
+always @(negedge clk)
+begin
+  
+  if (!reset)
+  begin
+    n <= 0;
+    cout2 <= 0;
+  end
+  
+  else 
+  begin
+    if (n == NUM - 1) n <= 0;
+    else n <= n +1;
+    
+    if (n < 17) cout2 <= 1;
+    else cout2 <= 0;    
+  end
+  
+end
+
+endmodule
+```
+
+
+
+第五题
+
+```verilog
+module parity(even,odd,bus);
+output even,odd;
+input[7:0] bus; //奇同偶异
+assign even=^bus;//偶校验用异或
+assign odd=^~bus;//奇校验用同或
+endmodule
+```
+
+
+
+第六题
+
+```verilog
+module  Decoder(In, En, Out);
+
+input En;
+input[2:0] In;
+output[7:0] Out;
+reg[7:0] Out;
+    
+always @*
+begin
+    if (En == 1) 
+       begin
+            case(In)
+                3b'0: Out=8d'1111 1110;
+                3b'1: Out=8d'1111 1101;
+                3b'2: Out=8d'1111 1011;
+                3b'3: Out=8d'1111 0111;
+                3b'4: Out=8d'1110 1111;
+                3b'5: Out=8d'1101 1111;
+                3b'6: Out=8d'1011 1111;
+                3b'7: Out=8d'0111 1111;
+            endcase
+       end
+end    
+    
+endmodule
+```
+
+
+
+
+
+第九题
+
+```verilog
+`timescale 1ns/1ps
+module test9_tb;
+ 
+reg clk, in1, in2;
+ 
+always
+begin
+	#5 clk = ~clk;
+end
+ 
+initial
+begin
+	clk = 1'b0;
+	in1 = 1'b0;
+    in2 = 1'b1;
+    
+    #5 in2 = 1'b0;
+    #5 in2 = 1'b1;
+    #5 in1 = 1'b1;
+    #10 in1 = 1'b0;
+	#5 in1 = 1'b1;1
+    #5 in2 = 1'b0;
+    #5 in1 = 1'b0;
+    
+end
+endmodule
+```
+

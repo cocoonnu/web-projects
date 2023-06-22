@@ -1053,11 +1053,68 @@ const btnClick = () => {
 
 
 
-## 2.5 ahooks 的使用记录
+## 2.5 Hooks 在项目中的使用
 
-### 2.5.1 useRequest 处理异步函数
+这一节主要记录项目中是如何编写自定义 Hooks、使用第三方库 ahooks 和利用 Hooks 进行数据维护的
 
-**useRequest(service, option)**
+
+
+### 2.5.1 Hooks 导入数据与维护
+
+当我们从自定义 Hooks 或 ahooks 里面导入响应式数据时：
+
+- **该数据有三大特点：是响应式的、单项数据流只读、初始值可能为空**
+
+- 我们还可以从里面进行**解构赋值，其数据也具有三大特点！**
+
+```ts
+const { data: questionData, loading } = useLoadQueList({ isDeleted: true })
+const { list: questionList = [] } = questionData || { list: [] }
+```
+
+
+
+另外我们可以在我们组件中**使用 useState 维护内部的数据。**如果以 Hooks 导出的数据作为初始值，则需要设置 useEffect 来监听依赖的数据，另外还可以在其他地方手动修改内部维护的数据
+
+```ts
+const [questionListState, setQuestionListState] = useState(questionList)
+
+// 自动根据依赖更新
+useEffect(() => {
+    setQuestionListState(questionList)
+}, [questionList])
+```
+
+
+
+这里收集一下 setState 的常用方式
+
+- **过滤数组：直接用 filter**
+
+```ts
+setQuestionListState(questionListState.filter(item => {
+    if (selectedIds.includes(item._id)) return false
+    return true
+}))   
+```
+
+
+
+- **数组添加元素：直接用 concat**
+
+```ts
+setQuestionList(questionList.concat(data1, data2))
+```
+
+
+
+
+
+### 2.5.2 useRequest 处理异步函数
+
+这里介绍一下第三方库 ahooks 中的 **useRequest(service, option)**
+
+- **主要作用是处理存入的异步函数，并返回状态**
 
 - service 为一个异步函数，option 为一个配置对象
 - 自动模式下该 Hook 会在组件初始化时执行
@@ -1132,49 +1189,176 @@ const { loading, run: createQuestion  } = useRequest(createQuestionApi, {
 
 
 
-## 2.6 Hooks 导出数据与维护
+## 2.6 Redux 实现状态管理
 
-当我们使用 Hooks 导入的数据时，**该数据有三大特点：是响应式的、单项数据流只读、初始值可能为空**
+我的项目使用 Redux Toolkit + React-redux + TS 是全局的数据状态管理，仓库数据只做简单维护（如派发 action 直接修改仓库数据），复杂逻辑和异步函数调用都放在自定义 Hooks 中定义
 
-我们还可以从里面**解构赋值，其数据也具有三大特点！**
+- TS 需要维护仓库的数据类型和每个模块的数据类型
+- redux-persist 插件可以实现数据持久化存储，这里分为使用和不使用两个版本
+
+
+
+### 2.6.1 没有使用 redux-persist
+
+**store/index.ts：封装 store，直接导出 store、useAppSelector、useAppDispatch、StoreStateType**
 
 ```ts
-const { data: questionData, loading } = useLoadQueList({ isDeleted: true })
-const { list: questionList = [] } = questionData || { list: [] }
+import { configureStore } from '@reduxjs/toolkit'
+import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux'
+import userReducer, { UserStateType } from './modules/userReducer'
+
+export type StoreStateType = {
+    user: UserStateType
+}
+
+const store = configureStore({
+    reducer: {
+        user: userReducer
+    }
+})
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+
+export const useAppDispatch: () => AppDispatch = useDispatch
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector 
+
+export default store
 ```
 
 
 
-另外我们可以在我们组件中**使用 useState 维护内部的数据。**如果以 Hooks 导出的数据作为初始值，则需要设置 useEffect 来监听依赖的数据，另外还可以在其他地方手动修改内部维护的数据
+**modules/userReducer.ts：封装模块，直接导出 userReducer、UserStateType、actions**
 
 ```ts
-const [questionListState, setQuestionListState] = useState(questionList)
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-// 自动根据依赖更新
-useEffect(() => {
-    setQuestionListState(questionList)
-}, [questionList])
+export type UserStateType = {
+    username: string
+    nickname: string
+}
+
+const userSlice = createSlice({
+    name: 'user',
+
+    initialState: {
+        username: '',
+        nickname: ''
+    } as UserStateType,
+
+    reducers: {
+        setUserState: (state: UserStateType, action: PayloadAction<UserStateType>) => {
+            return action.payload
+        }
+    }
+})
+
+export const { setUserState } = userSlice.actions
+export default userSlice.reducer
 ```
 
 
 
-这里收集一下 setState 的常用方式
-
-- **过滤数组：直接用 filter**
+**外部使用、修改仓库数据**
 
 ```ts
-setQuestionListState(questionListState.filter(item => {
-    if (selectedIds.includes(item._id)) return false
-    return true
-}))   
+import { StoreStateType, useAppSelector, useAppDispatch } from '@/store'
+import { setUserState } from '@/store/modules/userReducer'
+
+// 读取user模块数据
+const userState = useAppSelector((state: StoreStateType) => state.user)
+
+// 修改数据
+const dispatch = useAppDispatch()
+dispatch(setUserState(data))
 ```
 
 
 
-- **数组添加元素：直接用 concat**
+### 2.6.2 使用 redux-persist
+
+如果要使用 redux-persist 插件，那么需要对 store 里的代码格式进行一定的修改
+
+- 参考文章：https://blog.csdn.net/limuzhixing/article/details/129242822
+- 官方文档：https://github.com/rt2zz/redux-persist
+- 需要另外配置 persistedReducer 和 持久化存储对象 persistor
+- 需要另外使用 combineReducers 进行 Reducer 的合并
+- 需要另外使用一个中间件来处理一个生成的错误
+
+
+
+**一键安装**
+
+```bash
+npm i @reduxjs/toolkit react-redux redux-persist
+```
+
+
+
+**完整版 store/index.ts**
 
 ```ts
-setQuestionList(questionList.concat(data1, data2))
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux'
+import { persistReducer, persistStore } from 'redux-persist'
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import userReducer, { UserStateType } from './modules/userReducer'
+
+export type StoreStateType = {
+    user: UserStateType
+}
+
+const reducers = combineReducers({
+    user: userReducer,
+})
+
+const persistConfig = {
+    key: 'redux',
+    storage: storage, // 存储地址
+    // whitelist: ['CollapsedReducer'],//白名单只保存CollapsedReducer
+    // blacklist:['CollapsedReducer'],//黑名单仅不保存CollapsedReducer
+}
+
+const persistedReducer = persistReducer(persistConfig, reducers)
+
+const store = configureStore({
+    reducer: persistedReducer,
+    middleware: getDefaultMiddleware => getDefaultMiddleware({
+        serializableCheck: {
+            //忽略了 Redux Persist 调度的所有操作类型
+            ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+    })
+})
+
+export const persistor = persistStore(store)
+export default store
+
+type RootState = ReturnType<typeof store.getState>
+type AppDispatch = typeof store.dispatch
+
+export const useAppDispatch: () => AppDispatch = useDispatch
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector 
+```
+
+
+
+**App 中应用如下 index.tsx**
+
+```tsx
+import { Provider } from 'react-redux'
+import store, { persistor } from './store'
+import { PersistGate } from 'redux-persist/integration/react'
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+root.render(
+    <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+            <App />
+        </PersistGate>
+    </Provider>
+)
 ```
 
 

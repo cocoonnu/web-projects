@@ -1025,9 +1025,7 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 
 
-## 第三章 编辑器操作记录
-
-
+## 第三章 Windows setting
 
 ### 3.1 Typora 配置记录
 
@@ -1057,8 +1055,10 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 
 
+### 3.2 VScode 设置
 
-### 3.2 VScode 快捷键
+
+####  3.1.1 VScode 快捷键
 
 ```
 ctrl + i: 触发建议
@@ -1096,7 +1096,7 @@ ctrl + b: 空了
 
 
 
-### 3.3 VScode 插件介绍
+#### 3.1.2 VScode 插件介绍
 
 - pritter-Code formatter - 代码格式化
 
@@ -1104,28 +1104,34 @@ ctrl + b: 空了
 
 
 
-- Vue Language Features (Volar) - Vue3 代码支持
+- Vue Language Features (Volar) + TypeScript Vue Plugin - Vue3 和 TS 代码支持，Vetur - Vue2 代码支持
 
 
 
-- Vetur - Vue2 代码支持
+- Tabnine - 免费版 AI 代码自动补全，https://blog.csdn.net/RetroFlux/article/details/125773360
 
 
 
-13、Color Highlight（颜色提醒
-14、Dracula Official（主题
-
-\2. Code Spell Checker - 单词拼写检查，有时看到拼错的单词会非常难受，强迫症推荐
-\3. DotENV - .env环境变量文件语法高亮
-\4. ESLint + Stylelint - 统一代码风格
-\5. SVG - svg 图片预览
-\6. Power Mode - 炫酷的键入动效
-\7. Tabnine - AI 代码自动补全，个人觉得比copilot好用，它不会打断你的代码思路
-\8. Trailing Spaces - 行末空格高亮，貌似新版vscode内置了
+- GitHub Copilot：AI 代码自动补全（试用期两个月），https://blog.csdn.net/RetroFlux/article/details/124205948
 
 
 
-### 3.4 VScode 设置记录
+- Code Spell Checker - 单词拼写检查，https://blog.csdn.net/qq_42078081/article/details/115014474
+
+
+
+- DotENV - .env 环境变量文件语法高亮，https://blog.csdn.net/qq_45905655/article/details/130680442
+
+
+
+- SVG - svg 图片预览
+
+
+
+
+
+
+#### 3.1.3 VScode 设置记录
 
 - 在 VScode 中关闭对 js、ts 文件校验：搜索 validate 点击 TypeScript
 
@@ -1139,7 +1145,7 @@ ctrl + b: 空了
 
 
 
-### 3.5 VScode 配置代码片段
+#### 3.1.4 VScode 配置代码片段
 
 - 快捷键：Ctrl + Shift + P 打开搜索，搜索 snippets 选择配置用户代码片段
 
@@ -1163,7 +1169,7 @@ ctrl + b: 空了
 
 
 
-### 3.6 修改浏览器缓存地址
+### 3.3 修改浏览器缓存地址
 
 删除这几个文件夹
 
@@ -1202,3 +1208,26 @@ mklink /d "C:\Users\LENOVO\AppData\Local\Google\Chrome\User Data\Default\Code Ca
 
 
 
+### 3.4 AOC 显示器设置
+
+显示器型号：Q24P3C  首先下载 I-menu 软件：https://www.aocmonitor.com.cn/download，在软件里实现 OSD 配置的效果。G-menu 是游戏模式下的配置软件，剩下的两个软件在 I-menu 里面已经整合了
+
+- 亮度模式使用标准模式，选择伽马二，色温模式选择正常模式
+- DCR 开启之后会自动设置亮度和对比度，通常亮度会设置的很高（无法手动调节亮度了）
+- HDR 模式开启后会模拟 HDR 效果，这时候亮度对比度色彩都会被自动调节
+- Overdrive 越强，响应时间越短，但是可能产生灰影，非游戏模式下不建议开启
+- Clear Vision 越强，文字色彩越重越深，自行判断设置的强度
+
+
+
+**色彩校准**
+
+搜索校准显示器颜色和启用 ClearType 文本，使 Window11 对显示器起到更高的支持 
+
+设置原厂色彩校准教程：https://www.bilibili.com/read/cv3013179，感觉原厂的色彩太淡了,还是用了上一条设置
+
+
+
+**缩放比例**
+
+首先进入设置 - 屏幕 - 缩放 选择系统推荐的缩放即可。然后进入辅助功能 - 文本大小 设置文本放大，这样文本的锯齿感会降低一点，大小没有定论，自行设置即可

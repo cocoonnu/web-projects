@@ -1550,40 +1550,17 @@ function Test() {
 
 
 
-### 2.1.4 自定义 React hook
+### 2.1.4 自定义 React Hook
 
-有了两个 API，我们可以将响应式数据文件单独抽离出去，形成一个单独的 hook 文件
+自定义 React Hook 的目的是导出内部封装的响应式数据，实现组件复用、代码抽离的效果
 
-通常我们会使用第三方 hooks，以便节省我们的时间，这里推荐 ahooks，拿来即用即可！
-
-ahooks 官网：https://ahooks.gitee.io/zh-CN
-
-
-
-- 获取 DOM 距离顶部高度的 hook
-
-```js
-import { useState } from 'react'
-
-export function useWindowScroll() {
-    const [scrollTop, setScrollTop] = useState(0)
-
-    window.addEventListener('scroll', () => {
-        setScrollTop(document.documentElement.scrollTop)
-    })
-
-    return [scrollTop, setScrollTop]
-}
-```
-
-```jsx
-const [scrollTop] = useWindowScroll()
-(<div> { scrollTop } </div>)
-```
+- 使用 userState 定义数据，使用 useEffect 处理数据逻辑
+- 通常导出的响应式数据只读，可以导出 setState 实现数据可修改
+- 通常项目中我们会使用 ahooks，官网：https://ahooks.gitee.io/zh-CN
 
 
 
-- 封装一个 LocalStorage 的 hook
+例如封装一个 LocalStorage 的 Hook
 
 ```js
 import { useState, useEffect } from 'react'
@@ -1748,9 +1725,11 @@ export default function App() {
 
 ### 2.2.4 useContext
 
-这个  hook 可以实现**响应式数据或普通数据**跨层级传递，类似于之前的 Context 嵌套传递，使用起来更加简单
+这个  Hook 可以实现**响应式数据或普通数据**跨层级传递，子组件可以使用父组件定义的响应式数据
 
-参考文档：https://blog.csdn.net/weixin_43606158/article/details/100750602
+- 等效于之前的 Context 嵌套传递，使用起来更加简单，传递的数据**只读**
+
+- 参考文档：https://blog.csdn.net/weixin_43606158/article/details/100750602
 
 
 
@@ -1758,15 +1737,16 @@ export default function App() {
 
 ```tsx
 // 创建一个 Context 对象
-import React, { useContext } from "react"
+import React, { useContext, createContext } from "react"
 
-const TestContext= React.createContext({
-    // 这里可以设置默认的 value 对象
+const TestContext= createContext({
+    // 这里可以设置默认的 value 对象或者null
     name: 'cocoon'
 })
 
 function App() {
   return (
+    // 在父组件中可以设置自己的value值  
 	<TestContext.Provider 
 		value={{
 			username: 'czy',
@@ -2040,7 +2020,10 @@ export default React.memo(Child,areEqual)
 
 #  第三章 React 进阶知识点
 
-推荐文档专栏：https://blog.csdn.net/p1967914901/category_10164640.html
+推荐文档专栏：
+
+- 夏安的 React 笔记：https://blog.csdn.net/p1967914901/category_10164640.html
+- React 点滴知识点：https://blog.csdn.net/sinat_17775997/category_6352631.html
 
 
 

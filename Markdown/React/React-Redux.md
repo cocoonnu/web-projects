@@ -587,7 +587,7 @@ Redux-persist：https://blog.csdn.net/hbmern/article/details/124184309
 
 
 
-# 第二章 Redux Toolkit 入门
+# 第二章 认识 Redux Toolkit
 
 在前面我们学习 Redux 的时候应该已经发现，Redux 的编写逻辑过于的繁琐和麻烦。并且代码通常分拆在多个文件中（虽然也可以放到一个文件管理，但是代码量过多，不利于管理）
 
@@ -600,8 +600,10 @@ Redux Toolkit 包旨在成为编写Redux逻辑的标准方式，从而解决上�
 只需要安装两个包，即可实现完整功能，包括 Redux-thunk 和 Redux 开发者工具等
 
 ```bash
-$ npm install @reduxjs/toolkit react-redux
+$ npm install @reduxjs/toolkit react-redux --save 
 ```
+
+参考文档：https://blog.csdn.net/web220507/article/details/127864453
 
 
 
@@ -659,9 +661,12 @@ const counterSlice = createSlice({
 
     reducers: {
         addNumber(state, action) {
-            // console.log(action.payload)
-            // console.log(action.type)
+            // action.payload：dispatch时所传的参数
+            // action.type：dispatch时action类型字段
             state.count = state.count + action.payload
+            
+            // 可直接返回一个值替代state
+            return action.payload
         }
     }
 })
@@ -734,9 +739,18 @@ export default Count
 
 
 
-## 2.4 异步 action 的使用
+## 2.4 Redux 实现异步函数
 
-由于 `reducerSlice.reducers` 中的函数只能写同步 action 函数，因此我们将异步函数写在外面，当同时也要准备一个同步函数用于 `dispatch` 修改担当前模块数据
+Redux 使用异步函数有两种方式：
+
+- 方式一：action 直接作为异步函数，通过 dispatch 该异步函数实现修改仓库数据
+- 方式二：action 只作为同步函数使用，在外面用 Hooks 定义异步函数通过 dispatch 同步函数修改仓库数据
+
+
+
+**方式一的实现思路：**
+
+由于 `reducerSlice.reducers` 中的函数只能写同步 action 函数，因此我们将异步函数写在外面，但同时也要准备一个同步函数用于 `dispatch` 修改担当前模块数据
 
 store/modules/counter.js
 
@@ -781,6 +795,12 @@ const Count = () => {
 ```
 
 > 注意 asyncSub 函数也是要被 dispatch 的！！
+
+
+
+**方式二的实现思路：**
+
+在外部 Hooks 文件夹中定义个 hoos 文件， 
 
 
 
@@ -894,3 +914,359 @@ const Count = () => {
 export default Count
 ```
 
+
+
+
+
+# 第三章 认识 Mobox
+
+Mobox 是一个状态管理库，它通过实现一个类来进行一个仓库的状态管理。创建仓库使用 makeObservable，通过给组件包裹 mobx-react 暴露出的 observer 起到监听效果，从而实现创建到调用的闭环
+
+- 中文文档：https://www.mobxjs.com/
+- 参考文档：https://juejin.cn/post/6979095356302688286
+
+
+
+如果只使用函数组件，那么直接下载 mobx-react-lite 更轻量级的库（移除了 provider、inject ）
+
+```bash
+npm i mobx mobx-react-lite --save
+```
+
+
+
+如果使用类组件则需要下载  mobx-react
+
+```bash
+npm i mobx mobx-react --save
+```
+
+
+
+## 3.1 用类构建仓库并使用
+
+使用一个类迅速构建一个仓库，makeObservable 标记用到的方法和数据，makeAutoObservable 自动标记
+
+直接支持异步函数，修改数据需要使用 runInAction
+
+
+
+**构建仓库：store/modues/counter.js**
+
+```js
+import { makeObservable, action, computed, observable, runInAction } from 'mobx'
+
+class CounterStore {
+    count = 0
+
+    constructor() {
+        makeObservable(this, {
+            count: observable,
+            increment: action.bound,
+            decrement: action,
+            reset: action,     
+            countAdd: computed,
+            incrementAsync: action.bound
+        })
+
+        // 参数1：target，把谁变成响应式（可观察）
+        // 参数2：排除属性和方法
+        // 参数3：利用 autoBind 指定自动绑定 this
+        // makeAutoObservable(this, { decrement: true }, { autoBind: true })        
+    }
+
+    get countAdd() {
+        return this.count + 1
+    }
+
+    increment() {
+        this.count ++
+    }
+
+    decrement() {
+        this.count--
+    }
+
+    reset() {
+        this.count = 0
+    }    
+
+    async incrementAsync() {
+        setTimeout(() => {
+            runInAction(() => {
+                this.count++
+            })
+        }, 1000)
+    }    
+}
+
+const counterStore = new CounterStore()
+export default counterStore // 导出类实例
+```
+
+
+
+**使用仓库：Count.jsx**
+
+在单个组件中，直接引入仓库，并且使用 mobx-react-lite 导出的 observer 对组件进行监听，类组件也适用
+
+```jsx
+import React from 'react'
+import counter from '../store/modules/counter'
+import { observer } from 'mobx-react-lite'
+
+const Count = () => {
+
+    return (
+        <div>
+            {counter.count}
+            {counter.countAdd}
+            <button onClick={() => counter.increment()}>+</button>
+            <button onClick={() => counter.incrementAsync()}>异步+</button>
+        </div>
+    )
+}
+
+export default observer(Count)
+```
+
+
+
+> **自动订阅**在react组件**渲染期间**被使用到的**可观察对象属性**，当他们变化发生时，组件就会自动进行**重新渲染**。 前边在概览篇提到过MobX的核心能力就是能够将数据get中收集到的所有依赖，在set中一次性发布出去。在react场景中，就是要**将状态与组件渲染建立联系**，一旦状态变化，所有使用到此状态的组件都需要重新渲染，而这一切的关键就是observer
+
+
+
+## 3.2 仓库模块化的实现
+
+我们可以在 store/index.js 中定义一个公共的仓库，封装好所有的模块化仓库
+
+```js
+import counterStore from './modules/counter'
+import userStore from './modules/user'
+
+class RootStore {
+    constructor() {
+        this.userStore = userStore
+        this.counter = counterStore
+    }
+}
+
+const rootStore = new RootStore()
+export default rootStore
+```
+
+
+
+**实现仓库之间的通信的方法：**
+
+```js
+import { makeAutoObservable } from 'mobx'
+
+class UserStore {
+    constructor(rootStore) {
+        this.rootStore = rootStore
+        makeAutoObservable(this)
+    }
+    
+    uid = 'zyd123'
+    roleType = 1
+    changeRoleType(val) {
+        this.roleType = val
+    }
+}
+
+class RoleStore {
+    constructor(rootStore) {
+        this.rootStore = rootStore
+        makeAutoObservable(this)
+    }
+    
+    changeUserRoleType(uid, type) {
+        // 获取userStore仓库数据
+        const { userStore } = this.rootStore
+        if (uid === userStore.uid) {
+            userStore.changeRoleType(type)
+        }
+    }
+}
+
+// 新建一个上层rootStore，方便Stores间沟通
+class RootStore {
+    constructor() {
+        this.userStore = new UserStore(this)
+        this.roleStore = new RoleStore(this)
+    }
+}
+
+const rootStore = new RootStore()
+export default rootStore
+```
+
+
+
+## 3.3 统一集成化仓库引入
+
+按照上面的写法每一个组件需要通过引入仓库文件的方式来引入一个仓库并使用
+
+```js
+import counter from '../store/modules/counter'
+```
+
+这种方式繁琐且不利于维护，假如 store 文件重新组织，引入的地方则需要处处更改。所以应该设置一个方法在项目开发中 store 只需**一次注入**，就可以在所有组件内非常便捷的引用，**且每个组件依然需要设置 observer 监听**
+
+
+
+### 3.3.1 类组件 store 的维护
+
+通过使用 mobx-react 导出的 Provider、inject 来实现类组件中的 mobx 仓库的使用
+
+**src/index.jsx**
+
+```jsx
+import { Provider } from 'mobx-react'
+import rootStore from './store'
+
+const root = ReactDOM.createRoot(document.getElementById('root'))
+root.render(
+    <Provider {...rootStore}>
+        <App />
+    </Provider>
+)
+```
+
+
+
+**单个组件中使用：UserInfo.jsx**
+
+```jsx
+import React, { Component } from 'react'
+import { inject, observer } from 'mobx-react'
+
+class UserInfo extends Component {
+    render() {
+        // 直接通在props中访问仓库
+        const { roleName } = this.props.userStore;
+        const { count } = this.props.counter
+
+        return (
+            <div>{roleName} ## {count}</div>
+        )
+    }
+}
+
+// inject是高阶函数，所以inject('store')返回值还是个函数，最终入参是组件
+export default inject('userStore', 'counter')(observer(UserInfo))
+```
+
+
+
+### 3.3.2 函数组件 store 的维护
+
+通过 React 提供的 useContext, createContext 可以实现对响应式数据跨层级传递（即任何组件间传递），从而对mobx 仓库起到一键封装的作用，**store/index.js 只需要导出一个 useStore 函数即可**
+
+```js
+import { useContext, createContext } from 'react'
+import userStore from './modules/user'
+import counterStore from './modules/counter'
+
+class RootStore {
+    constructor() {
+        this.userStore = userStore
+        this.counterStore = counterStore
+    }
+}
+
+const rootStore = new RootStore()
+
+const rootStoreContext = createContext(rootStore)
+
+const useStore = (storeName) => {
+    const rootStore = useContext(rootStoreContext)
+    if (storeName) {
+        const childStore = rootStore[storeName]
+        if (!childStore) throw new Error('根据传入storeName，找不到对应的仓库')
+        return childStore
+    }
+    return rootStore
+}
+
+export default useStore
+```
+
+
+
+组件中使用
+
+```jsx
+import React from 'react'
+import { observer } from 'mobx-react-lite'
+import useStore from '../store'
+
+const Count = () => {
+    const counter = useStore('counterStore')
+
+    return (
+        <div>
+            {counter.count}
+            {counter.countAdd}
+            <button onClick={() => counter.increment()}>+</button>
+            <button onClick={() => counter.incrementAsync()}>异步+</button>
+        </div>
+    )
+}
+
+export default observer(Count)
+```
+
+
+
+## 3.4 实现局部状态管理
+
+本章作为 mobx 的拓展使用技巧。如果我们要在组件中实现一个局部仓库的效果，可以使用 mobx-react-lite 中的 `useLocalObservable`,  `useObserver` 来实现，本节只针对函数组件实现。
+
+
+
+***全局状态管理***：store 在组件外定义，经常放在全局一个单独的 store 文件夹。适合管理一些公共或者相对某模块是公共的状态。
+
+ ***局部状态管理***：store 常常定义在组件内部，适用于复杂的组件设计场景，用来解决组件多层嵌套下的状态层层传递、组件状态多且更新复杂等问题。
+
+
+
+> 相较于使用 useState 管理数据，这个方式多了很多 mobx 特有的功能：action、computed、reaction 等都非常有助于解决那种组件内 useState 繁多，且更新 state 的操作不容易管理和追溯等问题。
+
+
+
+**完整使用案例**
+
+```jsx
+import React from 'react'
+import { useLocalObservable, useObserver } from 'mobx-react-lite'
+
+const Test = () => {
+    
+    //定义组件内的响应式Store
+    const store = useLocalObservable(() => ({
+        name: 'cocoon',
+        changeName(text) {
+            this.name = text
+        }
+    }))
+
+    return useObserver(() => (
+        <div>
+            <h2>{store.name}</h2>
+            <button onClick={() => store.changeName('小米')}>修改</button>
+        </div>
+    ))
+}
+
+export default Test
+```
+
+
+
+## 3.5 拓展 Mobx APIs
+
+这里其他 mobx api 的使用，作为一个 mobx 的进阶笔记
+
+https://www.mobxjs.com/api#reactions
