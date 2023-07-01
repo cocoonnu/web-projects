@@ -60,15 +60,16 @@ Node.js 安装与环境配置：https://blog.csdn.net/qq_42006801/article/detail
 
 ## 1.2 nvm 安装及使用
 
- 
-
-在工作中，我们可能同时在进行2个或者多个不同的项目开发，每个项目的需求不同，进而**不同项目必须依赖不同版本的NodeJS运行环境**，并且一些低版本的第三方库，可能需要降低版本才能安装成功。所以使用 nvm 方便的在同一台设备上进行多个 node 版本之间切换。
+ 在工作中，我们可能同时在进行2个或者多个不同的项目开发，每个项目的需求不同，进而**不同项目必须依赖不同版本的NodeJS运行环境**，并且一些低版本的第三方库，可能需要降低版本才能安装成功。所以使用 nvm 方便的在同一台设备上进行多个 node 版本之间切换。
 
 
 
-安装教程：https://blog.csdn.net/qq_30376375/article/details/115877446
+安装教程：https://blog.csdn.net/m0_64697285/article/details/127318141
 
-直接安装即可，不用先卸载 Node.js
+- 直接安装即可，不用先卸载 Nodejs，然后 Nodejs 安装目录就用 C 盘默认的目录就行，下载 nvm 时会自动监测到已经安装过的 Nodejs 版本。  
+
+- 必须设置一下 nodejs 下载镜像源：`nvm node_mirror https://npm.taobao.org/mirrors/node/`，或者进入 nvm 安装目录里修改 setting.txt
+- 安装完 nvm 之后会自动帮我们配置好环境变量，无需自己配置
 
 
 
@@ -80,7 +81,7 @@ nvm on                      // 启用node.js版本管理
 nvm install <version>       // 安装node.js的命名 version是版本号 例如：nvm install 8.12.0
 nvm uninstall <version>     // 卸载node.js是的命令，卸载指定版本的nodejs，当安装失败时卸载使用
 nvm ls                      // 显示所有安装的node.js版本
-nvm list available          // 显示可以安装的所有node.js的版本
+nvm list available          // 显示可以安装的所有node.js的稳定版本
 nvm use <version>           // 切换到使用指定的nodejs版本
 nvm v                       // 显示nvm版本
 nvm install stable          // 安装最新稳定版
@@ -96,7 +97,7 @@ nvm install stable          // 安装最新稳定版
 
 
 
-全局安装nodemon（可自动监听 JS 文件的变化并重新编译）：`npm i -g nodemon`
+全局安装 nodemon（可自动监听 JS 文件的变化并重新编译）：`npm i -g nodemon`
 
 `nodemon xxx.js`
 
@@ -183,13 +184,31 @@ yarn config delete <key> # 删除某配置项
 yarn config set <key> <value> [-g|--global] # 设置配置项
 ```
 
+```bash
+yarn config set registry http://registry.npm.taobao.org/ # 设置镜像源
+```
 
+
+
+
+
+## 1.5 nrm 的安装及使用
+
+nrm 专门用来管理 npm 的下载镜像源，`npm i nrm -g`，即可一键安装。
+
+`nrm add <registry> <url>`：添加一个镜像源，通常是公司内部镜像源
+
+`nrm use <registry>`：切换镜像源
+
+`nrm del <registry>`：删除镜像源
+
+`nrm ls`：列出所有镜像源
+
+![image-20230628093523486](mark-img/image-20230628093523486.png)
 
 
 
 # 二、Node.js 的模块化
-
-
 
 Node应用是由模块组成，**遵循的是 CommonJS 模块规范**。 CommonJS 是一套代码规范, 目的是为了构建 JavaScript 在浏览器之外的生态系统 (服务器端, 桌面端)。 
 

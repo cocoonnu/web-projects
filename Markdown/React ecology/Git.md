@@ -1,5 +1,17 @@
 # 第一章 Git 命令行操作指南
 
+**首先全局设置一下**
+
+新版 Git 拉取代码时，默认是 crlf，如果每个文件行尾序列都被设置为 crlf，eslint 就会发出 warning，需要每个文件修改为 lf。修复方式一：修改项目的 eslint 和 prettier 配置，**修复方式二：直接修改一下 Git 的全局配置**
+
+```bash
+git config --global core.autocrlf false
+```
+
+
+
+**对 Git 仓库的理解**
+
 首先一个文件有四种操作：跟踪、修改、删除、新增
 
 - 新增一个文件：该文件默认为**未跟踪状态，无法监测文件状态**
@@ -69,11 +81,27 @@ git init
 
 
 
-**或者直接克隆一个仓库**
+**使用 http 可以直接克隆一个仓库**
 
 ```bash
 # 在父文件夹下克隆一个仓库 会在本地生成一个文件夹并带有git记录
 git clone https://github.com/cocoonnu/WebProjects.git
+```
+
+
+
+**使用 ssh 克隆一个仓库**
+
+```bash
+# 先去gitlab-help-ssh中找到生成ssh密钥的命令
+$ ssh-keygen -t rsa -b 2048 -C "<comment>"
+
+# 进入"C:\Users\LENOVO\.ssh\id_rsa.pub"复制里面的内容
+
+# 进入gitlab-设置中添加ssh密钥，粘贴复制的内容即可
+
+# 最后通过ssh的方式克隆仓库
+$ git clone git@git.ekuaibao.com:gaea/electronic-archives-web.git
 ```
 
 
@@ -530,7 +558,7 @@ $ git clone <远程仓库的网址> -b <分支名称> <本地目录>
 $ git fetch <远程仓库的别名>
 
 # 将远程仓库指定分支的最新版本取回到本地
-$ git fetch <远程主机名> <分支名>
+$ git fetch <远程仓库的别名> <分支名>
 ```
 
 
@@ -544,7 +572,7 @@ $ git fetch <远程主机名> <分支名>
 git checkout 远程仓库分支名 
 
 # 完整写法 切换分支并支持改名
-git checkout -b 本地分支名称 远程仓库名称/远程仓库分支名 
+git checkout -b 本地分支名称 远程仓库的别名/远程仓库分支名 
 ```
 
 
@@ -558,10 +586,10 @@ git checkout -b 本地分支名称 远程仓库名称/远程仓库分支名
 $ git pull
 
 # 从远程仓库获取指定分支的最新版本并合并本地指定分支
-git pull <远程主机名> <远程分支名>:<本地分支名>
+git pull <远程仓库的别名> <远程分支名>:<本地分支名>
 
 # 使用 rebase 的模式进行合并
-git pull --rebase <远程主机名> <远程分支名>:<本地分支名>
+git pull --rebase <远程仓库的别名> <远程分支名>:<本地分支名>
 ```
 
 ```bash
@@ -745,3 +773,24 @@ $ git checkout -- <filename>
 
 
 
+### 1.5.4 VScode 添加 Bash 窗口
+
+在 VScode setting.json 中添加：
+
+```json
+// "terminal.integrated.defaultProfile.windows": "Command Prompt",
+
+"terminal.integrated.defaultProfile.windows": "GitBash", // 默认打开bash命令窗口
+
+"terminal.integrated.profiles.windows": {
+    "GitBash": {
+        "path": "D:\\Git\\bin\\bash.exe"
+    },
+},
+```
+
+![image-20230627233857986](mark-img/image-20230627233857986.png)
+
+
+
+最新版本的 VScode 已经自动集成 Git Bash 了

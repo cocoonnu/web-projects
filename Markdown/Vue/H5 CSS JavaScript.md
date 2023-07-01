@@ -40,8 +40,6 @@ rgba(223, 229, 230, 1) 100%);
 
 ### 1.2 CSS 选择器详解
 
-
-
 **带 type 的匹配选择器**
 
 - `first-of-type`、`last-of-type`、`nth-of-type(n)`：选择第一个、最后一个、第 n 个
@@ -146,7 +144,15 @@ p[id*=div] {
 
 ### 1.3 CSS 滚动条样式
 
-全局 css 设置
+`::-webkit-scrollbar` 作为一个伪类选择器，不加前缀则是全局滚动条生效。
+
+参考文档：https://blog.csdn.net/coder_jxd/article/details/124213962
+
+MDN：https://developer.mozilla.org/zh-CN/docs/Web/CSS/::-webkit-scrollbar
+
+
+
+全局滚动条模板参考
 
 ```css
 /* 整个滚动条 */
@@ -178,13 +184,18 @@ p[id*=div] {
 }
 ```
 
->::-webkit-scrollbar — 整个滚动条.
->::-webkit-scrollbar-button — 滚动条上的按钮 (上下箭头).
->::-webkit-scrollbar-thumb — 滚动条上的滚动滑块.
->::-webkit-scrollbar-track — 滚动条轨道.
->::-webkit-scrollbar-track-piece — 滚动条没有滑块的轨道部分.
->::-webkit-scrollbar-corner — 当同时有垂直滚动条和水平滚动条时交汇的部分.
->::-webkit-resizer — 某些元素的corner部分的部分样式(例:textarea的可拖动按钮).
+
+
+单个盒子生效
+
+```scss
+// 滚动条隐藏
+&::-webkit-scrollbar {
+    width: 0px;
+}
+```
+
+
 
 
 
@@ -1098,35 +1109,62 @@ ctrl + b: 空了
 
 #### 3.1.2 VScode 插件介绍
 
-- pritter-Code formatter - 代码格式化
-
-参考文档：https://blog.csdn.net/qq_45981075/article/details/114551233
+Pritter - Code formatter - 代码格式化，https://blog.csdn.net/qq_45981075/article/details/114551233
 
 
 
-- Vue Language Features (Volar) + TypeScript Vue Plugin - Vue3 和 TS 代码支持，Vetur - Vue2 代码支持
+Vue Language Features (Volar) + TypeScript Vue Plugin - Vue3 和 TS 代码支持，Vetur - Vue2 代码支持
 
 
 
-- Tabnine - 免费版 AI 代码自动补全，https://blog.csdn.net/RetroFlux/article/details/125773360
+Tabnine - 免费版 AI 代码自动补全，https://blog.csdn.net/RetroFlux/article/details/125773360
 
 
 
-- GitHub Copilot：AI 代码自动补全（试用期两个月），https://blog.csdn.net/RetroFlux/article/details/124205948
+GitHub Copilot：AI 代码自动补全，https://blog.csdn.net/RetroFlux/article/details/124205948
 
 
 
-- Code Spell Checker - 单词拼写检查，https://blog.csdn.net/qq_42078081/article/details/115014474
+Code Spell Checker - 单词拼写检查，https://blog.csdn.net/qq_42078081/article/details/115014474
 
 
 
-- DotENV - .env 环境变量文件语法高亮，https://blog.csdn.net/qq_45905655/article/details/130680442
+DotENV - .env 环境变量文件语法高亮，https://blog.csdn.net/qq_45905655/article/details/130680442
 
 
 
-- SVG - svg 图片预览
+EditorConfig for VS Code - .editorconfig 文件高亮效果
 
 
+
+Beautify css/sass/scss/less - css/sass/scss/less 等文件实现格式化
+
+
+
+HTML CSS Support - 在 HTML 编写中提示 CSS 的类名和 id 名 
+
+
+
+JavaScript (ES6) code snippets - ES6 代码片段，https://github.com/xabikos/vscode-javascript
+
+
+
+language-stylus、stylus supremacy：Stylus CSS 预处理器代码支持和一键格式化
+
+
+npm Intellisense：自动补全引入 node modules 里面所安装的依赖，Path Intellisense：自动补全文件名
+
+
+
+Git History - 在文件中右键可以查看该文件的所有 Git 历史
+
+
+
+GitLens - 在每行代码后面都会显示最近一次的 Git 提交，另外在终端中还有单独的
+
+
+
+Project Manager - 项目管理插件，https://cloud.tencent.com/developer/article/2196913
 
 
 
