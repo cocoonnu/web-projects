@@ -70,6 +70,16 @@ $ nrm ls # 列出所有镜像源
 
 
 
+以下是 npm 常用命令总结：
+
+- `npm init -y` ：初始化一个 package.json 文件
+- `npm i` 或 `npm install` ：安装项目中所有依赖
+- `npm uninstall [package name]`：卸载项目中的依赖
+- `npm update [package name]`：升级项目中的依赖
+- `npm i [package name] -S/--save`：安装到 dependencies（生产环境）
+- `npm i [package name] -D/--save-dev`：安装到 devDependencies（开发环境） 
+- `npm install -global/-g <package name>`：全局安装依赖
+
 
 
 ## 1.3 使用 yarn 包管理工具
@@ -83,10 +93,15 @@ $ yarn init # 同npm init，执行输入信息后，会生成package.json文件
 $ yarn install # 安装package.json里所有包，并将包及它的所有依赖项保存进yarn.lock
 $ yarn install --flat # 安装一个包的单一版本
 $ yarn install --force # 强制重新下载所有包
+$ yarn remove <packageName>
+$ yarn upgrade <packageName>
 ```
 
 ```bash
 $ npm install -> yarn add
+$ npm run -> yarn run
 $ yarn config set registry http://registry.npm.taobao.org/ # 设置镜像源
 ```
+
+
 

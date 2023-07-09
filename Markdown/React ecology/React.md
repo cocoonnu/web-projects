@@ -4,13 +4,13 @@ A JavaScript library for building user interfaces （用于构建用户界面的
 
 
 
-`ReactJS` 是由 Facebook 在 2013年 5 月推出的一款 JS 前端开源框架,推出式主打特点式函数式编程风格。值得一说的是，到目前为止 `ReactJS` 是世界上使用人数最多的前端框架,它拥有全球最健全的文档和社区体系。
+`ReactJS` 是由 Facebook 在 2013年 5 月推出的一款 JS 前端开源框架，推出式主打特点式函数式编程风格。值得一说的是，到目前为止 `ReactJS` 是世界上使用人数最多的前端框架，它拥有全球最健全的文档和社区体系。
 
 
 
-ReactJS 的官方英文网站为：https://reactjs.org/
+React 的官方英文网站：https://reactjs.org  React 的中文网站：https://zh-hans.reactjs.org
 
-ReactJS 的中文网站为：https://zh-hans.reactjs.org/
+直接看 React API 文档：https://zh-hans.react.dev/reference/react
 
 
 
@@ -2044,5 +2044,4 @@ V6：https://blog.csdn.net/m0_69838795/article/details/129557342
 ## 3.3 useEffect 中使用异步
 
 https://blog.csdn.net/p1967914901/article/details/127581065
-
 

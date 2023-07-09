@@ -1,4 +1,4 @@
-# 第一章 项目初始化配置
+第一章 项目初始化配置
 
 使用脚手架 `create-react-app` 启动一个项目，默认情况下**脚手架搭建的项目配置文件都是隐藏的**
 
@@ -34,6 +34,10 @@ module.exports = {
 - Webpack 官网：https://www.webpackjs.com/
 
 - `create-react-app` 中文文档：https://create-react-app.bootcss.com/
+
+
+
+# 第一章 项目初始化配置
 
 
 
@@ -322,7 +326,7 @@ const CardOption: FC<PropsType> = (props: PropsType) => {
 
 
 
-**useState 的 TS 声明及使用**
+**useState 的 TS 声明及使用**，不过如果是普通类型会自动推断
 
 ```tsx
 const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -401,10 +405,6 @@ const Login: FC = () => {
 
 ## 2.1 CSS Module 的使用
 
-**CSS Module**
-
-**推荐文章：https://cloud.tencent.com/developer/article/1819624**
-
 我们一般是一个 jsx 文件对应一个 css 文件，但是如果直接这样引入的话，会造成直接引入整个文件，而不是按需加载，这样处理就极有可能对 css 造成全局污染或者冲突，从而就无法达到我们组件化的目的了
 
 ```js
@@ -441,13 +441,26 @@ import styles from './App.module.css'
 :global(.ant-image-mask) {
     display: none;
 }
+
+:global {
+    ......
+}
 ```
 
 > Creat React APP 创建的项目也原生支持了 SASS Module，直接将后缀名换成 SCSS 即可
 
 
 
-![image-20230521160732154](mark-img/image-20230521160732154.png)
+**css module 设置多类名：**安装 classnames 这个库
+
+```tsx
+const componentWrapperClass = {
+    [styles['component-wrapper']]: true,
+    [styles['selected']]: selectedId === componentInfo.fe_id
+}
+
+<div className={classNames(componentWrapperClass)}>...</div>
+```
 
 
 
@@ -1195,6 +1208,7 @@ const { loading, run: createQuestion  } = useRequest(createQuestionApi, {
 
 - TS 需要维护仓库的数据类型和每个模块的数据类型
 - redux-persist 插件可以实现数据持久化存储，这里分为使用和不使用两个版本
+- useAppSelector、useAppDispatch 两个内部直接支持 TS，外部无需引入 StoreStateType
 
 
 
@@ -1217,11 +1231,10 @@ const store = configureStore({
     }
 })
 
-export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
 export const useAppDispatch: () => AppDispatch = useDispatch
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector 
+export const useAppSelector: TypedUseSelectorHook<StoreStateType> = useSelector 
 
 export default store
 ```
@@ -1265,8 +1278,8 @@ export default userSlice.reducer
 import { StoreStateType, useAppSelector, useAppDispatch } from '@/store'
 import { setUserState } from '@/store/modules/userReducer'
 
-// 读取user模块数据
-const userState = useAppSelector((state: StoreStateType) => state.user)
+// 读取user模块数据 直接支持TS
+const userState = useAppSelector((state) => state.user)
 
 // 修改数据
 const dispatch = useAppDispatch()
@@ -1335,11 +1348,10 @@ const store = configureStore({
 export const persistor = persistStore(store)
 export default store
 
-type RootState = ReturnType<typeof store.getState>
 type AppDispatch = typeof store.dispatch
 
 export const useAppDispatch: () => AppDispatch = useDispatch
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector 
+export const useAppSelector: TypedUseSelectorHook<StoreStateType> = useSelector 
 ```
 
 
@@ -1649,7 +1661,7 @@ Axios 适用于浏览器环境和 Nodejs 环境，可以直接使用 Axios 发�
 
 - 每次请求的结果为一个 Promise 对象
 - 响应结果里面的 JSON 数据会被自动转换
-- 可实现取消请求、超时处理，客户端支持防御[XSRF](http://en.wikipedia.org/wiki/Cross-site_request_forgery)
+- 可实现取消请求、超时处理，客户端支持防御 [XSRF](http://en.wikipedia.org/wiki/Cross-site_request_forgery)
 - 无需手动写 TS，TypeScript 类型推断会自动完成
 - Aixos API：https://axios-http.com/zh/docs/api_intro
 

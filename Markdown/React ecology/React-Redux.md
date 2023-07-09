@@ -800,7 +800,7 @@ const Count = () => {
 
 **方式二的实现思路：**
 
-在外部 Hooks 文件夹中定义个 hoos 文件， 
+在外部 Hooks 文件夹中定义个 hoos 文件
 
 
 
@@ -918,7 +918,7 @@ export default Count
 
 
 
-# 第三章 认识 Mobox
+# 第三章 认识 MobX6
 
 Mobox 是一个状态管理库，它通过实现一个类来进行一个仓库的状态管理。创建仓库使用 makeObservable，通过给组件包裹 mobx-react 暴露出的 observer 起到监听效果，从而实现创建到调用的闭环
 
@@ -1047,7 +1047,7 @@ import userStore from './modules/user'
 class RootStore {
     constructor() {
         this.userStore = userStore
-        this.counter = counterStore
+        this.counterStore = counterStore
     }
 }
 
@@ -1109,7 +1109,7 @@ export default rootStore
 按照上面的写法每一个组件需要通过引入仓库文件的方式来引入一个仓库并使用
 
 ```js
-import counter from '../store/modules/counter'
+import counterStore from '../store/modules/counter'
 ```
 
 这种方式繁琐且不利于维护，假如 store 文件重新组织，引入的地方则需要处处更改。所以应该设置一个方法在项目开发中 store 只需**一次注入**，就可以在所有组件内非常便捷的引用，**且每个组件依然需要设置 observer 监听**
@@ -1145,8 +1145,8 @@ import { inject, observer } from 'mobx-react'
 class UserInfo extends Component {
     render() {
         // 直接通在props中访问仓库
-        const { roleName } = this.props.userStore;
-        const { count } = this.props.counter
+        const { roleName } = this.props.userStore
+        const { count } = this.props.counterStore
 
         return (
             <div>{roleName} ## {count}</div>
@@ -1155,14 +1155,14 @@ class UserInfo extends Component {
 }
 
 // inject是高阶函数，所以inject('store')返回值还是个函数，最终入参是组件
-export default inject('userStore', 'counter')(observer(UserInfo))
+export default inject('userStore', 'counterStore')(observer(UserInfo))
 ```
 
 
 
 ### 3.3.2 函数组件 store 的维护
 
-通过 React 提供的 useContext, createContext 可以实现对响应式数据跨层级传递（即任何组件间传递），从而对mobx 仓库起到一键封装的作用，**store/index.js 只需要导出一个 useStore 函数即可**
+通过 React 提供的 useContext, createContext 可以实现对响应式数据跨层级传递（即任何组件间传递），从而对 mobx 仓库起到一键封装的作用，**store/index.js 只需要导出一个 useStore 函数即可**
 
 ```js
 import { useContext, createContext } from 'react'
@@ -1267,10 +1267,404 @@ export default Test
 
 ## 3.5 拓展 Mobx APIs
 
-这里其他 mobx api 的使用，作为一个 mobx 的进阶笔记
-
-https://www.mobxjs.com/api#reactions
-
-
-
 Mobx 导出的一些副作用函数的使用：https://www.mobxjs.com/reactions
+
+
+
+# 第四章 认识 MobX5
+
+MobX6 使用 makeObservable\makeAutoObservable 来对类属性进行响应式监听，而 MobX5 使用装饰器语法
+
+MobX6 使用 observer + Provider + inject 实现把类组件变成响应式组件，MobX5 也一样，只不过是装饰器语法
+
+MobX5 中文文档：https://cn.mobx.js.org/，视频教学：https://www.bilibili.com/video/BV1tL4y1h7ND
+
+
+
+## 4.1 装饰器语法的使用
+
+使用装饰器之前需要先让项目支持装饰器，装饰器语法如下：https://juejin.cn/post/7214374960193699877
+
+- 类装饰器：target 为传入的类
+
+```js
+const test = (target) => {
+    target.sName = 'Tom'
+    target.getAge = function () {
+        return 20
+    }
+}
+
+@test
+class Student{
+
+}
+
+console.log(Student)
+```
+
+>将 Student 类做为参数传入 test 函数中，target 就是 Student 类，在类上挂载属性和方法，如果装饰器 test有返回值，则使用返回值替代 Student 类，没有返回值则为 Student 类 
+
+
+
+- 方法装饰器：target 为传入的类，name 为方法名称，descriptor 为一个装饰器
+
+```js
+function log(target, name, descriptor) {
+  // 保存原始方法
+  const original = descriptor.value
+
+  // 修改方法的行为
+  descriptor.value = function (...args) {
+	// 处理一些业务代码
+     
+    // 返回原方法的返回值
+    return original.apply(this, args)
+  }
+
+  // 返回修改后的方法
+  return descriptor
+}
+
+
+class Student {
+  @log
+  myMethod(arg1, arg2) {
+    return arg1 + arg2
+  }
+}
+
+// 测试
+const myObject = new Student()
+myObject.myMethod(1, 2)
+```
+
+> 方法装饰器可以在不改变原有方法的情况下，在方法执行前后插入业务代码，如打印日志、数据校验等。运用了代理模式，可以达到 AOP 切面编程效果
+
+
+
+- 属性装饰器：target 为传入的类，key 为属性名称，descriptor 为一个装饰器
+
+```js
+function readonly(target, key, descriptor) {
+  descriptor.writable = false;
+  return descriptor;
+}
+
+class Person {
+  @readonly
+  name = '张三';
+}
+
+const p = new Person();
+p.name = '李四'; // 抛出 TypeError，只读
+```
+
+> descriptor 属性如下：configurable - 可配置，enumerable：可枚举，initializer：初始值 
+
+
+
+## 4.2 Mobx5 中的装饰器
+
+Mobx 中封装的常用装饰器如下：https://cn.mobx.js.org/refguide/modifiers.html
+
+另外一般我们通过一个类来实现一个 mobx 仓库，不过也可以直接使用 `observable` 函数创建
+
+
+
+**@observable**
+
+对一个属性进行监听，属性可以是数字、字符串、数组、对象、map 等多种类型的数据
+
+```js
+import { observable } from "mobx"
+
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+}
+
+export const orderLine = new OrderLine()
+```
+
+
+
+**@computed**
+
+计算属性，当响应式数据改变的时候也跟着改变，同时具有缓存效果
+
+```js
+import { observable, computed } from "mobx"
+
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+
+    @computed get total() {
+        console.log('111')
+        return this.price * this.amount
+    }
+}
+```
+
+
+
+**@action**
+
+创建一个动作，通常用于对内部的属性进行变化，因为 Mobx 不推荐使用仓库实例修改仓库属性
+
+```js
+import { configure, observable } from 'mobx'
+
+configure({ enforceActions: true }) // 不允许在动作之外进行状态修改
+
+class OrderLine {
+    @observable price = 0
+    
+    @action change() {
+        this.price = 100
+    }
+}
+
+export const orderLine = new OrderLine()
+orderLine.change()
+
+// 设置之后直接修改会报错
+orderLine.price = 100
+```
+
+> @action.bound 可以实现在方法中 this 指向永远是该类实例
+
+
+
+**runInAction 工具函数**
+
+该函数可以实现在任何时候都可以自定义修改仓库中的属性，通常用于异步函数中
+
+```js
+import { observable, runInAction, configure } from "mobx"
+
+configure({ enforceActions: true })
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+}
+
+export const orderLine = new OrderLine()
+
+runInAction(() => {
+	this.price = 100
+})
+```
+
+
+
+## 4.3 Mobx5 中使用异步函数
+
+这里直接将 action 装饰的函数定义为异步函数即可，然后在异步函数中修改仓库属性有三种方法，这里推荐使用 runInAction 工具函数
+
+Mobx5 中文参考文档：https://cn.mobx.js.org/best/actions.html
+
+
+
+```js
+mobx.configure({ enforceActions: true })
+
+class Store {
+    @observable githubProjects = []
+    @observable state = "pending" // "pending" / "done" / "error"
+
+    @action
+    async fetchProjects() {
+        this.githubProjects = []
+        this.state = "pending"
+        try {
+            const projects = await fetchGithubProjectsSomehow()
+            const filteredProjects = somePreprocessing(projects)
+            
+            // await 之后，再次修改状态需要动作:
+            runInAction(() => {
+                this.state = "done"
+                this.githubProjects = filteredProjects
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.state = "error"
+            })
+        }
+    }
+}
+```
+
+
+
+## 4.4 Mobx5 中的副作用
+
+### 4.4.1 autorun
+
+类似于 watch 函数，初始化时执行一次，内部用到的响应式数据改变时也会执行，并且具有缓存效果
+
+官网更详细的介绍：https://cn.mobx.js.org/refguide/autorun.html
+
+```js
+import { observable, autorun, action } from "mobx"
+
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+    
+    @action init() {
+        // 简单使用
+        autorun(() => {
+            console.log('price', this.price)
+        })
+    }
+}
+
+export const orderLine = new OrderLine()
+orderLine.init()
+
+orderLine.price = 100
+```
+
+
+
+Autorun 接收第二个参数，它是一个参数对象，有如下可选的参数:
+
+- `delay`：可用于对效果函数进行去抖动的数字（以毫秒为单位），如果是 0（默认值）的话，那么不会进行去抖
+- `onError`：用来处理 reaction 的错误，而不是传播它们
+- `scheduler`：设置自定义调度器以决定如何调度 autorun 函数的重新运行
+
+
+
+### 4.4.2 when
+
+`when(predicate: () => boolean, effect?: () => void, options?)`
+
+`when` 观察并运行给定的 `predicate` 函数的返回值，直到返回 true。 一旦返回 true，给定的 `effect` 就会被执行，然后会被自动运行程序清理。因此只会执行一次，https://cn.mobx.js.org/refguide/when.html
+
+```js
+import { observable, when, action } from "mobx"
+
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+    
+    @action init() {
+        // 简单使用
+        when(() => {
+            return this.price > 100
+        },() => {
+            console.log('price > 100')
+        })
+    }
+}
+
+export const orderLine = new OrderLine()
+orderLine.init()
+
+orderLine.price = 101
+```
+
+
+
+### 4.4.3 reaction
+
+`reaction(() => data, (data, reaction) => { sideEffect }, options?)`
+
+第一个参数为一个 data 函数，该函数的返回值作为依赖项，并且直接作为第二个函数的参数传入。第二个参数为响应函数，当第一个函数的依赖项发生改变时执行。第三个参数为配置选项，https://cn.mobx.js.org/refguide/reaction.html
+
+
+
+响应函数：第一个参数 data 为依赖项最新的返回值，第二个参数 reaction 为当前的 reaction，可以用来在执行期间清理 `reaction`
+
+```js
+import { observable, reaction, action } from "mobx"
+
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+    
+    @action init() {
+        // 简单使用
+        reaction(() => [this.price, this.amount],
+        (data, reaction) => {
+            console.log('data', data)
+        })
+    }
+}
+
+export const orderLine = new OrderLine()
+orderLine.init()
+
+orderLine.price = 100
+```
+
+
+
+Reaction 接收第三个参数，它是一个参数对象，有如下可选的参数:
+
+- `fireImmediately`: 布尔值，用来标识效果函数是否在数据函数第一次运行后立即触发。默认值是 `false` 
+- `delay`: 可用于对效果函数进行去抖动的数字(以毫秒为单位)。如果是 0(默认值) 的话，那么不会进行去抖
+- `equals`: 默认值是 `comparer.default` 。如果指定的话，这个比较器函数被用来比较由 *数据* 函数产生的前一个值和后一个值。只有比较器函数返回 false *效果* 函数才会被调用。此选项如果指定的话，会覆盖 `compareStructural` 选项
+- `onError`: 用来处理 reaction 的错误，而不是传播它们
+- `scheduler`: 设置自定义调度器以决定如何调度 autorun 函数的重新运行
+
+
+
+# 第五章 认识 zustand
+
+Zustand（德语）：React 全新轻量级状态管理库
+
+可以直接啃英文文档：https://docs.pmnd.rs/zustand/getting-started/introduction
+
+
+
+## 5.1 如何更新状态&set
+
+设置状态初始值和重置状态的方式：https://docs.pmnd.rs/zustand/guides/how-to-reset-state
+
+
+
+zustand 采用不可变数据状态，简单数据类型可以直接使用 set 函数进行合并，它只会合并 state 最外层的数据
+
+https://docs.pmnd.rs/zustand/guides/updating-state
+
+
+
+复杂数据类型推荐使用 immer，可以使用原生 immer，也可以使用中间件
+
+https://docs.pmnd.rs/zustand/guides/updating-state#with-immer
+
+https://docs.pmnd.rs/zustand/integrations/immer-middleware
+
+
+
+Map、Set 类型也可以支持更新：https://docs.pmnd.rs/zustand/guides/maps-and-sets-usage
+
+
+
+另外附上 set 函数介绍：https://docs.pmnd.rs/zustand/guides/immutable-state-and-merging
+
+
+
+## 5.2 如何使用状态
+
+可以直接引入仓库之后通过 state 索引使用，也可以在内部封装一个函数 createSelectors 简化使用
+
+https://docs.pmnd.rs/zustand/guides/auto-generating-selectors
+
+
+
+## 5.3 适配 Typescript
+
+**针对状态的 TS 适配**
+
+基础使用：将状态定义为一个 type，在 create 的时候传入即可，在内部、外部使用状态时已经支持 TS
+
+简化使用：不用自己定义状态，而是使用中间件 combine 使其自行推断状态
+
+https://docs.pmnd.rs/zustand/guides/typescript#basic-usage
+
+
+

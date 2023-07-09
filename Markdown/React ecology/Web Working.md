@@ -495,6 +495,8 @@ Set：https://juejin.cn/post/7107449385264349191
 
 Map：https://juejin.cn/post/7106898275290054692
 
+遍历 Map：https://blog.csdn.net/qq_41767116/article/details/131161193
+
 WeakMap：https://juejin.cn/post/7107261631859523615
 
 Symbol 内置符号：https://juejin.cn/post/7074608058369835015
@@ -625,6 +627,10 @@ for (const key in target) {
 
 
 
+- 判断是否是空对象：`JSON.stringify(obj)==="{}"`
+
+
+
 
 
 ### 2.3 数组常见函数
@@ -718,7 +724,7 @@ if(arr.some(function checknumber(number){return number == 12;})) {
 
 - **arr.find**
 
-遍历查找数组，返回找到的值
+遍历查找数组，返回找到的值（只返回一个值），未找到返回 undefined
 
 ```js
 let num = arr.find(item => item == 12)
@@ -1055,7 +1061,7 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 ```html
 <!-- 直接使用html标签即可 而且可以不用加引号！ -->
-<img src=mark-img/image-20230211224700258.png  align=center />
+<img src=mark-img/image-20230211224700258.png  align="left" />
 ```
 
 
@@ -1175,7 +1181,7 @@ Project Manager - 项目管理插件，https://cloud.tencent.com/developer/artic
 
 
 
-- Volar 关闭箭头函数和CSS的reference：搜索一下即可
+- Volar 关闭箭头函数和 CSS 的 reference：搜索一下即可
 
 
 

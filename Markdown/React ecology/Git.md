@@ -2,7 +2,7 @@
 
 **首先全局设置一下**
 
-新版 Git 拉取代码时，默认是 crlf，如果每个文件行尾序列都被设置为 crlf，eslint 就会发出 warning，需要每个文件修改为 lf。修复方式一：修改项目的 eslint 和 prettier 配置，**修复方式二：直接修改一下 Git 的全局配置**
+新版 Git 拉取代码时，默认是 crlf，如果每个文件行尾序列都被设置为 crlf，某些项目的 Eslint 会发出 warning，需要每个文件行尾序列都被设置为 lf。修复方式一：修改项目的 eslint 和 prettier 配置，**修复方式二：直接修改一下 Git 的全局配置**
 
 ```bash
 git config --global core.autocrlf false
@@ -22,7 +22,7 @@ git config --global core.autocrlf false
 
 
 
-区域分为工作区和暂存区
+**区域分为工作区和暂存区**
 
 - `git add`：将工作区的文件提交至暂存区，状态变为未修改
 - `add` 命令可多次执行，将将工作区的文件提交，以更新暂存区
@@ -33,7 +33,7 @@ git config --global core.autocrlf false
 
 
 
-简单介绍一下 Git 工作流程
+**简单介绍一下 Git 工作流程**
 
 ```
 1.在工作区开发，添加，修改文件。
@@ -44,7 +44,7 @@ git config --global core.autocrlf false
 
 
 
-参考的文档和视频
+**参考的文档和视频**
 
 - https://juejin.cn/post/6974184935804534815
 
@@ -81,37 +81,16 @@ git init
 
 
 
-**使用 http 可以直接克隆一个仓库**
-
-```bash
-# 在父文件夹下克隆一个仓库 会在本地生成一个文件夹并带有git记录
-git clone https://github.com/cocoonnu/WebProjects.git
-```
-
-
-
-**使用 ssh 克隆一个仓库**
-
-```bash
-# 先去gitlab-help-ssh中找到生成ssh密钥的命令
-$ ssh-keygen -t rsa -b 2048 -C "<comment>"
-
-# 进入"C:\Users\LENOVO\.ssh\id_rsa.pub"复制里面的内容
-
-# 进入gitlab-设置中添加ssh密钥，粘贴复制的内容即可
-
-# 最后通过ssh的方式克隆仓库
-$ git clone git@git.ekuaibao.com:gaea/electronic-archives-web.git
-```
-
-
-
 **查看全局配置**
 
 ```bash
 git config --list --global
 git config 单项
 ```
+
+
+
+**连接远程仓库的指令在后面**
 
 
 
@@ -276,6 +255,8 @@ $ git reset 文件路径
 $ git reset # 移出所有暂存区文件
 ```
 
+
+
 - 版本切换（将 HEAD 的指向改变）
 
 ```bash
@@ -309,8 +290,6 @@ $ git reset --soft commitID
 ```
 
 >  相当于调用 git reset --mixed 命令后又做了一次 git add .
-
-
 
 
 
@@ -465,15 +444,35 @@ https://juejin.cn/post/6844903600976576519
 
 
 
-
 ## 1.4 Github 使用指南
+
+在连接远程仓库之前，最好先配置一下 ssh，一台电脑只需要配置一次 ssh 即可！
+
+- 生成 ssh 密钥：按确认或者按回车键直到生成一串密钥
+
+```bash
+$ ssh-keygen -t rsa -b 2048 -C "Lenovo user"
+
+# 或者
+$ ssh-keygen -t rsa -C "Lenovo user"
+```
+
+
+
+- 进入 `c/users/lenovo/.ssh` 目录，复制 `id_rsa.pub` 文件里的所有内容
+
+
+
+- 进入 GitHub 或者 Gitlab 设置中添加密钥即可： `SSH and GPG keys`  -> `New SSH Key`
+
+
 
 ### 1.4.1 Github 连接记录
 
 - **基于 https 连接**
 
 ~~~bash
-# 添加一个远程仓库
+# 连接一个远程仓库，需要在 GitHub 中事先创建一个仓库
 git remote add origin https://github.com/cocoonnu/WebProjects.git
 
 # 修改主分支名称
@@ -487,12 +486,6 @@ git push -u origin main
 
 - **基于 ssh 连接**
 
-输入: `ssh-keygen -t rsa -C <GitHub注册的邮箱>`  
-
-进入 `c/users/lenovo/.ssh` 目录，复制 `id_rsa.pub` 文件内容
-
-登录 `GitHub`  `Settings`  ->  `SSH and GPG keys`  -> `New SSH Key`
-
 ```bash
 git remote add origin git@github.com:cocoonnu/WebProjects.git
 git branch -M main
@@ -501,9 +494,7 @@ git push -u origin main
 
 
 
-
-
-### 1.4.2 远程仓库连接指令
+### 1.4.2 远程仓库连接克隆指令
 
 **git remote**
 
@@ -533,6 +524,8 @@ $ git remote set-url <远程仓库的别名> <新的远程仓库URL地址>
 
 
 **git clone**
+
+http 地址可以直接克隆，ssh 地址需要先在 Github、Gitlab 中配置好 ssh 密钥
 
 ```bash
 # 默认在当前目录下创建和版本库名相同的文件夹并下载版本到该文件夹下
@@ -586,10 +579,10 @@ git checkout -b 本地分支名称 远程仓库的别名/远程仓库分支名
 $ git pull
 
 # 从远程仓库获取指定分支的最新版本并合并本地指定分支
-git pull <远程仓库的别名> <远程分支名>:<本地分支名>
+$ git pull <远程仓库的别名> <远程分支名>:<本地分支名>
 
 # 使用 rebase 的模式进行合并
-git pull --rebase <远程仓库的别名> <远程分支名>:<本地分支名>
+$ git pull --rebase <远程仓库的别名> <远程分支名>:<本地分支名>
 ```
 
 ```bash
@@ -794,3 +787,41 @@ $ git checkout -- <filename>
 
 
 最新版本的 VScode 已经自动集成 Git Bash 了
+
+
+
+### 1.5.5 Git 分支开发流程
+
+在项目中确定一条开发的分支：`feature/实物打标-合并`
+
+```bash
+$ git checkout feature/实物打标-合并
+```
+
+
+
+在这条分支上创建一条自己的分支
+
+```bash
+$ git checkout feature/czy-test
+```
+
+
+
+开发功能完成后，提交一下
+
+```bash
+$ git add .
+$ git commit -m "feat: 添加路由数据批量存储函数"
+```
+
+
+
+切换到开发分支，更新一下分支，再合并刚刚自己开发的分支，可用 git merge 或者 git rebase，最后提交
+
+```bash
+$ git pull
+$ git rebase feature/czy-test # 合并的时候两个commit可能会有冲突
+$ git push # 解决冲突之后再
+```
+
