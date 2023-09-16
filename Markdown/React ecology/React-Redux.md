@@ -1618,6 +1618,10 @@ Zustand（德语）：React 全新轻量级状态管理库
 
 可以直接啃英文文档：https://docs.pmnd.rs/zustand/getting-started/introduction
 
+可参考文档：https://blog.csdn.net/qq_53931766/article/details/124632268
+
+官网文档翻译：https://zhuanlan.zhihu.com/p/475571377（推荐）
+
 
 
 ## 5.1 如何更新状态&set
@@ -1633,6 +1637,8 @@ https://docs.pmnd.rs/zustand/guides/updating-state
 
 
 复杂数据类型推荐使用 immer，可以使用原生 immer，也可以使用中间件
+
+**如果复杂类型使用 setState，那么需要考虑数据不可变性，同 React 里的 useState**
 
 https://docs.pmnd.rs/zustand/guides/updating-state#with-immer
 
@@ -1652,6 +1658,32 @@ Map、Set 类型也可以支持更新：https://docs.pmnd.rs/zustand/guides/maps
 
 可以直接引入仓库之后通过 state 索引使用，也可以在内部封装一个函数 createSelectors 简化使用
 
+```ts
+import { shallow } from 'zustand/shallow'
+
+// 这样引入的话仓库每个属性改变都会引起组件的重新渲染
+const { topMenuGroup } = useLayoutStore()
+
+// 只有topMenuGroup改变才会引起组件的重新渲染
+const topMenuGroup = useLayoutStore((state) => state.topMenuGroup)  
+
+// 只有nuts或honey改变才会引起组件的重新渲染
+const [nuts, honey] = useStore((state) => [state.nuts, state.honey], shallow)
+```
+
+> 注意：如果属性时引用类型，那么要考虑数据不可变原则！！可能无法监听到数据的改变
+
+
+
+为了对重新渲染进行更多控制，你可以提供自定义的比较函数。
+
+```js
+const treats = useStore(
+  (state) => state.treats,
+  (oldTreats, newTreats) => compare(oldTreats, newTreats)
+);
+```
+
 https://docs.pmnd.rs/zustand/guides/auto-generating-selectors
 
 
@@ -1668,3 +1700,55 @@ https://docs.pmnd.rs/zustand/guides/typescript#basic-usage
 
 
 
+## 5.4 外部使用仓库
+
+在函数组件中作为 hook 使用：
+
+```ts
+const { usernameFormRef, submit } = useLoginStore((state) => state)
+```
+
+
+
+在普通函数中作为仓库使用，**这样获取的不是响应式数据**
+
+```ts
+// 获取仓库属性
+const { resetUserInfo } = useAccountStore.getState()
+
+// 设置仓库属性
+useAccountStore.setState({ roles: ['123'] })
+useBoundStore.setState((state) => ({ count: state.count + 1 }))
+```
+
+
+
+## 5.5 API 功能预览
+
+https://docs.pmnd.rs/zustand/recipes/recipes#fetching-everything
+
+
+
+销毁仓库的所有属性及函数
+
+```ts
+deleteEverything: () => set({}, true), // clears the entire store, actions included
+```
+
+
+
+使用 subscribe 实现监听效果，最好搭配中间件使用，效果更佳
+
+https://docs.pmnd.rs/zustand/recipes/recipes#reading/writing-state-and-reacting-to-changes-outside-of-components
+
+
+
+可以通过 hook 的方式创建仓库，仅作为 api 的使用，使得仓库仅有这四个方法
+
+https://docs.pmnd.rs/zustand/recipes/recipes#using-zustand-without-react 
+
+
+
+map 和 set 的使用方式
+
+https://docs.pmnd.rs/zustand/guides/maps-and-sets-usage

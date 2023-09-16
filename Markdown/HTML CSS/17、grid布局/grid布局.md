@@ -140,7 +140,7 @@ grid 布局工具：https://www.lingdaima.com/grid/
 
 2、`grid-template-rows: m1 m2 m3`：m 为每一行的行高，m 的个数为每行元素个数
 
-
+3、`grid-auto-rows: 50px`：如果未知有多少行，就可以直接指定每行高度为  50px
 
 > 如果未定义 grid-template-rows，则会根据列宽和列的个数默认填充满容器
 >

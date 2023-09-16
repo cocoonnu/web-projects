@@ -1300,8 +1300,6 @@ const click = () => {
 
 > 实际上只会加1，因为是异步更新的，当时 count 一直是原来的值，这就导致了数据合并
 
-
-
 ```js
 const click = () => {
     setCount(count => count + 1)
@@ -1319,7 +1317,7 @@ const click = () => {
 
 遵循不可变数据原则：不能直接修改 state 的值，而是传入一个新的值（理解为必须进行浅拷贝）
 
-通过模板字符串实现
+通过拓展运算符实现
 
 ```js
 
@@ -1376,6 +1374,16 @@ export default function App() {
 ```
 
 
+
+- **获取最新的 State：先使用 `useRef` 进行存储数据，再使用 `useEffect` 监听数据变化，并进行更新**
+
+参考文档：https://blog.csdn.net/qq_41131745/article/details/127704928?spm=1001.2101.3001.6650.3
+
+
+
+- **如果 map 值发生变化，如何强制重新渲染？**下面的方式是尝试转换为对象代替 map。。
+
+https://www.coder.work/article/7952666
 
 
 
@@ -1607,7 +1615,7 @@ function Test() {
 
 ```jsx
 export default function App() {
-    const testRef = useRef(null)
+    const testRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
         console.log(testRef.current)
@@ -1947,7 +1955,7 @@ export default App
 
 ### 2.3.2 useMemo
 
-useMemo 返回的也是一个有记忆的值，在依赖不变的情况下，多次定义的时候，返回的值是相同的
+useMemo 返回的也是一个有记忆的值，在依赖不变的情况下，多次定义的时候，返回的值是相同的。**返回一个变量而不是函数**
 
 - 参数一：传入一个回调函数，具有返回值
 

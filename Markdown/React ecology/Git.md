@@ -5,7 +5,7 @@
 新版 Git 拉取代码时，默认是 crlf，如果每个文件行尾序列都被设置为 crlf，某些项目的 Eslint 会发出 warning，需要每个文件行尾序列都被设置为 lf。修复方式一：修改项目的 eslint 和 prettier 配置，**修复方式二：直接修改一下 Git 的全局配置**
 
 ```bash
-git config --global core.autocrlf false
+$ git config --global core.autocrlf false # 取消自动设置行尾序列
 ```
 
 
@@ -46,11 +46,8 @@ git config --global core.autocrlf false
 
 **参考的文档和视频**
 
-- https://juejin.cn/post/6974184935804534815
-
-- https://juejin.cn/post/6978812726411788295
-
-- https://www.bilibili.com/video/BV1pX4y1S7Dq/?spm_id_from=444.41
+- 常用 Git 命令总结：https://juejin.cn/post/6978812726411788295
+- .gitignore 详解：https://blog.csdn.net/nyist_zxp/article/details/119887324
 
 
 
@@ -96,14 +93,14 @@ git config 单项
 
 ## 1.2 Git 基本操作指令
 
-### 1.2.1 状态修改指令
+### 1.2.1 git status/add/commit 
 
 **git status**
 
 ```bash
 git status # 会区分暂存区和工作区
 
-git status -s #精简查看 
+git status -s # 精简查看 
 ```
 
 
@@ -149,16 +146,21 @@ $ git commit -m "<提交的描述信息>"
 # 把所有修改、已删除的文件提交到本地仓库中
 # 不包括新增文件或其他未跟踪的文件，等同于先调用了 "git add -u"
 $ git commit -a -m "<提交的描述信息>"
+```
 
-# 修改上次提交的描述信息
+```bash
+# 将暂存区的内容提交到上次提交中，并可在弹出文件中修改提交信息
 $ git commit --amend
+
+# 将暂存区的内容提交到上次提交中并修改提交信息
+$ git commit --amend -m ""
 ```
 
 
 
 
 
-### 1.2.2 信息查询指令
+### 1.2.2 git diff/log/config
 
 **git diff**
 
@@ -187,8 +189,8 @@ $ git diff <分支名称> <分支名称>
 # 打印当前分支的所有提交记录
 $ git log # 输入 enter 继续显示 q 退出显示
 
-# 展示所有的版本
-git reflog
+# 可以查看所有分支的所有操作记录（包括已经被删除的 commit 记录和 reset 的操作）
+$ git reflog
 
 # 打印从第一次提交到指定的提交的记录
 $ git log <commit ID>
@@ -216,16 +218,27 @@ $ git log --all --graph
 
 
 
-### 1.2.3 状态撤销指令
+### 1.2.3 git checkout/rm/reset
 
 **git checkout**
 
-```bash
-# 可撤销对工作区中指定文件的修改或删除
-# 新增的文件和已经添加到暂存区的文件不受影响
-$ git checkout -- 文件路径 
+这里只介绍该指令对已跟踪文件撤销更改方式的功能
 
-$ git checkout . # 撤销工作区的所有修改和删除
+```bash
+# 对工作区已跟踪的文件的修改、删除进行撤销
+$ git checkout <文件相对路径>
+$ git checkout ./test/a.md
+```
+
+```bash
+# 对暂存区文件或者已经提交的文件进行撤销修改
+$ git checkout <commitId> <文件相对路径> # 前提是指定版本必须存在该文件
+$ git checkout 31f8213 ./04-markdown/5.23.md
+```
+
+```bash
+# 撤销工作区的所有修改和删除
+$ git checkout . 
 ```
 
 
@@ -330,13 +343,13 @@ $ esc # 清空本行命令
 
 ## 1.3 Git 分支管理指令
 
-每一个分支可以理解为一个指针，默认使用的是 master/main 分支。header 指针永远指向最新的分支提交对象
+每一个分支可以理解为一个指针，默认使用的是 main 分支。HEAD 指针永远指向最新的分支提交对象
 
-![image-20230504111547454](mark-img/image-20230504111547454.png)
+分支命名规范：https://www.cnblogs.com/huaibin/p/15021658.html
 
 
 
-### 1.3.1 分支基本操作指令
+### 1.3.1 git branch/checkout
 
 **git branch**
 
@@ -344,7 +357,10 @@ $ esc # 清空本行命令
 # 列出本地的所有分支，当前所在分支以 "*" 标出
 $ git branch
 
-# 列出本地的所有分支并显示最后一次提交，当前所在分支以 "*" 标出
+# 列出本地+远程的所有分支
+$ git branch -a
+
+# 列出本地的所有分支并显示最后一次提交
 $ git branch -v
 $ git branch --list
 
@@ -354,7 +370,6 @@ $ git branch <分支名名称>
 
 ```bash
 # 修改分支名称
-
 # 如果不指定原分支名称则为当前所在分支
 $ git branch -m <原分支名称> <新的分支名称>
 
@@ -374,10 +389,10 @@ $ git branch -D <分支名称>
 
 **git checkout**
 
-切换分支后，暂存区、工作区的文件内容也会跟着切换
+由于工作区、暂存区内容共享，所以当工作区、暂存区无内容时才允许修改分支
 
 ```bash
-# 切换到已存在的指定分支
+# 切换到已存在的指定本地分支
 $ git checkout <分支名称>
 
 # 创建并切换到指定的分支，保留所有的提交记录
@@ -390,24 +405,42 @@ $ git checkout --orphan <分支名称>
 
 
 
-实际上当工作区有文件状态被修改，但是又没有 commit。这个时候想切换分支 Git 是不支持的。
+### 1.3.2 git rebase/merge
+
+**git  rebase**
+
+![image-20230716225531230](mark-img/image-20230716225531230.png)
+
+白话理解：commit1 为 test 和 main 分支最近一次合并的提交节点（或者为两个分支初始分开的节点）
+
+main 分支提交记录：commit1 - main1.0 - main2.0，test 分支提交记录：commit1 - test1.0 - test3.0 - test3.0
+
+在 test 分支中使用 rebase 合并 main 分支，那么本地的 test1.0 - test2.0 - test3.0 三次提交记录会被删除，**然后处理冲突两次。**
+
+第一次冲突为传入 test3.0，本地 main1.0 解决之后更新新的提交 test3.0 rebase main1.0
+
+第二次冲突为传入 test3.0，本地 main2.0 解决之后更新新的提交 test3.0 rebase main2.0
+
+最后 test 分支提交记录为 commit1 -  test3.0 rebase main1.0 - test3.0 rebase main2.0（上图最后多画了一个节点）、
+
+```bash
+$ git rebase 分支名
+$ git rebase --continue # 解决一次冲突之后，继续rebase
+```
 
 
 
-### 1.3.2 合并分支与解决冲突
+如果想要恢复 test 分支之前本地提交的三次记录，可以 `git pull rebase` 合并远程分支的那三条记录。不过这又得处理三次冲突了
 
-![image-20230504203739451](mark-img/image-20230504203739451.png)
-
-![image-20230504203802430](mark-img/image-20230504203802430.png)
+使用 git rebase 还可以合并多次 commit：https://juejin.cn/post/6844903600976576519
 
 
-
-- `rebase` 并没有进行合并操作，只是提取了当前分支的修改，将其复制在了目标分支的最新提交后面
-- `merge` 是一个合并操作，会将两个分支的修改合并在一起
 
 
 
 **git merge**
+
+![image-20230716225611530](mark-img/image-20230716225611530.png)
 
 把两个分支最新的2个 commit 合并成一个 commit。最后的分支树呈现非线性的结构
 
@@ -420,25 +453,21 @@ $ git merge <分支名称>
 
 # 把指定的分支合并到当前所在的分支下，不进行新的提交
 $ git merge --no-commit <分支名称>
+
+# 解决一次冲突之后，继续merge
+$ git merge --continue 
 ```
 
-产生冲突后根据前后的比较，进行修改即可
 
 
+**注意点**
 
-**git  rebase**
-
-git reabse 将需要合并的分支的当前 commit 复制到 master 的最新 commit 之后，会形成一个线性的分支树
+在任何时候，你都可以终止 rebase 的行动，并且分支会回到 rebase 开始前的状态。
 
 ```bash
-$ git rebase <分支名称>
+$ git rebase --abort
+$  rm -fr ".git/rebase-merge" # 类似强制退出
 ```
-
-
-
-**使用 git rebase 合并多次 commit 的方法**
-
-https://juejin.cn/post/6844903600976576519
 
 
 
@@ -494,12 +523,12 @@ git push -u origin main
 
 
 
-### 1.4.2 远程仓库连接克隆指令
+### 1.4.2 git remote/clone
 
 **git remote**
 
 ```bash
-# 添加远程仓库
+# 添加一个远程仓库
 $ git remote add <远程仓库的别名> <远程仓库的URL地址>
 
 # 修改远程仓库的别名
@@ -510,7 +539,7 @@ $ git remote rename <原远程仓库的别名> <新的别名>
 # 列出已经存在的远程仓库
 $ git remote
 
-# 列出远程仓库的详细信息，在别名后面列出URL地址
+# 列出所有远程仓库的详细信息，在别名后面列出URL地址
 $ git remote -v
 $ git remote --verbose
 
@@ -540,11 +569,11 @@ $ git clone <远程仓库的网址> -b <分支名称> <本地目录>
 
 
 
-### 1.4.3 远程仓库拉取指令
+### 1.4.3 git fetch/pull
 
 **git fetch**
 
-只是将远程仓库的分支最新版本取回（拉取）到本地，**工作区无变化**
+只是将远程仓库的所有分支最新版本取回（拉取）到本地，**工作区无变化**
 
 ```bash
 # 将远程仓库所有分支的最新版本全部取回到本地
@@ -556,9 +585,9 @@ $ git fetch <远程仓库的别名> <分支名>
 
 
 
-**跟踪分支**
+**切换分支**
 
-从远程仓库拉取分支之后，执行切换命令就自动变成本地分支了，并进行了跟踪
+从远程仓库拉取分支之后，执行切换命令就自动变成本地分支了，并进行了跟踪。**注意要从远程分支分出去的分支上进行切换，在其他分支切换无效**，如 feature/N/系统监控 分支从 master 分出，就必须在master进行checkout
 
 ```bash
 # 简写形式 从本地切换一下即可
@@ -572,7 +601,7 @@ git checkout -b 本地分支名称 远程仓库的别名/远程仓库分支名
 
 **git pull**
 
-从远程仓库获取分支最新版本并合并到本地。 **首先会执行 `git fetch`，然后执行 `git merge`**，把获取的分支的 HEAD 合并到当前分支。工作区直接变化
+从远程仓库获取**当前分支**最新版本并合并到本地。 **首先会执行 `git fetch`，然后执行 `git merge`**，把获取的分支的 HEAD 合并到当前分支。工作区直接变化
 
 ```bash
 # 从远程仓库获取当前分支的最新版本并合并
@@ -597,7 +626,7 @@ git pull origin master
 
 
 
-### 1.4.4 远程仓库提交指令
+### 1.4.4 git push
 
 **git push**
 
@@ -613,7 +642,7 @@ $ git push <远程仓库名>
 # 指定 origin 为默认远程仓库
 $ git push -u origin master
 
-# 如果只有一个分支，并指定了默认远程仓库
+# 之后在此分支则可以直接提交
 $ git push
 ```
 
@@ -625,26 +654,12 @@ $ git push <远程仓库名> --delete <远程分支名>
 $ git push <远程仓库的别名> :<远程分支名>
 ```
 
-
-
-**如果你的本地仓库版本落后于远程仓库版本，那么有两种方式**
-
-拉取一下远程仓库的最新版本，解决冲突后再提交
-
 ```bash
-$ git pull
+# 直接强制提交，远程仓库的最新版本会被覆盖
+$ git push --force
 
-$ git add .
-
-$ git commit
-```
-
-
-
-直接强制提交，远程仓库的最新版本会被覆盖
-
-```bash
-$ git push -f
+# 检查后提交，如果远程仓库存在新的的提交则push失败
+$ git push --force-with-lease
 ```
 
 
@@ -738,27 +753,7 @@ $ git stash clear
 
 
 
-### 1.5.2 工作区撤销更改方式
-
-对工作区的修改、删除进行撤销
-
-```bash
-$ git checkout -- <filename>
-```
-
-
-
-对暂存区文件进行删除并撤销修改
-
-```bash
-$ git reset <filename>
-
-$ git checkout -- <filename>
-```
-
-
-
-### 1.5.3 Github 部署静态网站
+### 1.5.2 Github 部署静态网站
 
 将项目 dist 文件夹部署到一个仓库中，进入仓库的 `setting` -> `pages`，选择根路径然后点 `Save` 即可！
 
@@ -766,7 +761,7 @@ $ git checkout -- <filename>
 
 
 
-### 1.5.4 VScode 添加 Bash 窗口
+### 1.5.3 VScode 添加 Bash 窗口
 
 在 VScode setting.json 中添加：
 
@@ -790,7 +785,7 @@ $ git checkout -- <filename>
 
 
 
-### 1.5.5 Git 分支开发流程
+### 1.5.4 Git 分支开发流程
 
 在项目中确定一条开发的分支：`feature/实物打标-合并`
 
@@ -825,3 +820,50 @@ $ git rebase feature/czy-test # 合并的时候两个commit可能会有冲突
 $ git push # 解决冲突之后再
 ```
 
+
+
+这里介绍两条同步开发的分支合并流程：
+
+```bash
+feature/登录模块开发
+
+feature/Form表单封装
+```
+
+
+
+我的分支某个功能开发完成，正常 git add、git commit、git push。之后切换到另一个分支，拉取最新的代码
+
+```bash
+$ git checkout feature/Form表单封装
+$ git pull # 拉取远程最新的代码
+```
+
+
+
+再切换回个人分支，在将本地将另一条分支进行合并
+
+```bash
+$ git checkout feature/登录模块开发
+$ git rebase feature/Form表单封装
+$ git rebase --continue
+```
+
+
+
+解决冲突后，可使用如下命令进行提交，该命令会检查远程仓库的分支是否存在他人的新提交
+
+这条命令执行后不会有分支合并的可视化
+
+```bash
+$ git push --force-with-lease
+```
+
+
+
+如果需要分支合并的可视化，那么不能用上面那条命令，而是需要再和远程分支再 rebase
+
+```bash
+$ git pull --rebase
+$ git push # 解决冲突之后在push
+```

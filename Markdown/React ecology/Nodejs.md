@@ -1,4 +1,4 @@
-# Nodejs 系统环境配置
+# 第一章 Nodejs 环境配置
 
 在新电脑里面直接可以用我写的这篇文章的配置，当电脑本地环境报错的时候就找解决办法，解决不了就直接卸载重来！另外还有 VScode 如果出现什么问题直接更新一下就行了，最好 3 个月更新一次
 
@@ -58,6 +58,8 @@ $ npm config set registry=https://registry.npm.taobao.org
 
 或者下载一个全局的工具 NRM 来进行镜像源的管理：`npm i nrm -g`
 
+**注意是直接切换全局的镜像源，包括 npm、yarn**
+
 ```bash
 $ nrm add <registry> <url>  # 添加一个镜像源，通常是公司内部镜像源
 
@@ -84,7 +86,9 @@ $ nrm ls # 列出所有镜像源
 
 ## 1.3 使用 yarn 包管理工具
 
-下载 yarn 这个全局包管理工具，注意切换 Nodejs 版本之后需要另外再下载：`npm i yarn -g`
+下载 yarn 这个全局包管理工具，注意切换 Nodejs 版本之后需要另外再下载
+
+全局安装：`npm i yarn -g`
 
 下面是 yarn 的一些常用命令：
 

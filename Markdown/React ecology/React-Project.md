@@ -1,4 +1,4 @@
-第一章 项目初始化配置
+# 第一章 项目初始化配置
 
 使用脚手架 `create-react-app` 启动一个项目，默认情况下**脚手架搭建的项目配置文件都是隐藏的**
 
@@ -34,10 +34,6 @@ module.exports = {
 - Webpack 官网：https://www.webpackjs.com/
 
 - `create-react-app` 中文文档：https://create-react-app.bootcss.com/
-
-
-
-# 第一章 项目初始化配置
 
 
 
@@ -296,6 +292,10 @@ Github：https://github.com/conventional-changelog/commitlint
 
 这里会介绍一下项目中对于 TS 的一些适配情况。
 
+TS 常用工具类型：https://juejin.cn/post/6844903981521567752
+
+TS 项目使用指南：https://juejin.cn/post/6979094659603628039
+
 tsconfig 配置文件讲解：https://blog.csdn.net/cs23405/article/details/115750351
 
 
@@ -364,6 +364,42 @@ const Login: FC = () => {
 }
 ```
 
+```tsx
+ClipboardEvent<T = Element> 剪贴板事件对象
+
+DragEvent<T = Element> 拖拽事件对象
+
+ChangeEvent<T = Element> Change 事件对象
+
+KeyboardEvent<T = Element> 键盘事件对象
+
+MouseEvent<T = Element> 鼠标事件对象
+
+TouchEvent<T = Element> 触摸事件对象
+
+WheelEvent<T = Element> 滚轮事件对象
+
+AnimationEvent<T = Element> 动画事件对象
+
+TransitionEvent<T = Element> 过渡事件对象
+```
+
+
+
+
+
+**下载并使用 lodash**
+
+```bash
+$ npm i @types/lodash lodash
+$ npm i @types/lodash-es lodash-es // 或者
+```
+
+```ts
+import { clonedeep } from 'lodash'
+import { defaultsDeep } from 'lodash-es' /**按需引入*/
+```
+
 
 
 
@@ -396,6 +432,24 @@ const Login: FC = () => {
 如果是普通组件的子组件，那么在当前文件夹下创建 `components` 文件夹，子组件以自己的命名命名在 `components` 文件夹下创建 `JSX` 文件，如果有样式文件，还是在 `components` 文件夹下创建
 
 如果是路由组件下的普通组件，那么在当前文件夹下创建 `components` 文件夹，子组件以自己的命名命名 `components` 文件夹下创建 `JSX` 文件，如果有样式文件，还是在 `components` 文件夹下创建
+
+
+
+## 1.6 自动代码格式化配置
+
+如果项目中已经配置好了 Eslint、Prettier 环境，那么下载插件 Eslint、Prettier。
+
+设置自动格式化配置为 Prettier，在去工作区中设置
+
+```json
+{
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true, // 保存时自动格式化
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true // 保存时自动修复eslint报错
+  },    
+}
+```
 
 
 
@@ -454,6 +508,8 @@ import styles from './App.module.css'
 **css module 设置多类名：**安装 classnames 这个库
 
 ```tsx
+import classNames from 'classnames'
+
 const componentWrapperClass = {
     [styles['component-wrapper']]: true,
     [styles['selected']]: selectedId === componentInfo.fe_id
@@ -874,6 +930,8 @@ const [questionList] = useState([
 />
 ```
 
+![image-20230730173908911](mark-img/image-20230730173908911.png)
+
 
 
 ### 2.4.4 Form 表单的详细使用
@@ -1041,6 +1099,14 @@ const formRef = React.useRef<FormInstance>(null)
       
 forRef.current | null
 ```
+
+```ts
+{
+    "uid": "rc-upload-1691655950368-2"
+}
+```
+
+
 
 
 
@@ -1734,6 +1800,26 @@ const {data} = await axios.post('/user', document.querySelector('#my-form'), {
 
 
 
+**axios：需要指定字段名**
+
+```js
+axios({
+  method: 'post',
+  url: '/user/12345',
+  data: { // 请求
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+  },
+  params: { // url参数键值对
+      
+  }  
+});
+```
+
+
+
+
+
 **支持并发请求**
 
 ```js
@@ -1819,11 +1905,20 @@ baseURL: 'server/'
 baseURL: 'server/'
 ```
 
-实现发送请求时：`axiosInstance.get('api/list') ` 得到地址默认添加 server 字段实现代理，然后又清除
+实现发送请求时：`axiosInstance.get('api/list') ` 得到地址默认添加 server 字段实现代理
 
-`http://localhost:8000/server/api/list` => `http://localhost:3000/api/list`
+`http://localhost:8000/server/api/list` => `http://localhost:3000/server/api/list`
 
 
+
+### 3.5.3 Axios 的拦截器
+
+关于问题：使用axios发送请求的时候 什么时候算请求出错，什么情况算响应出错 ，有以下解答
+
+- https://segmentfault.com/q/1010000020659252
+
+- 请求拦截器失败回调：这里极少情况会进来，暂时没有找到主动触发的方法，可能是请求语法错误才会触发
+- 响应拦截器失败回调：当接口地址错误，网络错误，后端返回错误，状态码大于 2xx 的响应都会触发
 
 
 

@@ -1,44 +1,146 @@
-## 第一章 HTML CSS
-### 1.1 CSS 常用样式记录
+# 第一章 HTML
 
-- **calc() 函数**
+## 1.1 HTML 备忘清单
 
-参考文档：https://blog.csdn.net/p1967914901/article/details/127405749
+HTML 备忘清单
+
+https://wangchujiang.com/reference/docs/html.html
+
+Emmet （HTML、CSS 内置的快捷指令）备忘清单
+
+https://wangchujiang.com/reference/docs/emmet.html
+
+特殊字符及转义参考
+
+https://blog.csdn.net/jack_rose_me/article/details/124603494
+
+
+
+## 1.2 IMG 标签知识点
+
+**保持盒子内图片匹配**
 
 ```scss
-width: calc(50% - 10px);
-width: calc((100% - 184.62px) / 2);
+// 使用外层盒子
+.imgBx img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+// 直接使用img
+    img {
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        object-fit: contain;
+    }
+
+fill		// 默认，不保证保持原有的比例，内容拉伸填充整个内容容器
+contain		// 保持原有尺寸比例。内容被缩放
+cover		// 保持原有尺寸比例。但部分内容可能被剪切
+none		// 保留原有元素内容的长度和宽度，也就是说内容不会被重置
 ```
 
-- **CSS 变量**
 
-```css
-:root {
-  --hue:180;
+
+**src为空时，img标签不显示裂图**
+
+```js
+img[src=""], img:not([src]) {
+    opacity:0;
 }
 ```
 
-- **宽度取内容宽度**
+
+
+**访问网络图片必须添加如下属性**
+
+```html
+index.html
+<meta name="referrer" content="no-referrer">
+```
+
+> https://blog.csdn.net/u011127019/article/details/125169827
+
+
+
+**src 绑定 JS 变量**
+
+```js
+// 不能直接使用js变量存储地址字符串给src 需要先引入资源
+
+import img from './img.png'
+const img = require('./img/clock.svg')
+```
+
+```html
+<img :src="img" />
+```
+
+
+
+**背景图片适配**
 
 ```css
-width: fit-content
-```
-
-- **渐变色定义**
-
-`0deg` 将创建一个从下到上的渐变，`90deg` 将创建一个从左到右的渐变。设置 0% - 100%
-
-```scss
-background: linear-gradient(90deg, rgba(223, 229, 230, 0) 0%,
-rgba(223, 229, 230, 1) 100%);
+div {
+    width: 300px;
+    height: 380px;
+    background: url(./fingerprint.png) no-repeat;
+    /* 一般指定宽度为盒子宽度 或者cover contain*/
+    background-size: 300px;
+}
 ```
 
 
 
+## 1.3 HTML 静态资源路径
+
+React 脚手架中使用 `%PUBLIC_URL%` 则固定从服务器根路径 `http://localhost:3000` 的文件夹下获取资源
+
+```html
+<link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+```
+
+> 和 `href="/logo192.png"` 效果是一样
 
 
 
-### 1.2 CSS 选择器详解
+使用 `./` 则从当前服务器路径 `http://localhost:3000/home` 的文件夹下获取资源
+
+```html
+<link rel="apple-touch-icon" href="./logo192.png" />
+```
+
+
+
+
+
+# 第二章 CSS
+
+## 2.1 CSS 速记链接
+
+CSS 备忘清单：https://wangchujiang.com/reference/docs/css.html
+
+> CSS 样式包含三种类型：行内样式（内联样式）、内部样式（style 标签）、外部样式（link 标签）
+>
+> 加载页面时，link 标签引入的 CSS 被同时加载；@import 引入的 CSS 将在页面加载完毕后被加载
+>
+> a 标签不能嵌套 a 标签，p 标签不能嵌套块级元素
+
+
+
+## 2.2 CSS 选择器详解
+
+CSS 选择器速记：[https://wangchujiang.com/reference/docs/css.html#css-选择器](https://wangchujiang.com/reference/docs/css.html#css-选择器)
+
+CSS 选择器介绍：https://vue3js.cn/interview/css/selector.html
+
+> 可以同时使用多个伪类，而只能同时使用一个伪元素
+>
+> nth-of-type(2n + 1)：n 从 0 开始匹配
+
+
 
 **带 type 的匹配选择器**
 
@@ -97,9 +199,9 @@ p:nth-child(2) {
 **其他伪类选择器**
 
 ```css
-:link 选择未被访问的链接
-:visited 选取已被访问的链接
-:active 选择活动链接
+:link 未被访问的链接样式
+:visited 已被访问的链接样式
+:active 鼠标点击时链接的样式
 :hover 鼠标指针浮动在上面的元素
 :focus 选择具有焦点的
 :root 设置HTML文档
@@ -142,9 +244,11 @@ p[id*=div] {
 
 
 
-### 1.3 CSS 滚动条样式
 
-`::-webkit-scrollbar` 作为一个伪类选择器，不加前缀则是全局滚动条生效。
+
+## 2.3 CSS 滚动条样式
+
+`::-webkit-scrollbar` 作为一个伪类选择器，设置全局滚动条
 
 参考文档：https://blog.csdn.net/coder_jxd/article/details/124213962
 
@@ -199,87 +303,8 @@ MDN：https://developer.mozilla.org/zh-CN/docs/Web/CSS/::-webkit-scrollbar
 
 
 
-### 1.5 Img 属性图片使用
 
-- **保持盒子内图片匹配**
-
-```scss
-// 使用外层盒子
-.imgBx img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-// 直接使用img
-    img {
-        width: 35px;
-        height: 35px;
-        cursor: pointer;
-        object-fit: contain;
-    }
-
-fill		// 默认，不保证保持原有的比例，内容拉伸填充整个内容容器
-contain		// 保持原有尺寸比例。内容被缩放
-cover		// 保持原有尺寸比例。但部分内容可能被剪切
-none		// 保留原有元素内容的长度和宽度，也就是说内容不会被重置
-```
-
-
-
-- **src为空时，img标签不显示裂图**
-
-```js
-img[src=""], img:not([src]) {
-    opacity:0;
-}
-```
-
-
-
-- **访问网络图片必须添加如下属性**
-
-```html
-index.html
-<meta name="referrer" content="no-referrer">
-```
-
-> https://blog.csdn.net/u011127019/article/details/125169827
-
-
-
-- **src 绑定 JS 变量**
-
-```js
-// 不能直接使用js变量存储地址字符串给src 需要先引入资源
-
-import img from './img.png'
-const img = require('./img/clock.svg')
-```
-
-```html
-<img :src="img" />
-```
-
-
-
-- **背景图片适配**
-
-```css
-div {
-    width: 300px;
-    height: 380px;
-    background: url(./fingerprint.png) no-repeat;
-    /* 一般指定宽度为盒子宽度 或者cover contain*/
-    background-size: 300px;
-}
-```
-
-
-
-### 1.6 媒体查询 Rem布局
-
-
+## 2.4 响应式布局介绍
 
 **Rem 布局**
 
@@ -312,76 +337,35 @@ html 默认 font-size 为16px ,  `1rem = html-font-size * 1`
 
 
 
-### 1.7 CSS 常用代码记录
-
-#### 1.7.1 CSS 初始化属性
-
-```css
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-li {
-    list-style: none;
-}
-/* 去除图片之间的空隙 */
-img {
-    vertical-align: middle;
-}
-a {
-    color: #666;
-    text-decoration: none;
-
-    /* 去除在移动端下a标签点击的蓝色背景 */
-    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-    -webkit-user-select: none;
-    -moz-user-focus: none;
-    -moz-user-select: none;
-
-}
-input {
-    border: 0;
-    outline: none;
-}
-input::placeholder {
-    color: #aaa;
-}
-```
 
 
+## 2.5 Flex/Grid 布局技巧
 
-#### 1.7.2 绝对定位内容居中
+**flex 布局**
 
-```css
-/* 在有定位的父盒子中实现垂直水平居中 */
-div {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-}
-```
+Flex 介绍：https://vue3js.cn/interview/css/flexbox.html
+Flex 备忘清单：https://wangchujiang.com/reference/docs/css.html#css-flexbox
 
-
-
-#### 1.7.3 Flex/Grid 布局技巧
-
-Flex：https://vue3js.cn/interview/css/flexbox.html
-
-Grid：https://vue3js.cn/interview/css/grid.html
-
-```css
+```less
 /* flex实现居中 */
 div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* flex行列间隙：column-gap  row-gap */
+```
 
 
+
+**grid 布局**
+
+Grid 介绍：https://vue3js.cn/interview/css/grid.html
+
+Grid 备忘清单：[https://wangchujiang.com/reference/docs/css.html#css-grid-网格布局](https://wangchujiang.com/reference/docs/css.html#css-grid-网格布局)
+
+```less
 /* grid实现居中 */
 div {
     display: grid;
@@ -397,74 +381,35 @@ div {
 
 
 
-#### 1.7.4 CSS 文字属性使用
-
-```scss
-// 引入字体
-font-family: 'Varela Round';
-@font-face {
-    font-family: 'Poppins';
-    src: url("./Poppins.ttf");
-}
-
-// 引入在线谷歌字体
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap');
-
-// 文字间距
-letter-spacing: 1px;
-
-// 文字段落间距
-word-spacing
-
-// 垂直位置
-vertical-align
-
-// 水平位置
-text-align
-```
-
-```less
-// 设置单行文本省略号
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-
-// 设置单行文本省略号
-// 一定要垂直布局
-width: 400px;
--webkit-line-clamp: 2;
-overflow: hidden;
-text-overflow: ellipsis;
-```
+## 2.6 背景属性与渐变
 
 
 
-### 1.8 HTML 静态资源路径
+## 2.7 CSS 技巧总结
 
-React 脚手架中使用 `%PUBLIC_URL%` 则固定从服务器根路径 `http://localhost:3000` 的文件夹下获取资源
+**父级元素清除浮动的方式**
 
-```html
-<link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-```
+1. 在父级元素创建 BFC，https://vue3js.cn/interview/css/BFC.html
+2. 在最后的浮动元素末尾添加一个空标签，设置 `clear: both` 样式
+3. 给父元素添加一个伪元素 `::after`，设置 `clear: both` 样式
 
-> 和 `href="/logo192.png"` 效果是一样
-
-
-
-使用 `./` 则从当前服务器路径 `http://localhost:3000/home` 的文件夹下获取资源
-
-```html
-<link rel="apple-touch-icon" href="./logo192.png" />
-```
+ 
 
 
 
+# 第三章 JavaScript
+
+推荐阅读文档专栏，包含 JS 大部分语法和知识点复习：https://juejin.cn/column/6991485674788487205
+
+JavaScript 八大数据类型：Number、String、Boolean、Null、Undefined、Object、Symbol、BigInt  
+
+变量名必须以字母、下划线（_）或美元符号（$）开头，不能以数字开头
+
+变量名可以包含字母、数字、下划线或美元符号，但不能包含其他特殊字符
 
 
 
-## 第二章 JavaScript
-
-### 2.1 ES6 使用笔记
+## 3.1 ES6 使用笔记
 
 **展开运算符**
 
@@ -491,7 +436,7 @@ console.log({...apple} === apple);	// false
 
 **更多复杂类型**
 
-Set：https://juejin.cn/post/7107449385264349191
+Set（引用类型和 NaN 无法去重）：https://juejin.cn/post/7107449385264349191
 
 Map：https://juejin.cn/post/7106898275290054692
 
@@ -503,7 +448,11 @@ Symbol 内置符号：https://juejin.cn/post/7074608058369835015
 
 Symbol 类型：https://juejin.cn/post/7073852491695128583
 
-Error 类型：https://juejin.cn/post/7169017392016654372
+RegExp：https://juejin.cn/post/7275550152974221346
+
+Error：https://juejin.cn/post/7169017392016654372
+
+Date：https://juejin.cn/post/6996926386405376037
 
 ```js
 // 直接抛出一个错误 可以使得后面的代码不再执行
@@ -516,10 +465,10 @@ throw new Error('参数不是一个可迭代对象')
 
 **原型和原型链**
 
+- 详细解析：https://juejin.cn/post/6844903989088092174
 - 对于 ES6 复杂类型，实例里面都有一个 `__proto__` 属性执行构造函数的 `prototype`
 - 构造函数的 `prototype` 里面有多个原型方法，不同复杂类型对应不同方法
-- 所以实例复杂类型可以直接调用哪些原型方法
-- 所有的 `prototype` 都有一个属性 `constructor`，这是一个原型构造函数
+- JS 内置的构造函数如下所示
 
 ```js
 // 可查看原型及其方法
@@ -528,15 +477,14 @@ console.log(s)
 let o = new Object()
 console.log(o);
 let m = new Map()
-console.log(m);
+console.log(m)
 let r = new RegExp()
 console.log(r)
 let w = new WeakMap()
-console.log(w);
+console.log(w)
 let f = new Function()
-console.log(f);
+console.log(f)
 let a = new Array()
-console.log(a);
 ```
 
 ```js
@@ -550,17 +498,47 @@ let a1 = new a.constructor(a)
 
 
 
+**经典的原型链**
+
+只要记住三个法则：
+
+- 构造函数和对象实例都是对象，只有构造函数有 prototype（原型对象），任何对象都有 `__proto__`
+- 对象的 `__proto__` 指向其构造函数的 prototype
+- 构造函数的 prototype 里面有一个属性 constructor，就等于该构造函数。其实例对象直接有该属性
+
+```js
+// 构造函数Function（构造函数的构造函数）
+// 构造函数Object（对象的构造函数）
+function Foo() {} // 构造函数Foo
+const foo = new Foo() // 对象实例foo
+
+// 可以得到以下关系
+foo.__proto__ == Foo.prototype
+Foo.__proto == Function.prototype
+Function.__proto__ = Function.prototype
+
+Foo.prototype.__proto__ == Object.prototype // 原型对象也是一个对象，构造函数为Object
+Function.prototype.__proto__ == Object.prototype
+
+Object.__proto__ == Function.prototype // Object的构造函数为Function
+Object.prototype.__proto__ == null // 原型链的终点
+```
+
+```js
+Foo.prototype.constructor == Foo
+Function.prototype.constructor == Function
+Object.prototype.constructor == Object
+```
+
+> null 和 undefined 没有原型对象
 
 
-### 2.2 对象常见函数
 
-MDN 官方文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object
+## 3.2 对象常见函数
 
-内含多个 API 使用方法
+这里记录 Object 原型对象所暴露的 API，通常在每个对象下都可以使用
 
-
-
-- **Object.assign**
+**Object.assign**
 
 用来合并对象。如果存在同名属性则o1被o2覆盖，**返回o1对象**  浅拷贝
 
@@ -579,7 +557,7 @@ console.log(returnedTarget === target);
 
 
 
-- **Object.keys、Object.values 、Object.entries**
+**Object.keys、Object.values 、Object.entries**
 
 返回键、值、键值对数组
 
@@ -598,9 +576,9 @@ console.log(Object.entries(person));
 
 
 
-- **for in 循环**
+**for in 循环**
 
-for...in 遍历一个对象的**可枚举属性**，如对象、数组、字符串。针对属性，所以获得 key
+for...in 遍历一个对象的**可枚举属性**，如对象、数组、字符串。针对属性，所以获得 key（数组获得 index ）
 
 注意：key 可以得到该对象所有的属性，包括原型链上的属性
 
@@ -619,35 +597,70 @@ for (const key in target) {
 
 
 
-- **delete obj.name：删除对象属性**
+**Object.defineProperty**
+
+`Object.defineProperty(obj, prop, descriptor)`
+
+用于定义一个对象的新属性或修改对象已有属性的特性（如可写性、可枚举性等）,
+
+obj 是要定义属性的对象，prop 是要定义的属性名，descriptor 是一个包含属性特性的对象。
+
+descriptor 对象可以包含以下属性：
+
+- `value`：属性的值
+- `writable`：属性是否可写，默认为 `false`
+- `enumerable`：属性是否可枚举，默认为 `false`
+- `configurable`：属性是否可配置（delete），默认为 `false`
+- `get`：获取属性值的函数
+- `set`：设置属性值的函数
 
 
 
-- **obj.hasOwnProperty**：只会检查**对象的自有属性**，对象原形上的属性其不会检测
+**object 实例常用 API**
 
+- delete obj.name：删除对象属性
 
+- obj.hasOwnProperty：只会检查**对象的自有属性**，对象原形上的属性其不会检测
 
 - 判断是否是空对象：`JSON.stringify(obj)==="{}"`
 
 
 
+**toString()**
+
+https://blog.csdn.net/u011140116/article/details/121845262
 
 
-### 2.3 数组常见函数
 
-https://vue3js.cn/interview/JavaScript/array_api.html
+**valueOf()**
 
-容易搞混的几个api
+https://blog.csdn.net/weixin_45242865/article/details/119798783
+
+
+
+## 3.3 数组常见函数
+
+数组常见函数：https://vue3js.cn/interview/JavaScript/array_api.html
+
+Array 原型方法大全：https://juejin.cn/post/7028018256266919973
+
+**会直接改变原数组的方法：push、pop、splice、unshift、shift、sort、reverse**
+
+
+
+**容易搞混的几个api**
 
 `arr.splice`：arr.splice(下标，个数，替换的值)，替换个数和删除个数可以不一致
 
-`arr.slice`：截取下标为 a ，到下标为 b（不包括 b）的区间（字符串也适用）
+`arr.slice`：截取下标为 a ，到下标为 b（不包括 b）的区间（字符串也适用），省略 b 则截取到末尾
 
 `str.split('')`：将字符串变成数组
 
+`arr.length`：数组长度会自动延长到最后一个被赋值的位置，中间没有被赋值的都为 undefined
 
 
-- 普通方法总结
+
+**普通方法总结**
 
 ```js
 1、arr.shift：删除数组的第一个元素   
@@ -661,16 +674,20 @@ let a= [].concat(1,2,3,[4,5],[6,7])
 
 5、arr.reverse()：用来将一个数组中的全部项顺序置反
 
-6、arr.indexOf(value)：数组存在value则返回下标 不存在返回
+6、arr.indexOf(value)：数组存在value则返回其下标 不存在返回-1
 
-7、arr.join(',')：数组转字符串
+7、arr.includes(value)：数组存在value则返回true,否则返回false
+
+8、arr.join(',')：数组转字符串
+
+9、arr.push(1, 2, 3)：只会push最后一项
 ```
 
 
 
 - **arr.concat**
 
-首先会创建一个当前数组的副本，然后再把它的参数添加到副本末尾，最后返回一个新数组，不会影响原始数组
+首先会创建一个当前数组的副本，然后再把它的参数添加到副本末尾，最后返回一个新数组，**不会影响原始数组**
 
 ```js
 let colors = ["red", "green", "blue"];
@@ -684,11 +701,22 @@ console.log(colors2); // ["red", "green", "blue", "yellow", "black", "brown"]
 
 - **arr.splice**
 
-arr.splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值） 如：第三项不填则为删除
+arr.splice(下标，个数，替换的值)：数组值替换（可替换、添加、删除值），**该方法会改变原始数组**
 
 ```js
 // 删除下标为index的项
 arr.splice(index, 1)
+```
+
+
+
+- **arr.slice**
+
+从数组中添加、删除项目，然后返回被删除的项目，**该方法会改变原始数组**
+
+```ts
+const newArr = arr.slice(a,b) // 截取a-b区间，改变arr同时返回改变之后的数组（不包含b！！）
+const newArr = arr.slice() // 经典的浅拷贝！！
 ```
 
 
@@ -786,7 +814,7 @@ let newArr = arr.flat(Infinity)
 for...of 遍历一个可迭代对象，如数组、字符串、Map/Set（无object） 。针对一个迭代对象，所以获得 value
 
 ```js
-for (let key of arr) {}
+for (let v of arr) {}
 ```
 
 
@@ -832,62 +860,106 @@ items.sort((a, b) => {
 
 
 
+- **arr.every**
+
+判断数组中是否所有元素都满足条件，所有都满足则返回 true，否则返回 false
+
+```ts
+const isOld = columns?.every((item, index) => {
+  const oldItem = oldPropsColumnsCurrent?.[index]
+  return item.key === oldItem?.key || item?.dataIndex === oldItem?.dataIndex
+})
+```
 
 
-### 2.4 JavaScript 常用函数
 
-- 30 个常用函数
+- **二维数组去重**（数组为number类型）
+
+利用的是对象添加 `key - values` 时的特性，把数组作为对象的 `key` 值，达到去重的目的
+
+```ts
+const TwoDimArrayUnique = (arr) => {
+  const obj = {}
+  arr.forEach(item => obj[item] = item)
+  return Object.values(obj)
+}
+```
+
+
+
+- **Array.form**
+
+将类数组或者 Set 实例转化为数组，https://blog.csdn.net/qq_27674439/article/details/108793223
+
+
+
+## 3.4 JavaScript 常用函数
+
+**30 个常用函数**
 
 https://juejin.cn/post/7145036326373425159
 
 
 
-- JSON.stringify
+**JSON.stringify**
 
 https://juejin.cn/post/7191712569394987065
 
 
 
-
-- Math
+**Math 和 Number 的 API**
 
 ```js
 Math.ceil() // 数字向上取整
 
-Math.round() // 四舍五入
+Math.round() // 整数四舍五入
 
 Math.abs() // 绝对值
 
-Math.floor() // 向下
+Math.floor() // 向下取整
 
-parseInt(a) // 字符串转化为整数（向下取整）
+isNaN(value) // value会先被Number()隐式类型转换，转化后不是一个数字则返回true
 
-isNaN(a * 1) // 判断 a 是不是数字
-
-toFixed：// 保留小数位
+num.toFixed(n) // 保留n位小数，四舍五入
 
 Math.floor(Math.random() * num)：// 返回0到num-1的整数
 ```
 
 
 
-- 字符串
+**`parseInt()` 、 `parseFloat()` 、`Number()` 的区别**
 
-https://vue3js.cn/interview/JavaScript/string_api.html
+前两个是将字符串根据一定的规则转换为整数或者浮点数，后者是将其他类型隐式转换成 Number
+
+https://blog.csdn.net/qq_41131745/article/details/114663291
+
+
+
+**两个浮点数直接相减后不能直接用来判断结果**
 
 ```js
-substr：// 截取字符串
-
-Arr.join() , Str.split() // 数组与字符串互相转化
-
-String.fromCharCode(ASCII码)：// 通过ASCII码返回字符 A从6
-
-charCodeAt(str)：// 返回str的ASCII码
+0.3 - 0.2 !== 0.1 // 会考虑到精度丢失的问题，部分浮点数计算也是如此 
 ```
 
 
 
-- 其他函数
+**字符串**
+
+增删改查基础方法：https://vue3js.cn/interview/JavaScript/string_api.html
+
+`str.split`：https://blog.csdn.net/weixin_52844244/article/details/122836185
+
+`String.fromCharCode(ASCII)`：通过 ASCII 码返回字符（A = 65）
+
+`str.charCodeAt(index)`：返回 `str[index]` 的 ASCII 码
+
+`[...new Set(string)].join('')`：字符串去重
+
+`match、search、replace`：[https://vue3js.cn/interview/JavaScript/string_api.html#三、模板匹配方法](https://vue3js.cn/interview/JavaScript/string_api.html#三、模板匹配方法)
+
+
+
+**其他函数**
 
 ```js
 navigator.clipboard.writeText(123); // 实现用户复制内容为123
@@ -911,7 +983,7 @@ document.onkeydown = function(event){
 
 
 
-- 获取随机值
+**获取随机值**
 
 使用 `Mock.Random`：https://github.com/nuysoft/Mock/wiki/Mock.Random
 
@@ -924,9 +996,7 @@ console.log(Random.date())
 
 
 
-
-
-### 2.5 DOM BOM 使用记录
+## 3.5 DOM BOM 使用记录
 
 DOM 常用操作：https://vue3js.cn/interview/JavaScript/Dom.html
 
@@ -934,7 +1004,7 @@ BOM  常用操作：https://vue3js.cn/interview/JavaScript/BOM.html
 
 
 
-#### 2.5.1 Event 高度宽度属性
+### 3.5.1 Event 对象属性
 
 MouseEvent MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/MouseEvent
 
@@ -946,29 +1016,19 @@ Event MDN：https://developer.mozilla.org/zh-CN/docs/Web/API/Event
 
 - `e.target`：触发绑定事件的对象，可以为本体，也可以为子盒子
 
-
-
 - `e.clientX`：鼠标在**页面上可视区域的位置**，从浏览器可视区域左上角开始，即是以浏览器滑动条此刻的滑动到的位置为参考点，随滑动条移而变化
-
-
 
 - `e.pageX`：鼠标在**页面上的位置**，从页面左上角开始，即是以页面为参考点，不随滑动条移动而变化
 
-
-
 - `e.offsetX`：鼠标在 `e.target` **盒子里的位置**，如果该盒子有边框，则可能出现负值
 
-
-
 - `e.stopPropagation`：阻止事件冒泡
-
-
 
 - `e.preventDefault`：组件事件默认行为
 
 
 
-#### 2.5.2 DOM 高度宽度属性
+### 3.5.2 DOM 高度宽度属性
 
 https://vue3js.cn/interview/JavaScript/visible.html
 
@@ -983,7 +1043,7 @@ https://vue3js.cn/interview/JavaScript/visible.html
 
 
 
-#### 2.5.3 BOM API 使用记录
+### 3.5.3 BOM API 使用记录
 
 - **scrollIntoView**
 
@@ -1002,7 +1062,7 @@ if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest
 
 
 
-#### 2.5.4 事件捕获和事件冒泡
+### 3.5.4 事件捕获和事件冒泡
 
 **事件流：有三个阶段**
 
@@ -1017,10 +1077,12 @@ if (two) two.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest
 **事件模型可以分为三种**
 
 - 原始事件模型：同一个类型的事件只能绑定一次、只支持冒泡，不支持捕获、btn.onclick = fun
-- 标准事件模型：1、使用addEventListener进行监听
+- 标准事件模型：1、使用 addEventListener 进行监听，默认事件冒泡
 - 标准事件模型：2、第三个参数决定该元素的事件在捕获还是冒泡中执行，可绑定多个事件
 - 标准事件模型：3、事件捕获先执行，再目标元素事件，再事件冒泡
 - https://github.com/febobo/web-interview/issues/64
+
+> 原始事件模型、标准事件模型、IE事件模型、Netscape4事件模型
 
 
 
@@ -1032,7 +1094,15 @@ https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener
 
 
 
-Vue 里面的事件监听：
+**DOM 事件类型大全**
+
+https://www.runoob.com/jsref/dom-obj-event.html
+
+> 不支持冒泡：妈（mouseenter）妈( mouseleave )不( blur )放( focus )心你( load、unload、resize )
+
+
+
+**Vue 里面的事件监听**
 
 - 默认为事件冒泡执行：`@click="doThis"`
 - 设置为事件捕获执行：`@click.capture="doThis"`
@@ -1042,9 +1112,152 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 
 
-## 第三章 Windows setting
+### 3.5.5 DOM 操作 API 记录
 
-### 3.1 Typora 配置记录
+**document 对象**
+
+推荐文章：https://juejin.cn/post/7029691847060488228
+
+| 方法                                | 功能                        | 兼容性                       |
+| ----------------------------------- | --------------------------- | ---------------------------- |
+| `document.getElementById()`         | 通过 id 得到**元素**        | IE 6                         |
+| `document.getElementsByTagName()`   | 通过标签名得到**元素数组**  | IE 6                         |
+| `document.getElementsByClassName()` | 通过类名得到**元素数组**    | IE 9                         |
+| `document.querySelector()`          | *通过选择器得到**元素**     | IE 8 部分兼容、IE 9 完全兼容 |
+| `document.querySelectorAll()`       | *通过选择器得到**元素数组** | IE 8 部分兼容、IE 9 完全兼容 |
+
+
+
+
+## 3.6 正则表达式介绍
+
+菜鸟教程：https://www.runoob.com/regexp/regexp-tutorial.html
+
+正则表达式实用大全：https://wangchujiang.com/regexp-example/
+
+
+
+**常见的特殊字符匹配**
+
+```
+\d     匹配一个数字字符。等价于 [0-9]。
+\D     匹配一个非数字字符。等价于 [^0-9]。
+\f     匹配一个换页符。等价于 \x0c 和 \cL。
+\n     匹配一个换行符。等价于 \x0a 和 \cJ。
+\r     匹配一个回车符。等价于 \x0d 和 \cM。
+\s     匹配任何空白字符，包括空格、制表符、换页符等等。等价于 [\f\n\r\t\v]。
+\S     匹配任何非空白字符。等价于 [^ \f\n\r\t\v]。
+\t     匹配一个制表符。等价于 \x09 和 \cI。
+\v     匹配一个垂直制表符。等价于 \x0b 和 \cK。
+\w     匹配字母、数字、下划线。等价于'[A-Za-z0-9_]'。
+\W     匹配非字母、数字、下划线。等价于 '[^A-Za-z0-9_]'。 
+```
+
+
+
+
+
+## 3.7 Global&Window 
+
+**全局对象介绍**
+
+内部对象包括 Array、Boolean、Date、Function、Global、Math、Number、Object、RegExp、String
+
+以及各种错误类对象，包括 Error、EvalError、RangeError、ReferenceError、SyntaxError 和 TypeError
+
+
+
+**Window**
+
+全局定义的变量会封装在 window 对象下
+
+
+
+## 3.8 变量提升和函数提升
+
+var 和 function 定义的变量或函数都会直接到块级作用域的最顶层，其中 function 定义的更高
+
+其次就会是后者的声明覆盖前者：https://www.cnblogs.com/liuhe688/p/5891273.html	
+
+```js
+function hoistFunction() {
+  foo(); // 2
+  var foo = function() {
+    console.log(1);
+  };
+  foo(); // 1
+  function foo() {
+    console.log(2);
+  }
+  foo(); // 1
+}
+```
+
+```js
+// 预编译之后
+function hoistFunction() {
+  var foo;
+  foo = function foo() {
+    console.log(2);
+  }
+  foo(); // 2
+  foo = function() {
+    console.log(1);
+  }
+  foo(); // 1
+	foo(); // 1
+}
+```
+
+
+
+## 3.9 JS 类型与运算符详解
+
+**常用运算符**
+
+推荐文章：https://juejin.cn/post/6993711769281626119
+
+`&& 、|| 、??、?.`：https://www.cnblogs.com/jimyking/p/16225335.html
+
+`&、|、^、~`（位运算，转换为二进制）：https://blog.csdn.net/qq_34205932/article/details/106481876
+
+` obj.child = obj = { num2: 935 }; `：赋值操作先定义变量(从左到右)，再进行赋值（从右到左）
+
+
+
+**鉴定为 false 的变量**
+
+只有 `0，-0，NaN，""，null，undefined` 可以直接作为 false 判断，但是像 `[]、{}`  而是返回 true。最后记住：对象永远等于真！！！
+
+
+
+**隐式类型转换**
+
+在执行 `+、-、==` 运算符时，某些变量会进行隐式类型转换 `Boolean() Number() String()`，转换规则如下
+
+https://vue3js.cn/interview/JavaScript/==%20_===.html
+
+https://vue3js.cn/interview/JavaScript/type_conversion.html
+
+> 一些特殊转换记录：Number([]) = 0, Number(null) = 0, Number(undefined) = NaN
+
+
+
+## 3.10 高阶函数与闭包
+
+
+
+## 3.11 浏览器页面进程
+
+
+
+
+
+
+
+# 第四章 Windows setting
+
+## 4.1 Typora 配置记录
 
 - [x] **图像配置**
 
@@ -1072,10 +1285,10 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
 
 
-### 3.2 VScode 设置
+## 4.2 VScode 设置
 
 
-####  3.1.1 VScode 快捷键
+###  4.2.1 VScode 快捷键
 
 ```
 ctrl + i: 触发建议
@@ -1113,7 +1326,7 @@ ctrl + b: 空了
 
 
 
-#### 3.1.2 VScode 插件介绍
+### 4.2.2 VScode 插件介绍
 
 Pritter - Code formatter - 代码格式化，https://blog.csdn.net/qq_45981075/article/details/114551233
 
@@ -1175,7 +1388,7 @@ Project Manager - 项目管理插件，https://cloud.tencent.com/developer/artic
 
 
 
-#### 3.1.3 VScode 设置记录
+### 4.2.3 VScode 设置记录
 
 - 在 VScode 中关闭对 js、ts 文件校验：搜索 validate 点击 TypeScript
 
@@ -1189,7 +1402,11 @@ Project Manager - 项目管理插件，https://cloud.tencent.com/developer/artic
 
 
 
-#### 3.1.4 VScode 配置代码片段
+- 关闭 VScode ESlint 检查：设置中搜索 `eslint.enable` 
+
+
+
+### 4.2.4 VScode 配置代码片段
 
 - 快捷键：Ctrl + Shift + P 打开搜索，搜索 snippets 选择配置用户代码片段
 
@@ -1213,7 +1430,7 @@ Project Manager - 项目管理插件，https://cloud.tencent.com/developer/artic
 
 
 
-### 3.3 修改浏览器缓存地址
+## 4.3 修改浏览器缓存地址
 
 删除这几个文件夹
 
@@ -1252,7 +1469,7 @@ mklink /d "C:\Users\LENOVO\AppData\Local\Google\Chrome\User Data\Default\Code Ca
 
 
 
-### 3.4 AOC 显示器设置
+## 4.4 AOC 显示器设置
 
 显示器型号：Q24P3C  首先下载 I-menu 软件：https://www.aocmonitor.com.cn/download，在软件里实现 OSD 配置的效果。G-menu 是游戏模式下的配置软件，剩下的两个软件在 I-menu 里面已经整合了
 
