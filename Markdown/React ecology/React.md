@@ -158,6 +158,31 @@ const name = '柴柴'
 
 
 
+**key 关键属性**
+
+1. key 属性是 React 官方规定的关键属性，当传入的 key 值变化时必然会引起组件的重新渲染
+
+2. 并且 React 规定 key 不能作为 props 参数传递
+
+```tsx
+const Test = (props: { key: string }) => {
+  const { key } = props;
+  return <div>{key}</div>;
+};
+
+const App = () => {
+  return (
+    <div className="App">
+      <Test key={"1111"} />
+    </div>
+  );
+};
+```
+
+> Test 组件直接报错，获取不到 key 属性
+
+
+
 **条件渲染**
 
 ```jsx
@@ -1320,7 +1345,6 @@ const click = () => {
 通过拓展运算符实现
 
 ```js
-
 const click = () => {
     setCountArr([...countArr, 4,5,6])
     setUser({ ...user, name: 'cocoon' })
@@ -1556,6 +1580,35 @@ function Test() {
 
 
 
+**异步函数调用**
+
+不允许在 useEffect 中直接定义异步函数，而是将异步函数单独封装成一个函数然后在它里面调用
+
+```ts
+getServerInfo: async () => {
+  set({ serverInfoLoading: true })
+  const catchResData = await catchServer.catchFn({
+    key: DB_CATCH_KEYS.serverInfo,
+    fn: async () => {
+      const res = await fetchServerInfo()
+      if (!res.data) {
+        showFetchErrorMsg(res)
+        set({ serverInfoLoading: false })
+        return null
+      }
+      return res.data
+    }
+  })
+  set({ serverInfo: catchResData, serverInfoLoading: false })
+},
+
+useEffect(() => {
+  getServerInfo()
+}, [getServerInfo])
+```
+
+
+
 
 
 ### 2.1.4 自定义 React Hook
@@ -1604,14 +1657,33 @@ function Test() {
 
 
 
+### 2.1.5 React 中的计算属性
+
+React 官方推荐我们直接在渲染层得到计算属性或者使用 useMemo
+
+```ts
+// 直接通过当前属性得到（每次更新时重新计算）
+const double = count * 2;
+
+// 当依赖更新时计算得到
+const doubleMemo = useMemo(() => {
+  console.log("useMemo");
+  return count * 2;
+}, [count]);
+```
+
+
+
+
+
 ## 2.2 Ref Hooks 介绍
 
 ### 2.2.1 useRef
 
-和前面学的 `createRef` 类似，**返回一个 ref 对象，返回的 ref 对象在组件的整个生命周期保持不变**
+使用 useRef 创建的对象 `const ref = useRef(null)`，可以直接修改它的值 `ref.current = 123`。相对与 useState 不同的是，当修改 ref 对象时 React 不会触发组件更新，**但是会它的值会保持在整个组件的生命周期中**
 
-- 用来获取 DOM 元素, 操作 DOM，获取类组件实例，依然不能获取函数组件的实例
-- 还可以用来保存一个数据，这个对象在整个生命周期中可以保存不变，即组件更新也不会改变
+- 用来获取 DOM 元素, 操作 DOM 对象
+- 还可以用来保存一个数据，这个对象在整个生命周期中可以保存不变，即组件重新渲染也不会改变
 
 ```jsx
 export default function App() {
@@ -1638,6 +1710,52 @@ export default function App() {
 - 由 createRef 创建的 ref 对象，**组件每更新一次，ref 对象就会被重新创建**
 
 参考文档：https://blog.csdn.net/m0_71485750/article/details/126859793
+
+
+
+**实现 DOM 时的 Ref 绑定**
+
+- 直接函数中定义 hook 是不行的
+
+```tsx
+<ul>
+  {items.map((item) => {
+    // 行不通！
+    const ref = useRef(null);
+    return <li ref={ref} />;
+  })}
+</ul>
+```
+
+- 应该利用 **ref 回调**来实现，https://zh-hans.react.dev/reference/react-dom/components/common#ref-callback
+
+```tsx
+const itemsRef = useRef(null);
+function getMap() {
+  if (!itemsRef.current) {
+    // 首次运行时初始化 Map。
+    itemsRef.current = new Map();
+  }
+  return itemsRef.current;
+}
+
+<ul>
+  {catList.map(cat => (
+    <li
+      key={cat.id}
+      ref={(node) => {
+        const map = getMap();
+        if (node) {
+          map.set(cat.id, node);
+        } else {
+          map.delete(cat.id);
+        }
+      }}
+    >
+......
+```
+
+> 这样 itemsRef.current 就存好了 `<li>` 组件的所有 DOM 实例，用一个 map 存储
 
 
 
@@ -1900,7 +2018,6 @@ const App = memo(() => {
 })
 
 export default App
-
 ```
 
 
@@ -2049,7 +2166,32 @@ V6：https://blog.csdn.net/m0_69838795/article/details/129557342
 
 
 
-## 3.3 useEffect 中使用异步
+## 3.3 React 实现组件异步加载
 
-https://blog.csdn.net/p1967914901/article/details/127581065
+参考文档：https://juejin.cn/post/7239244337539219514
 
+```tsx
+import React, { lazy, Suspense } from 'react';
+
+const LazyComponent = lazy(() => import('./LazyComponent'));
+
+function App() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <LazyComponent />
+      </Suspense>
+    </div>
+  );
+}
+
+export default App;
+```
+
+
+
+## 3.4 React 实现组件缓存
+
+使用到一个库：`react-activation`，通常用于当页面组件缓存（状态缓存）
+
+中文文档：https://github.com/CJY0208/react-activation/blob/HEAD/README_CN.md

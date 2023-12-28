@@ -4,6 +4,10 @@
 
 新版 Git 拉取代码时，默认是 crlf，如果每个文件行尾序列都被设置为 crlf，某些项目的 Eslint 会发出 warning，需要每个文件行尾序列都被设置为 lf。修复方式一：修改项目的 eslint 和 prettier 配置，**修复方式二：直接修改一下 Git 的全局配置**
 
+```
+vscode: files.eol:
+```
+
 ```bash
 $ git config --global core.autocrlf false # 取消自动设置行尾序列
 ```
@@ -62,7 +66,7 @@ $ git config --global core.autocrlf false # 取消自动设置行尾序列
 **设置签名**
 
 ```bash
-# 初次配置 git 需要设置签名 随便填写即可
+# 初次配置 git 需要设置签名 随便填写即
 git config --global user.name cocoon
 git config --global user.email 2806525575@qq.com
 ```
@@ -469,7 +473,7 @@ $ git rebase --abort
 $  rm -fr ".git/rebase-merge" # 类似强制退出
 ```
 
-
+退出 rebase 状态：https://www.cnblogs.com/Guang-Jun/p/17166396.html
 
 
 
@@ -714,16 +718,19 @@ $ git push
 
 ### 1.5.1 使用 stash 来暂存文件
 
-会有这么一个场景，现在你正在用你的 feature 分支上开发新功能。这时，生产环境上出现了一个 bug 需要紧急修复，但是你这部分代码还没开发完，不想提交，怎么办？这个时候可以用 `git stash` 命令先把工作区已经修改的文件暂存起来，然后切换到 hotfix 分支上进行 bug 的修复，修复完成后，切换回 feature 分支，从堆栈中恢复刚刚保存的内容。
+会有这么一个场景，现在你正在用你的 feature 分支上开发新功能。这时，生产环境上出现了一个 bug 需要紧急修复，但是你这部分代码还没开发完，不想提交，怎么办？这个时候可以用 `git stash` 命令先把暂存区已经修改的文件缓存起来，然后切换到 hotfix 分支上进行 bug 的修复，修复完成后，切换回 feature 分支，从堆栈中恢复刚刚保存的内容。
 
 
 
-**git  stash**
-
-每次缓存之后，工作区就会变干净。
+1. git stash 帮助我们把暂存区的内容给缓存起来，这样就不需要 commit 来对暂存区清空了
+2. 然后就可以随意切换分支，另外所有分支 `git stash` 的暂存都是共享的
+3. **注意一：最好在 `git stash` 之前 `git add .` 一下，因为有些新增文件并没有被跟踪**
+4. **注意二：在应用 `git stash pop`、`git stash apply ` 之前要确保工作区内容为空**
+5. 在应用暂存之后，如果暂存区的修改有重叠，则需要合并更改
 
 ```bash
 # 把本地工作区的改动暂存起来
+$ git add .
 $ git stash
 
 # 执行存储时，添加备注，方便查找
@@ -867,3 +874,69 @@ $ git push --force-with-lease
 $ git pull --rebase
 $ git push # 解决冲突之后在push
 ```
+
+
+
+## 1.6 Git 打标签与发版
+
+在一个长期大型项目中，可能会有数千个提交版本，我们可能需要对重要的节点性提交打个记号，这时也可以使用 Git 的标签功能。在一些项目相关的书籍中，我们会看到 “执行 xxx 命令签出这个版本以查看对应的代码” ，这也是使用 Git 的标签功能做到的。本节实验将详细讲解此功能的具体操作。
+
+参考文档：https://juejin.cn/post/7101196005843927071
+
+
+
+### 1.6.1 git tag
+
+**创建 tag**
+
+tag 只是基于 commit 的，和分支无关。<commit id> 省略则指向最近一次提交的 commit
+
+```bash
+$ git tag <tagName> <commit id> -a -m 'tag description'
+```
+
+
+
+**删除 tag**
+
+```bash
+$ git tag -d <tagName>
+```
+
+
+
+**远程操作 tag**
+
+注意 tag 的远程提交和代码的远程提交完全独立
+
+```bash
+# 提交一个tag到远程仓库
+$ git push origin <tagName>
+
+# 提价本地的所有tag到远程仓库
+$ git push origin --tags
+
+# 删除远程仓库的某个tag
+$ git push origin :refs/tags/<tagName>
+```
+
+
+
+**签出 tag**
+
+直接基于某个 tag 创建一个分支进行开发
+
+```bash
+$ git checkout -b <branchName> <tagName>
+```
+
+
+
+### 1.6.2 releases
+
+GitHub 的 releases 是 2013 年发布的新功能，旨在协助软件开发者分发新版本给用户，关于这个功能这里仅作简单介绍。
+
+当项目组织宣布发布一个软件产品的版本，发布过程就是一个将软件交付给最终用户的工作流。版本是具有修改日志和二进制文件的一类对象，它们提供了 Git 工作流之外的完整项目历史，它们也可以从存储库的主页上被访问。发布版 release 附带发布说明和下载软件或源代码的链接。按照许多 Git 项目的约定，发布版本与 Git 的标签 tag 绑定。您可以使用现有的标签，或者让 release 在发布时创建标签。这就是上面查看 GitHub 仓库中标签信息时出现的场景。
+
+标签是 Git 中的概念，而 releases 则是 Github、码云等源码托管商所提供的更高层的概念。Git 本身是没有 releases 这个概念，只有 tag。两者之间的关系则是，release 基于 tag，为 tag 添加更丰富的信息，一般是编译好的文件。
+

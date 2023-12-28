@@ -289,7 +289,7 @@ module.exports = {
 var exports = module.exports
 ```
 
-> 这使得 module.exports 完全可以替换成 exports，但是两个不要一起用！
+> 这使得   完全可以替换成 exports，但是两个不要一起用！
 
 
 

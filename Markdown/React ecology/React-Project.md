@@ -9,26 +9,20 @@
 ```js
 const path = require('path')
 const reslove = pathname => path.resolve(__dirname, pathname)
-
 module.exports = {
-    webpack: {
-        alias: {
-            '@': reslove('src'),
-        }
+  webpack: {
+    alias: {
+      '@': reslove('src'),
     },
-
-    devServer: {
-        port: 8000,
-        proxy: {
-            '/api': 'http://localhost:3001',
-        },
-    },    
+  },
+  devServer: {
+    port: 8000,
+    proxy: {
+      '/api': 'http://localhost:3001',
+    },
+  },
 }
 ```
-
-修改完 `craco.config.js` 必须要重启项目！！有点麻烦了
-
-
 
 - Craco 官网：https://github.com/dilanx/craco
 - Webpack 官网：https://www.webpackjs.com/
@@ -37,20 +31,32 @@ module.exports = {
 
 
 
-## 1.1 ESlint 的详细使用方法
+## 1.1 ESlint 的使用方法
 
-ESLint 是一个可配置的 JavaScript 检查器（实际上可以检查 JS、TS、JSX、TSX、VUE 等主流文件格式）。它可以帮助你发现并修复 JavaScript 代码中的问题。问题可以指潜在的运行时漏洞、未使用最佳实践、风格问题等
+**认识 ESLint**
+
+ESLint 是一个可配置的 JavaScript 检查器（实际上可以检查 JS、TS、JSX、TSX、VUE 等主流文件格式）。它可以帮助你发现并修复 JavaScript 代码中的问题。问题可以指潜在的运行时漏洞、未使用最佳实践、风格问题等。
+
+ESLint = 部分格式化检查 + 代码质量检查 
 
 
 
-关于 .eslintrc.js 文件配置的介绍
+**配置 ESLint**
+
+中文官网：https://zh-hans.eslint.org/docs/latest/
+
+规则大全：https://zh-hans.eslint.org/docs/latest/rules/
+
+参考文档：https://blog.csdn.net/brokenkay/article/details/111106266
+
+
+
+**关于 .eslintrc.js 文件配置的介绍**
 
 - extends：一些拓展封装了它自定义的语法规则，通过下载配置即可继承别人写好的配置规则
 - parser：指定一个代码解析器的引擎，让它去检测代码是不是正规合法的，一般情况下使用默认的
 - rules：我们自定义的规则，它的优先级是最高的，需要遵循自定义规则规范
 - env：指定脚本允许运行的环境，通常 node、browser、es6 全都开启
-
-
 
 配置 .eslintignore 忽略特定的文件和目录，其中的每一行都是一个 glob 模式
 
@@ -63,37 +69,17 @@ node_modules
 
 
 
-中文官网：https://zh-hans.eslint.org/docs/latest/
+**配置插件与其他**
 
-规则大全：https://zh-hans.eslint.org/docs/latest/rules/
+1. 配置插件：下载 `ESlint` 插件，实现 vscode 代码检查支持
 
-自定义规则规范：https://zh-hans.eslint.org/docs/latest/use/configure/rules
-
-
-
-安装
-
-```bash
-$ npm i eslint -D
-
-$ npx eslint --init # 根据提出的问题会自动生成 .eslintrc.js
-```
-
-
-
-配置插件：下载 `ESlint` 插件，启用。在 VScode 设置中搜索 `eslint` 可编辑配置（一般不需要编辑）
-
-
-
-添加 `lint` 全局检查命令
+2. 添加 `lint` 全局检查命令
 
 ```json
 "lint": "eslint --ext .js,.ts,.tsx src"
 ```
 
-
-
-实现保存时自动进行 ESlint autofix，进入 .vscode/setting.json 添加
+3. 全局实现保存时自动进行 ESlint autofix
 
 ```json
 "editor.codeActionsOnSave": {
@@ -103,53 +89,52 @@ $ npx eslint --init # 根据提出的问题会自动生成 .eslintrc.js
 
 
 
-下面是我自定义的一些规则仅供参考
+**自定义规则参考**
 
 ```js
+// 0：取消 1：警告 2：报错
 rules: {
-    "indent": ["error", 4], // 缩进
-
-    // "no-unused-vars": [
-    //     "error", { "varsIgnorePattern": "Taro|wx" }
-    // ], // 检查变量是否有被使用
-
-    "no-unused-vars": 0,
-
-    "no-mixed-spaces-and-tabs": ["error", "smart-tabs"], // 禁止空格和tab的混合缩进
-
-    "no-debugger": 2, //禁止有debugger
-
-    "space-infix-ops": 2, // 要求操作符周围有空格
-
-    "space-before-blocks": 2, // 要求语句块之前有空格
-
-    "import/first": 0, // 消除绝对路径必须要在相对路径前引入的问题
-
-    "semi": ["error", "never"], // 不允许加分号
-}
+  indent: ['error', 2], // 缩进
+  semi: ['error', 'never'], // 不允许加分号
+  'no-unused-vars': 0, // 不检查变量是否使用
+  'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'], // 禁止空格和tab的混合缩进
+  'no-debugger': 2, //禁止有debugger
+  'space-infix-ops': 2, // 要求操作符周围有空格
+  'space-before-blocks': 2, // 要求语句块之前有空格
+  'import/first': 0, // 消除绝对路径必须要在相对路径前引入的问题
+},
 ```
 
 
 
-ESLint 全方位解析：https://blog.csdn.net/brokenkay/article/details/111106266
-
-React ESlint 报错处理：https://blog.csdn.net/Yuj_l/article/details/125655060
 
 
+## 1.2 Prettier 的使用方法
 
-## 1.2 Prettier 的使用和抛弃
+**认识 Prettier**
 
-Prettier 提供代码格式化方案，**通过下载依赖和插件，设置 .prettierrc.js 的代码格式**。实现保存时自动进行代码格式化。它可以支持 JS、JSX、TS、Flow、JSON、CSS、LESS 等文多种件格式
+Prettier 提供代码格式化方案，通过下载依赖和插件，设置 .prettierrc.js 的代码格式。实现保存时自动进行代码格式化。它可以支持 JS、JSX、TS、CSS、Less 和 SCSS、HTML、JSON、GraphQL、Markdown 等文多种件格式
 
-- 官方文档：https://www.prettier.cn/
-
-- 基本使用指南：https://blog.csdn.net/weixin_44808483
-
-- 代码格式大全：https://blog.csdn.net/weixin_44808483/article/details/118113753
-- 到这里实现代码格式化已经基本够用，如果还使用了 ESlint 的话，就会造成冲突！
-- 有人 ESlint 就行了，反正我的项目是不会使用 Prettier 的！！！
+Prettier = 前端语言全量格式化工具
 
 
+
+**配置 Prettier**
+
+官方文档：https://www.prettier.cn/
+
+参考文档：https://blog.csdn.net/weixin_44808483/article/details/118113753
+
+安装 Prettier 插件：Prettier - Code formatter，实现 vscode 代码检查支持
+
+全局实现保存时自动格式化：
+
+1. 在文件中点右键选择使用 Prettier 格式化
+2. 全局 setting.json 设置 `"editor.formatOnSave": true`
+
+
+
+**集成 ESLint**
 
 如果要将 Prettier 集成到 ESLint 当中的话，那么需要下载拓展
 
@@ -157,9 +142,7 @@ Prettier 提供代码格式化方案，**通过下载依赖和插件，设置 .p
 $ npm install prettier eslint-config-prettier eslint-plugin-prettier -D
 ```
 
-
-
-添加拓展，这个拓展会把 ESlint 中可能导致冲突的规则关掉，这样两者就能兼容使用了
+在 ESLint 中添加拓展，这个拓展会把 ESlint 中可能导致冲突的规则关掉，这样两者就能兼容使用了
 
 ```js
 "extends": [
@@ -167,8 +150,6 @@ $ npm install prettier eslint-config-prettier eslint-plugin-prettier -D
     "plugin:prettier/recommended"
 ]
 ```
-
-
 
 添加一键格式化命令
 
@@ -178,17 +159,7 @@ $ npm install prettier eslint-config-prettier eslint-plugin-prettier -D
 
 
 
-实现保存时自动进行 Prettier 格式化，进入 .vscode/setting.json 添加
-
-```json
-"editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-}
-```
-
-
-
-下面是自定义的一些代码格式仅供参考
+**参考规则大全** 
 
 ```js
 //此处的规则供参考，其中多半其实都是默认值，可以根据个人习惯改写
@@ -201,9 +172,9 @@ module.exports = {
   quoteProps: 'as-needed', //仅在必需时为对象的key添加引号
   jsxSingleQuote: true, // jsx中使用单引号
   trailingComma: 'all', //多行时尽可能打印尾随逗号
-  bracketSpacing: true, //在对象前后添加空格-eg: { foo: bar }
+  bracketSpacing: true, //在对象前后添加空格: { foo: bar }
   jsxBracketSameLine: true, //多属性html标签的‘>’折行放置
-  arrowParens: 'always', //单参数箭头函数参数周围使用圆括号-eg: (x) => x
+  arrowParens: 'always', //单参数箭头函数参数周围使用圆括号: (x) => x
   requirePragma: false, //无需顶部注释即可格式化
   insertPragma: false, //在已被preitter格式化的文件顶部加上标注
   proseWrap: 'preserve', //不知道怎么翻译
@@ -213,6 +184,8 @@ module.exports = {
   embeddedLanguageFormatting: 'auto', //对引用代码进行格式化
 }
 ```
+
+
 
 
 
@@ -271,6 +244,8 @@ $ npx husky add .husky/pre-commit "npm run lint-staged"
 
 Husky 入门教程：https://blog.csdn.net/HHoao/article/details/127833268
 
+Github：https://github.com/conventional-changelog/commitlint
+
 
 
 commitlint：对 commit 提交格式规范检查的工具，使用方式也在参考文档里面
@@ -282,7 +257,42 @@ commitlint：对 commit 提交格式规范检查的工具，使用方式也在�
 例如：fix(server): send cors headers
 ```
 
-Github：https://github.com/conventional-changelog/commitlint
+commitlint.config.js
+
+```js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [ // type枚举
+        2, 'always',
+        [
+          'build', // 编译相关的修改，例如发布版本、对项目构建或者依赖的改动
+          'feat', // 新功能
+          'fix', // 修补bug
+          'docs', // 文档修改
+          'style', // 代码格式修改, 注意不是 css 修改
+          'refactor', // 重构
+          'perf', // 优化相关，比如提升性能、体验
+          'test', // 测试用例修改
+          'revert', // 代码回滚
+          'ci', // 持续集成修改
+          'config', // 配置修改
+          'chore', // 其他改动
+        ],
+    ],
+    'type-empty': [2, 'never'], // never: type不能为空; always: type必须为空
+    'type-case': [0, 'always', 'lower-case'], // type必须小写，upper-case大写，camel-case小驼峰，kebab-case短横线，pascal-case大驼峰，等等
+    'scope-empty': [0],
+    'scope-case': [0],
+    'subject-empty': [2, 'never'], // subject不能为空
+    'subject-case': [0],
+    'subject-full-stop': [0, 'never', '.'], // subject以.为结束标记
+    'header-max-length': [2, 'always', 72], // header最长72
+    'body-leading-blank': [0], // body换行
+    'footer-leading-blank': [0, always], // footer以空行开头
+  }
+}
+```
 
 
 
@@ -291,6 +301,8 @@ Github：https://github.com/conventional-changelog/commitlint
 ## 1.4 TS 在项目中的适配
 
 这里会介绍一下项目中对于 TS 的一些适配情况。
+
+TS 深度学习文档：https://juejin.cn/post/7096695346239111199
 
 TS 常用工具类型：https://juejin.cn/post/6844903981521567752
 
@@ -540,7 +552,7 @@ declare module "*.scss" {
 }
 ```
 
-- **使用 TS 插件使得 VScode 在我们 style. 的时候出现提示**
+- 使用 TS 插件使得 VScode 在我们 style. 的时候出现提示
 
 ```bash
 $ npm install typescript-plugin-css-modules --save-dev

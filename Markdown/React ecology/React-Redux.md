@@ -1612,7 +1612,9 @@ Reaction 接收第三个参数，它是一个参数对象，有如下可选的�
 
 
 
-# 第五章 认识 zustand
+
+
+# 第五章 认识 Zustand
 
 Zustand（德语）：React 全新轻量级状态管理库
 
@@ -1671,7 +1673,7 @@ const topMenuGroup = useLayoutStore((state) => state.topMenuGroup)
 const [nuts, honey] = useStore((state) => [state.nuts, state.honey], shallow)
 ```
 
-> 注意：如果属性时引用类型，那么要考虑数据不可变原则！！可能无法监听到数据的改变
+> 注意：如果属性是引用类型，那么要考虑数据不可变原则！！可能无法监听到数据的改变
 
 
 
@@ -1752,3 +1754,10 @@ https://docs.pmnd.rs/zustand/recipes/recipes#using-zustand-without-react
 map 和 set 的使用方式
 
 https://docs.pmnd.rs/zustand/guides/maps-and-sets-usage
+
+
+
+开启持久化存储
+
+https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md
+
