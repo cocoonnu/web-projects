@@ -47,7 +47,7 @@ ESLint = 部分格式化检查 + 代码质量检查
 
 规则大全：https://zh-hans.eslint.org/docs/latest/rules/
 
-参考文档：https://blog.csdn.net/brokenkay/article/details/111106266
+直接执行命令即可：`npm init @eslint/config`
 
 
 
